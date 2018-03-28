@@ -16,7 +16,7 @@ In the above case, the image features are merely the last layer of an Inception-
 
 ## Deep Predictive Coding model
 
-For details refer to [Lotter, 2016](#lotter), Section 2.
+For details refer to [Lotter, 2016](#lotter), Section 2. A reference implementation is provided [here](https://github.com/coxlab/prednet).
 
 ![prednet](./images/prednet.png)
 
