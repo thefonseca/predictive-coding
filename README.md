@@ -14,13 +14,23 @@ Given this successful application on videos, we hypothesise that **representatio
 
 In the above case, the image features are merely the last layer of an Inception-v4 convolutional network pre-trained on an object classification task. We believe that PredNets could perform better in this task because they are specifically designed to handle temporal data and, most importantly, they can be trained in an unsupervised way on cheaply available unlabeled video datasets.
 
+## Deep Predictive Coding model
+
+For details refer to [Lotter, 2016](#lotter), Section 2.
+
+![prednet](./images/prednet.png)
+
+![prednet](./images/prednet-equations.png)
+
+![prednet](./images/prednet-algorithm.png)
+
 ## References
 
 ##### Friston
 Friston, K., & Kiebel, S. (2009). Predictive coding under the free-energy principle. Philosophical Transactions of the Royal Society B: Biological Sciences, 364(1521), 1211-1221.
 
 ##### Lotter
-Lotter, W., Kreiman, G., & Cox, D. (2016). Deep predictive coding networks for video prediction and unsupervised learning. arXiv preprint arXiv:1605.08104.
+Lotter, W., Kreiman, G., & Cox, D. (2016). [Deep predictive coding networks for video prediction and unsupervised learning](https://arxiv.org/abs/1605.08104). arXiv preprint arXiv:1605.08104.
 
 ##### Frermann
 Frermann, L., Cohen, S. B., & Lapata, M. (2017). Whodunnit? Crime Drama as a Case for Natural Language Understanding. arXiv preprint arXiv:1710.11601.
