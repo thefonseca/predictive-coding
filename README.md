@@ -33,19 +33,19 @@ For details refer to [Lotter, 2016](#lotter), Section 2. A reference implementat
 ## References
 
 ##### Friston
-Friston, K., & Kiebel, S. (2009). Predictive coding under the free-energy principle. Philosophical Transactions of the Royal Society B: Biological Sciences, 364(1521), 1211-1221.
+Friston, K., & Kiebel, S. (2009). [Predictive coding under the free-energy principle](http://rstb.royalsocietypublishing.org/content/364/1521/1211). Philosophical Transactions of the Royal Society B: Biological Sciences, 364(1521), 1211-1221.
 
 ##### Lotter
 Lotter, W., Kreiman, G., & Cox, D. (2016). [Deep predictive coding networks for video prediction and unsupervised learning](https://arxiv.org/abs/1605.08104). arXiv preprint arXiv:1605.08104.
 
 ##### Frermann
-Frermann, L., Cohen, S. B., & Lapata, M. (2017). Whodunnit? Crime Drama as a Case for Natural Language Understanding. arXiv preprint arXiv:1710.11601.
+Frermann, L., Cohen, S. B., & Lapata, M. (2017). [Whodunnit? Crime Drama as a Case for Natural Language Understanding](https://arxiv.org/abs/1710.11601). arXiv preprint arXiv:1710.11601.
 
 ##### Hermann
-Hermann, K. M., Hill, F., Green, S., Wang, F., Faulkner, R., Soyer, H., ... & Wainwright, M. (2017). Grounded language learning in a simulated 3D world. arXiv preprint arXiv:1706.06551.
+Hermann, K. M., Hill, F., Green, S., Wang, F., Faulkner, R., Soyer, H., ... & Wainwright, M. (2017). [Grounded language learning in a simulated 3D world](https://arxiv.org/abs/1706.06551). arXiv preprint arXiv:1706.06551.
 
 ##### Monfort
-Monfort, M., Zhou, B., Bargal, S. A., Andonian, A., Yan, T., Ramakrishnan, K., ... & Oliva, A. (2018). Moments in Time Dataset: one million videos for event understanding. arXiv preprint arXiv:1801.03150.
+Monfort, M., Zhou, B., Bargal, S. A., Andonian, A., Yan, T., Ramakrishnan, K., ... & Oliva, A. (2018). [Moments in Time Dataset: one million videos for event understanding](https://arxiv.org/abs/1801.03150). arXiv preprint arXiv:1801.03150.
 
 ##### Aytar
-Aytar, Y., Vondrick, C., & Torralba, A. (2017). See, hear, and read: Deep aligned representations. arXiv preprint arXiv:1706.00932.
+Aytar, Y., Vondrick, C., & Torralba, A. (2017). [See, hear, and read: Deep aligned representations](https://arxiv.org/abs/1706.00932). arXiv preprint arXiv:1706.00932.
