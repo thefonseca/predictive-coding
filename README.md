@@ -24,6 +24,12 @@ For details refer to [Lotter, 2016](#lotter), Section 2. A reference implementat
 
 ![prednet](./images/prednet-algorithm.png)
 
+
+## Related questions worth exploring
+* Could we add an attentional mechanism on top of PredNet?
+* How do PredNets behave when presented to [adversarial examples](https://blog.openai.com/adversarial-example-research/)?
+* Are PredNets prone to [optical illusions](http://www.michaelbach.de/ot/)?
+
 ## References
 
 ##### Friston
