@@ -14,10 +14,10 @@ def extract_frames(source_dir, dest_dir, splits, video_pattern='{}/**/*.mp4'):
 
         current_folder = None
         
-        videos = glob.glob(video_pattern.format(split))[:3]
+        videos = glob.glob(video_pattern.format(split))
         
         if len(videos) == 0:
-            videos = glob.glob(video_pattern2.format(split))[:3]
+            videos = glob.glob(video_pattern2.format(split))
 
         for video in tqdm(videos, desc='Processing {} set'.format(split)):
 
