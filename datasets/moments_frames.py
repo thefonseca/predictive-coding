@@ -41,7 +41,7 @@ def extract_frames(source_dir, dest_dir, splits, video_pattern='{}/**/*.mp4'):
 
             frame_path = os.path.join(frame_folder, frame_pattern)
             #print('Extracting {} frames to {} ...'.format(video, frame_path))
-            os.system('ffmpeg -i "{}" "{}"'.format(video, frame_path))
+            os.system('ffmpeg -hide_banner -loglevel panic -i "{}" "{}"'.format(video, frame_path))
         
 
 if __name__ == '__main__':
