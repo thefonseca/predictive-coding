@@ -8,7 +8,7 @@ FLAGS = None
 def extract_frames(source_dir, dest_dir, splits, video_pattern='{}/**/*.mp4'):
     
     video_pattern = os.path.join(source_dir, video_pattern)
-    video_pattern2 = os.path.join(source_dir, video_pattern.replace('/**', ''))
+    video_pattern2 = video_pattern.replace('/**', '')
     
     for split in splits:
 
