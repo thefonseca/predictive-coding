@@ -1,7 +1,6 @@
 import os
 import glob
 from tqdm import tqdm
-import numpy as np
 import pickle as pkl
 import argparse
 
@@ -12,10 +11,6 @@ def generate_frame_list(source_dir, splits):
     image_pattern2 = os.path.join(source_dir, '{}/*.jpg')
 
     for split in splits:
-
-        #data_file = 'X_{}.pkl'.format(split)
-        #if os.path.exists(data_file):
-        #    continue
 
         source_list = []
         print('Searching for image files in "{}/{}/<category>" (this may take a while)...'.format(source_dir, 
