@@ -69,12 +69,12 @@ for X, y in tqdm(test_generator):
     print(X.shape)
     pred = test_model.predict(X, batch_size)
     
-    mse_model += np.sum((X[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
-    mse_prev += np.sum((X[:, :-1] - X[:, 1:]) ** 2)
+    mse_model += np.mean((X[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
+    mse_prev += np.mean((X[:, :-1] - X[:, 1:]) ** 2)
     
     if n % in_memory_ratio == 0:
-        X_test.append(X)
-        X_hat.append(pred)
+        X_test.extend(X)
+        X_hat.extend(pred)
         
     n += 1
     
@@ -83,8 +83,8 @@ for X, y in tqdm(test_generator):
         
 X_test = np.array(X_test)
 X_hat = np.array(X_hat)
-X_test = np.reshape(X_test, (-1,) + X_test.shape[2:])
-X_hat = np.reshape(X_hat, (-1,) + X_hat.shape[2:])
+#X_test = np.reshape(X_test, (-1,) + X_test.shape[2:])
+#X_hat = np.reshape(X_hat, (-1,) + X_hat.shape[2:])
 
 if data_format == 'channels_first':
     X_test = np.transpose(X_test, (0, 1, 3, 4, 2))
@@ -95,9 +95,9 @@ print(X_test.shape)
 # Compare MSE of PredNet predictions vs. using last frame.  Write results to prediction_scores.txt
 #mse_model = np.mean( (X_test[:, 1:] - X_hat[:, 1:])**2 )  # look at all timesteps except the first
 #mse_prev = np.mean( (X_test[:, :-1] - X_test[:, 1:])**2 )
-mse_model /= (n * batch_size * nt)
-mse_prev /= (n * batch_size * nt)
-if not os.path.exists(RESULTS_SAVE_DIR): os.mkdir(RESULTS_SAVE_DIR)
+mse_model /= (n * batch_size)
+mse_prev /= (n * batch_size)
+if not os.path.exists(RESULTS_SAVE_DIR): os.makedirs(RESULTS_SAVE_DIR)
 f = open(RESULTS_SAVE_DIR + 'prediction_scores.txt', 'w')
 f.write("Model MSE: %f\n" % mse_model)
 f.write("Previous Frame MSE: %f" % mse_prev)

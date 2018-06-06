@@ -3,3 +3,5 @@
 **/.ipynb_checkpoints*
 **/*.zip
 datasets/*_data*
+models/*_data*
+models/results/*

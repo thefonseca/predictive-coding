@@ -18,7 +18,7 @@ from keras.layers import Input, Dense, Flatten
 from prednet import PredNet
 from kitti_data import SequenceGenerator
 from kitti_settings import *
-#from tqdm import tqdm
+from tqdm import tqdm
 
 n_plot = 40
 batch_size = 10
@@ -49,27 +49,44 @@ test_model = Model(inputs=inputs, outputs=predictions)
 
 test_generator = SequenceGenerator(test_file, test_sources, nt, sequence_start_mode='unique', data_format=data_format)
 X_test = test_generator.create_all()
-print(X_test.shape)
-X_hat = test_model.predict(X_test, batch_size, verbose=1)
+#X_hat = test_model.predict(X_test, batch_size, verbose=1)
 
-'''
 # Alternative implementation to check the time spent for each batch
+n = 0
 X_hat = []
+mse_model = 0
+mse_prev = 0
+
 for idx in tqdm(range(0, X_test.shape[0], batch_size)):
-    pred = test_model.predict(X_test[idx:idx+batch_size], batch_size)
-    X_hat.append(pred)
+    idx_end = idx + batch_size
+    if idx_end > X_test.shape[0]:
+        idx_end = X_test.shape[0]
+        
+    X = X_test[idx:idx_end]
+    pred = test_model.predict(X, batch_size)
+    X_hat.extend(pred)
+    
+    mse_model += np.mean((X[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
+    mse_prev += np.mean((X[:, :-1] - X[:, 1:]) ** 2)
+    
+    n += 1
+    
 X_hat = np.array(X_hat)
-X_hat = np.reshape(X_hat, (-1,) + X_hat.shape[2:])
-'''
+print(X_hat.shape)
+#X_hat = np.reshape(X_hat, (-1,) + X_hat.shape[2:])
+#print(X_hat.shape)
+
+mse_model /= (n * batch_size)
+mse_prev /= (n * batch_size)
     
 if data_format == 'channels_first':
     X_test = np.transpose(X_test, (0, 1, 3, 4, 2))
     X_hat = np.transpose(X_hat, (0, 1, 3, 4, 2))
 
 # Compare MSE of PredNet predictions vs. using last frame.  Write results to prediction_scores.txt
-mse_model = np.mean( (X_test[:, 1:] - X_hat[:, 1:])**2 )  # look at all timesteps except the first
-mse_prev = np.mean( (X_test[:, :-1] - X_test[:, 1:])**2 )
-if not os.path.exists(RESULTS_SAVE_DIR): os.mkdir(RESULTS_SAVE_DIR)
+#mse_model = np.mean( (X_test[:, 1:] - X_hat[:, 1:])**2 )  # look at all timesteps except the first
+#mse_prev = np.mean( (X_test[:, :-1] - X_test[:, 1:])**2 )
+if not os.path.exists(RESULTS_SAVE_DIR): os.makedirs(RESULTS_SAVE_DIR)
 f = open(RESULTS_SAVE_DIR + 'prediction_scores.txt', 'w')
 f.write("Model MSE: %f\n" % mse_model)
 f.write("Previous Frame MSE: %f" % mse_prev)
