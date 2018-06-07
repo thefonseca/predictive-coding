@@ -1,4 +1,4 @@
-import hickle as hkl
+import pickle as pkl
 import numpy as np
 from keras import backend as K
 from keras.preprocessing.image import Iterator
@@ -16,7 +16,7 @@ class SequenceGenerator(Iterator):
         #self.X = hkl.load(data_file)  # X will be like (n_images, nb_cols, nb_rows, nb_channels)
         # source for each image so when creating sequences 
         # can assure that consecutive frames are from same video
-        self.sources = hkl.load(source_file) 
+        self.sources = pkl.load(source_file) 
         
         self.nt = nt
         self.frame_step = frame_step
