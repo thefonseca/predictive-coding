@@ -14,6 +14,7 @@ import matplotlib.gridspec as gridspec
 from keras import backend as K
 from keras.models import Model, model_from_json
 from keras.layers import Input, Dense, Flatten
+from keras.utils import multi_gpu_model
 
 from prednet import PredNet
 from kitti_data import SequenceGenerator
@@ -46,6 +47,7 @@ input_shape[0] = nt
 inputs = Input(shape=tuple(input_shape))
 predictions = test_prednet(inputs)
 test_model = Model(inputs=inputs, outputs=predictions)
+#test_model = multi_gpu_model(test_model, gpus=4)
 
 test_generator = SequenceGenerator(test_file, test_sources, nt, sequence_start_mode='unique', data_format=data_format)
 X_test = test_generator.create_all()
