@@ -1,5 +1,5 @@
 '''
-Evaluate trained PredNet on KITTI sequences.
+Evaluate trained PredNet on Moments in Time sequences.
 Calculates mean-squared error and plots predictions.
 '''
 
@@ -67,7 +67,6 @@ mse_model = 0
 mse_prev = 0
 
 for X, y in tqdm(test_generator):
-    print(X.shape)
     pred = test_model.predict(X, batch_size)
     
     mse_model += np.mean((X[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
@@ -79,8 +78,8 @@ for X, y in tqdm(test_generator):
         
     n += 1
     
-    if n > 3:
-        break
+    #if n > 3:
+    #    break
         
 X_test = np.array(X_test)
 X_hat = np.array(X_hat)
