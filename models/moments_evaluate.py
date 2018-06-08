@@ -22,14 +22,13 @@ from tqdm import tqdm
 
 
 n_plot = 40
-batch_size = 9
+batch_size = 5
 nt = 10
 
 weights_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_weights.hdf5')
 json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
-#test_file = os.path.join(DATA_DIR, 'X_test.hkl')
 img_dir = os.path.join(DATA_DIR, 'test')
-test_sources = os.path.join(DATA_DIR, 'sources_test.hkl')
+test_sources = os.path.join(DATA_DIR, 'sources_test.pkl')
 
 print('Loading pre-trained model...')
 # Load trained model
@@ -52,8 +51,10 @@ predictions = test_prednet(inputs)
 test_model = Model(inputs=inputs, outputs=predictions)
 
 print('Creating generator...')
-test_generator = SequenceGenerator(img_dir, test_sources, nt, 
-                                   sequence_start_mode='unique', 
+test_generator = SequenceGenerator(img_dir, test_sources, nt,
+                                   frame_step=3, seq_overlap=5, max_seq=5,
+                                   shuffle=False, batch_size=batch_size,
+                                   max_frame_padding=15, seed=17,
                                    data_format=data_format)
 #X_test = test_generator.create_all(normalize=False)
 #X_hat = test_model.predict(X_test, batch_size)
