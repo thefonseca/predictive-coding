@@ -9,11 +9,10 @@ import os
 # Data generator that creates sequences for input into PredNet.
 class SequenceGenerator(Iterator):
     def __init__(self, img_dir, source_file, nt, frame_step=1, seq_overlap=0,
-                 batch_size=9, shuffle=False, seed=None, max_seq=None,
-                 output_mode='error', N_seq=None, max_frame_padding = 10,
+                 batch_size=9, shuffle=False, seed=None, max_seq_per_video=None,
+                 output_mode='error', N_seq=None, max_missing_frames = 10,
                  data_format=K.image_data_format(), img_size=(128, 160)):
         
-        #self.X = hkl.load(data_file)  # X will be like (n_images, nb_cols, nb_rows, nb_channels)
         # source for each image so when creating sequences 
         # can assure that consecutive frames are from same video
         self.sources = pkl.load(open(source_file, "rb")) 
@@ -26,11 +25,11 @@ class SequenceGenerator(Iterator):
         self.output_mode = output_mode
         assert (seq_overlap >= 0 and seq_overlap < self.nt), 'sequence overlap must be between >= 0 and < nt'
         self.seq_overlap = seq_overlap
-        self.max_seq = max_seq
+        self.max_seq_per_video = max_seq_per_video
         
         self.img_dir = img_dir
         self.img_size = img_size
-        self.max_frame_padding = max_frame_padding
+        self.max_missing_frames = max_missing_frames
 
         curr_location = 0
         missing_final_frame = 0
@@ -41,7 +40,7 @@ class SequenceGenerator(Iterator):
             
             count = self.seq_counts.get(self.sources[curr_location], 0)
             
-            if self.max_seq is not None and count >= max_seq:
+            if self.max_seq_per_video is not None and count >= self.max_seq_per_video:
                 curr_location += self.frame_step
             
             elif self.sources[curr_location] == self.sources[curr_location + self.nt * self.frame_step - 1]:
@@ -59,15 +58,15 @@ class SequenceGenerator(Iterator):
                 curr_location += self.nt * self.frame_step
                 curr_location -= self.seq_overlap * self.frame_step
                 
-            elif (curr_location + self.nt * self.frame_step - max_frame_padding - 1 > curr_location) and \
-                 (self.sources[curr_location] == self.sources[curr_location + self.nt * self.frame_step - max_frame_padding - 1]):
+            elif (curr_location + self.nt * self.frame_step - max_missing_frames - 1 > curr_location) and \
+                 (self.sources[curr_location] == self.sources[curr_location + self.nt * self.frame_step - max_missing_frames - 1]):
                 ''' If videos have varying number of frames, the last sequence may be incomplete.
                     In this case, we adjust the sequence start to guarantee the desired number of frames.
                     Depending on the task, it may be important to assure that all videos have the same 
                     number of sequences! '''
                 
                 last_frame_offset = None
-                for i in range(1, max_frame_padding):
+                for i in range(1, max_missing_frames):
                     # look for last frame of current source video
                     
                     if self.sources[curr_location] == self.sources[curr_location + self.nt * self.frame_step - i - 1]:
@@ -90,7 +89,7 @@ class SequenceGenerator(Iterator):
                 curr_location += self.frame_step
                 
         self.possible_starts = possible_starts
-        print('videos with less frames:', missing_final_frame)
+        print('Videos with missing frames: {}'.format(missing_final_frame))
 
         if shuffle:
             self.possible_starts = np.random.permutation(self.possible_starts)
@@ -182,7 +181,8 @@ class SequenceGenerator(Iterator):
         target_ds = float(self.img_size[larger_dim])/im.shape[larger_dim]
 
         im = resize(im, (int(np.round(target_ds * im.shape[0])), 
-                         int(np.round(target_ds * im.shape[1]))))
+                         int(np.round(target_ds * im.shape[1]))),
+                    mode='reflect')
 
         # crop
         im = self.crop_center(im, self.img_size[0], self.img_size[1])

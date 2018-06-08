@@ -7,4 +7,4 @@ DATA_DIR = '../datasets/moments_data_frames/'
 WEIGHTS_DIR = './model_data/kitti_keras/'
 
 # Where results (prediction plots and evaluation file) will be saved.
-RESULTS_SAVE_DIR = './results/moments/'
+RESULTS_SAVE_DIR = './results/'
