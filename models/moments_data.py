@@ -16,7 +16,7 @@ class SequenceGenerator(Iterator):
         #self.X = hkl.load(data_file)  # X will be like (n_images, nb_cols, nb_rows, nb_channels)
         # source for each image so when creating sequences 
         # can assure that consecutive frames are from same video
-        self.sources = pkl.load(source_file) 
+        self.sources = pkl.load(open(source_file, "rb")) 
         
         self.nt = nt
         self.frame_step = frame_step
