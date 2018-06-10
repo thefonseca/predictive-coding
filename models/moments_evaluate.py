@@ -108,8 +108,11 @@ def evaluate(img_dir, img_sources, output_mode, n_timesteps=10,
     X_hat = []
     #mse_model = 0
     #mse_prev = 0
+    
+    n_batches = len(test_generator.possible_starts) / batch_size
 
-    for X_, y in tqdm(test_generator):
+    for i in tqdm(range(n_batches)):
+        X_, y = next(test_generator)
         pred = test_model.predict(X_, batch_size)
 
         #mse_model += np.mean((X[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
