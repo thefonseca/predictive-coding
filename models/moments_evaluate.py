@@ -121,8 +121,8 @@ def evaluate(img_dir, img_sources, output_mode, n_timesteps=10,
 
         n += 1
 
-        if n > 2:
-            break
+        #if n > 2:
+        #    break
 
     X = np.array(X)
     X_hat = np.array(X_hat)

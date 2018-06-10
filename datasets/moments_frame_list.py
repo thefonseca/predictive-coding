@@ -15,12 +15,12 @@ def generate_frame_list(source_dir, splits):
         source_list = []
         print('Searching for image files in "{}/{}/<category>" (this may take a while)...'.format(source_dir, 
                                                                                                   split))
-        frames = glob.glob(image_pattern.format(split))
+        frames = sorted(glob.glob(image_pattern.format(split)))
 
         if len(frames) == 0:
             print('Searching for image files in "{}/{}" (this may take a while)...'.format(source_dir, 
                                                                                            split))
-            frames = glob.glob(image_pattern2.format(split))
+            frames = sorted(glob.glob(image_pattern2.format(split)))
 
         if len(frames) == 0:
             continue
