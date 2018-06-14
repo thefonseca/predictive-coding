@@ -83,8 +83,7 @@ class PredNet(Recurrent):
         self.LSTM_activation = activations.get(LSTM_activation)
         self.LSTM_inner_activation = activations.get(LSTM_inner_activation)
 
-        #default_output_modes = ['prediction', 'error', 'all']
-        default_output_modes = ['prediction', 'error', 'all', 'features']
+        default_output_modes = ['prediction', 'error', 'all']
         layer_output_modes = [layer + str(n) for n in range(self.nb_layers) for layer in ['R', 'E', 'A', 'Ahat']]
         assert output_mode in default_output_modes + layer_output_modes, 'Invalid output_mode: ' + str(output_mode)
         self.output_mode = output_mode
@@ -103,35 +102,6 @@ class PredNet(Recurrent):
         self.column_axis = -1 if data_format == 'channels_first' else -2
         super(PredNet, self).__init__(**kwargs)
         self.input_spec = [InputSpec(ndim=5)]
-        
-    def __compute_layer_shape(self, input_shape, layer_type=None, layer_num=None):
-        
-        if layer_type is None: layer_type = self.output_layer_type
-        if layer_num is None: layer_num = self.output_layer_num
-            
-        stack_str = 'R_stack_sizes' if layer_type == 'R' else 'stack_sizes'
-        stack_mult = 2 if layer_type == 'E' else 1
-        
-        out_stack_size = stack_mult * getattr(self, stack_str)[layer_num]
-        out_nb_row = input_shape[self.row_axis] / 2**layer_num
-        out_nb_col = input_shape[self.column_axis] / 2**layer_num
-        if self.data_format == 'channels_first':
-            out_shape = (out_stack_size, out_nb_row, out_nb_col)
-        else:
-            out_shape = (out_nb_row, out_nb_col, out_stack_size)
-        return out_shape
-    
-    def unflatten_features(self, input_shape, feature_batch):
-        r = []
-        r_index = 0
-        for l in range(self.nb_layers):
-            layer_shape = self.__compute_layer_shape(input_shape, 'R', l)
-            flat_shape = np.prod(layer_shape)
-            layer_r = feature_batch[:,:, r_index:r_index+flat_shape]
-            layer_r = layer_r.reshape(feature_batch.shape[:2] + layer_shape)
-            r.append(layer_r)
-            r_index += flat_shape
-        return r
 
     def compute_output_shape(self, input_shape):
         if self.output_mode == 'prediction':
@@ -140,16 +110,16 @@ class PredNet(Recurrent):
             out_shape = (self.nb_layers,)
         elif self.output_mode == 'all':
             out_shape = (np.prod(input_shape[2:]) + self.nb_layers,)
-        elif self.output_mode == 'features':
-            out_shape = 0
-            for l in range(self.nb_layers):
-                layer_shape = self.__compute_layer_shape(input_shape, 'R', l)
-                print('Layer {} shape: {}'.format(l, layer_shape))
-                flat_shape = np.prod(layer_shape)
-                out_shape += flat_shape
-            out_shape = (out_shape,)
         else:
-            out_shape = compute_layer_shape(input_shape)
+            stack_str = 'R_stack_sizes' if self.output_layer_type == 'R' else 'stack_sizes'
+            stack_mult = 2 if self.output_layer_type == 'E' else 1
+            out_stack_size = stack_mult * getattr(self, stack_str)[self.output_layer_num]
+            out_nb_row = input_shape[self.row_axis] / 2**self.output_layer_num
+            out_nb_col = input_shape[self.column_axis] / 2**self.output_layer_num
+            if self.data_format == 'channels_first':
+                out_shape = (out_stack_size, out_nb_row, out_nb_col)
+            else:
+                out_shape = (out_nb_row, out_nb_col, out_stack_size)
 
         if self.return_sequences:
             return (input_shape[0], input_shape[1]) + out_shape
@@ -212,19 +182,13 @@ class PredNet(Recurrent):
         for l in range(self.nb_layers):
             for c in ['i', 'f', 'c', 'o']:
                 act = self.LSTM_activation if c == 'c' else self.LSTM_inner_activation
-                self.conv_layers[c].append(Conv2D(self.R_stack_sizes[l], self.R_filt_sizes[l], 
-                                                  padding='same', activation=act, 
-                                                  data_format=self.data_format))
+                self.conv_layers[c].append(Conv2D(self.R_stack_sizes[l], self.R_filt_sizes[l], padding='same', activation=act, data_format=self.data_format))
 
             act = 'relu' if l == 0 else self.A_activation
-            self.conv_layers['ahat'].append(Conv2D(self.stack_sizes[l], self.Ahat_filt_sizes[l], 
-                                                   padding='same', activation=act, 
-                                                   data_format=self.data_format))
+            self.conv_layers['ahat'].append(Conv2D(self.stack_sizes[l], self.Ahat_filt_sizes[l], padding='same', activation=act, data_format=self.data_format))
 
             if l < self.nb_layers - 1:
-                self.conv_layers['a'].append(Conv2D(self.stack_sizes[l+1], self.A_filt_sizes[l], 
-                                                    padding='same', activation=self.A_activation, 
-                                                    data_format=self.data_format))
+                self.conv_layers['a'].append(Conv2D(self.stack_sizes[l+1], self.A_filt_sizes[l], padding='same', activation=self.A_activation, data_format=self.data_format))
 
         self.upsample = UpSampling2D(data_format=self.data_format)
         self.pool = MaxPooling2D(data_format=self.data_format)
@@ -315,15 +279,13 @@ class PredNet(Recurrent):
         if self.output_layer_type is None:
             if self.output_mode == 'prediction':
                 output = frame_prediction
-            elif self.output_mode == 'features':
-                output = K.concatenate([K.batch_flatten(r[l]) for l in range(self.nb_layers)], axis=-1)
             else:
                 for l in range(self.nb_layers):
                     layer_error = K.mean(K.batch_flatten(e[l]), axis=-1, keepdims=True)
                     all_error = layer_error if l == 0 else K.concatenate((all_error, layer_error), axis=-1)
                 if self.output_mode == 'error':
                     output = all_error
-                else: # output_mode == 'all'
+                else:
                     output = K.concatenate((K.batch_flatten(frame_prediction), all_error), axis=-1)
 
         states = r + c + e

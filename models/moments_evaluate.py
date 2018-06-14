@@ -99,14 +99,14 @@ def save_predictions(X, X_hat, experiment_name, results_dir, output_mode,
         plt.savefig(plot_save_dir +  'plot_' + str(i) + '.png')
         plt.clf()
 
-def evaluate(img_dir, img_sources, output_mode, n_timesteps=10, 
+def evaluate(model, img_dir, img_sources, output_mode, n_timesteps=10, 
              frame_step=3, seq_overlap=5, max_seq_per_video=5, 
              shuffle=False, batch_size=5, max_missing_frames=15, 
              N_seq=None, seed=17, data_format=K.image_data_format(), 
              **extras):
     
     print('Creating generator...')
-    test_generator = SequenceGenerator(img_dir, img_sources, n_timesteps,
+    data_generator = SequenceGenerator(img_dir, img_sources, n_timesteps,
                                        frame_step=frame_step, seq_overlap=5, 
                                        max_seq_per_video=max_seq_per_video, 
                                        N_seq=N_seq, shuffle=shuffle, 
@@ -117,38 +117,49 @@ def evaluate(img_dir, img_sources, output_mode, n_timesteps=10,
     n = 0
     in_memory_ratio = 20
     X = []
-    X_hat = []
+    preds = []
     #mse_model = 0
     #mse_prev = 0
     
-    n_batches = ((len(test_generator.possible_starts) - 1) // batch_size) + 1 # ceil
-    print('Number of sequences: {}'.format(len(test_generator.possible_starts)))
+    n_batches = ((len(data_generator.possible_starts) - 1) // batch_size) + 1 # ceil
+    print('Number of sequences: {}'.format(len(data_generator.possible_starts)))
     print('Number of batches: {}'.format(n_batches))
 
     for i in tqdm(range(n_batches)):
-        X_, y = next(test_generator)
-        pred = test_model.predict(X_, batch_size)
+        X_, y = next(data_generator)
+        pred = model.predict(X_, batch_size)
 
         #mse_model += np.mean((X[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
         #mse_prev += np.mean((X[:, :-1] - X[:, 1:]) ** 2)
 
         if n % in_memory_ratio == 0:
             X.extend(X_)
-            X_hat.extend(pred)
+            preds.extend(pred)
 
         n += 1
 
     X = np.array(X)
-    X_hat = np.array(X_hat)
-
-    if data_format == 'channels_first':
-        X = np.transpose(X, (0, 1, 3, 4, 2))
-        X_hat = np.transpose(X_hat, (0, 1, 3, 4, 2))
+    preds = np.array(preds)
 
     #mse_model /= (n * batch_size)
     #mse_prev /= (n * batch_size)
     
-    return X, X_hat
+    if output_mode == 'features':
+        preds = model.get_layer('prednet_1').unflatten_features(X.shape, preds)
+        
+        if data_format == 'channels_first':
+            for f in preds: 
+                f = np.transpose(f, (0, 1, 3, 4, 2))
+                #print(f.shape)
+                
+    elif output_mode == 'prediction':    
+        if data_format == 'channels_first':
+            preds = np.transpose(preds, (0, 1, 3, 4, 2))
+            
+    if data_format == 'channels_first':
+        X = np.transpose(X, (0, 1, 3, 4, 2))
+    
+    return X, preds
     
     
 if __name__ == '__main__':
@@ -165,9 +176,10 @@ if __name__ == '__main__':
     data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     
     print('Creating testing model...')
-    test_model = create_test_model(pretrained_model, **experiment)
+    model = create_test_model(pretrained_model, **experiment)
+    model.summary()
     
-    X, X_hat = evaluate(data_format=data_format, **experiment)
+    X, preds = evaluate(model, data_format=data_format, **experiment)
     
     if experiment['output_mode'] == 'prediction':
-        save_predictions(X, X_hat, FLAGS.config, **experiment)
+        save_predictions(X, preds, FLAGS.config, **experiment)

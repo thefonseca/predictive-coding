@@ -13,7 +13,7 @@ experiments = {
     'moments_transfer_kitti': {
         'description': 'Using PredNet pre-trained on KITTI dataset to perform inference \
 on Moments in Time dataset.',
-        'output_mode': 'prediction', # 'prediction' | 'error' | 'features'
+        'output_mode': 'features', # 'prediction' | 'error' | 'features'
         'n_timesteps': 10,
         'frame_step': 3,
         'seq_overlap': 5,
