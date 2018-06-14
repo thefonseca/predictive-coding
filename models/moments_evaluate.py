@@ -68,7 +68,6 @@ def save_predictions(X, X_hat, experiment_name, results_dir, n_plot=20, **config
     mse_model = np.mean((X[:, 1:] - X_hat[:, 1:]) ** 2)  # look at all timesteps except the first
     mse_prev = np.mean((X[:, :-1] - X[:, 1:]) ** 2)
     
-    results_dir = os.path.join(results_dir, experiment_name + '_prediction')
     #if not os.path.exists(results_dir): os.makedirs(results_dir)
     save_experiment_config(results_dir, config)
     
@@ -109,17 +108,19 @@ def save_predictions(X, X_hat, experiment_name, results_dir, n_plot=20, **config
         plt.savefig(plot_save_dir +  'plot_' + str(i) + '.png')
         plt.clf()
         
-def save_features(X, X_hat, experiment_name, results_dir, **config):
+def save_representation(X, X_hat, experiment_name, results_dir, config):
     # TODO
-    results_dir = os.path.join(results_dir, experiment_name + '_features')
     save_experiment_config(results_dir, config)
     
         
-def save_results(X, preds, experiment_name, output_mode, config):
+def save_results(X, preds, experiment_name, output_mode, results_dir, **config):
+    
+    results_dir = os.path.join(results_dir, experiment_name + '_' + output_mode)
+    
     if output_mode == 'prediction':
-        save_predictions(X, preds, experiment_name, **config)
-    elif output_mode == 'features':
-        save_features(X, preds, experiment_name, **config)
+        save_predictions(X, preds, experiment_name, results_dir, **config)
+    else:
+        save_representation(X, preds, experiment_name, results_dir, config)
 
 def evaluate(model, img_dir, img_sources, output_mode, n_timesteps=10, 
              frame_step=3, seq_overlap=5, max_seq_per_video=5, 
@@ -166,7 +167,7 @@ def evaluate(model, img_dir, img_sources, output_mode, n_timesteps=10,
     #mse_model /= (n * batch_size)
     #mse_prev /= (n * batch_size)
     
-    if output_mode == 'features':
+    if output_mode == 'representation':
         preds = model.get_layer('prednet_1').unflatten_features(X.shape, preds)
         
         if data_format == 'channels_first':
@@ -174,9 +175,8 @@ def evaluate(model, img_dir, img_sources, output_mode, n_timesteps=10,
                 f = np.transpose(f, (0, 1, 3, 4, 2))
                 #print(f.shape)
                 
-    elif output_mode == 'prediction':    
-        if data_format == 'channels_first':
-            preds = np.transpose(preds, (0, 1, 3, 4, 2))
+    elif data_format == 'channels_first':
+        preds = np.transpose(preds, (0, 1, 3, 4, 2))
             
     if data_format == 'channels_first':
         X = np.transpose(X, (0, 1, 3, 4, 2))
@@ -192,18 +192,29 @@ if __name__ == '__main__':
                        action="store_true")
     group.add_argument('--error', help='model will output prediction errors', 
                        action="store_true")
-    group.add_argument('--features', help='model will output PredNet features (R) for all layers', 
+    group.add_argument('--representation', help='model will output PredNet representation (R) for all layers', 
                        action="store_true")
+    parser.add_argument('--layer', help='output specific layer number', type=int)
     FLAGS, unparsed = parser.parse_known_args()
     
     experiment = experiments[FLAGS.config]
     
-    for arg in ['prediction', 'features', 'error']:
+    for arg in ['prediction', 'representation', 'error']:
         if getattr(FLAGS, arg):
             output_mode = arg
+            
+    if FLAGS.layer is not None:
+        prednet_output_mode = output_mode[:1].upper() + str(FLAGS.layer)
+    else:
+        prednet_output_mode = output_mode
+        
+    print(prednet_output_mode)
         
     print('\n==> Starting experiment: {}'.format(experiment['description']))
-    print('==> Output mode: {}\n'.format(output_mode))
+    if FLAGS.layer is None:
+        print('==> Output mode: {}\n'.format(output_mode))
+    else:
+        print('==> Output mode: {} (layer {})\n'.format(output_mode, FLAGS.layer))
     
     print('Loading pre-trained model...')
     pretrained_model = load_model(**experiment)
@@ -211,11 +222,11 @@ if __name__ == '__main__':
     data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     
     print('Creating testing model...')
-    model = create_test_model(pretrained_model, output_mode, **experiment)
+    model = create_test_model(pretrained_model, prednet_output_mode, **experiment)
     model.summary()
     
-    X, preds = evaluate(model, output_mode=output_mode, 
+    X, preds = evaluate(model, output_mode=prednet_output_mode, 
                         data_format=data_format, **experiment)
     
-    save_results(X, preds, FLAGS.config, output_mode, experiment)
+    save_results(X, preds, FLAGS.config, prednet_output_mode, **experiment)
     

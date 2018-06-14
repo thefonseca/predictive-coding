@@ -84,7 +84,7 @@ class PredNet(Recurrent):
         self.LSTM_inner_activation = activations.get(LSTM_inner_activation)
 
         #default_output_modes = ['prediction', 'error', 'all']
-        default_output_modes = ['prediction', 'error', 'all', 'features']
+        default_output_modes = ['prediction', 'error', 'all', 'representation']
         layer_output_modes = [layer + str(n) for n in range(self.nb_layers) for layer in ['R', 'E', 'A', 'Ahat']]
         assert output_mode in default_output_modes + layer_output_modes, 'Invalid output_mode: ' + str(output_mode)
         self.output_mode = output_mode
@@ -140,16 +140,16 @@ class PredNet(Recurrent):
             out_shape = (self.nb_layers,)
         elif self.output_mode == 'all':
             out_shape = (np.prod(input_shape[2:]) + self.nb_layers,)
-        elif self.output_mode == 'features':
+        elif self.output_mode == 'representation':
             out_shape = 0
             for l in range(self.nb_layers):
                 layer_shape = self.__compute_layer_shape(input_shape, 'R', l)
-                print('Layer {} shape: {}'.format(l, layer_shape))
                 flat_shape = np.prod(layer_shape)
+                print('Layer {} shape: {} ({})'.format(l, layer_shape, flat_shape))
                 out_shape += flat_shape
             out_shape = (out_shape,)
         else:
-            out_shape = compute_layer_shape(input_shape)
+            out_shape = self.__compute_layer_shape(input_shape)
 
         if self.return_sequences:
             return (input_shape[0], input_shape[1]) + out_shape
@@ -315,7 +315,7 @@ class PredNet(Recurrent):
         if self.output_layer_type is None:
             if self.output_mode == 'prediction':
                 output = frame_prediction
-            elif self.output_mode == 'features':
+            elif self.output_mode == 'representation':
                 output = K.concatenate([K.batch_flatten(r[l]) for l in range(self.nb_layers)], axis=-1)
             else:
                 for l in range(self.nb_layers):
