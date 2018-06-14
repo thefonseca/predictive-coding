@@ -53,20 +53,30 @@ def create_test_model(train_model, output_mode, n_timesteps=10, gpus=None, **ext
         
     return test_model
 
-def save_predictions(X, X_hat, experiment_name, results_dir, output_mode,
-                     n_plot=20, **extras):
+def save_experiment_config(results_dir, config):
+    if not os.path.exists(results_dir): os.makedirs(results_dir)
+    f = open(os.path.join(results_dir, 'experiment_config.txt'), 'w')
+    
+    for key in sorted(config):
+        f.write('{}: {}\n'.format(key, config[key]))
+        
+    f.close()
+
+def save_predictions(X, X_hat, experiment_name, results_dir, n_plot=20, **config):
     
     # Compare MSE of PredNet predictions vs. using last frame.  Write results to prediction_scores.txt
     mse_model = np.mean((X[:, 1:] - X_hat[:, 1:]) ** 2)  # look at all timesteps except the first
     mse_prev = np.mean((X[:, :-1] - X[:, 1:]) ** 2)
     
-    results_dir = os.path.join(results_dir, experiment_name + '_' + output_mode)
-    if not os.path.exists(results_dir): os.makedirs(results_dir)
+    results_dir = os.path.join(results_dir, experiment_name + '_prediction')
+    #if not os.path.exists(results_dir): os.makedirs(results_dir)
+    save_experiment_config(results_dir, config)
+    
     f = open(os.path.join(results_dir, 'prediction_scores.txt'), 'w')
     f.write("Model MSE: %f\n" % mse_model)
     f.write("Previous Frame MSE: %f" % mse_prev)
     f.close()
-
+    
     # Plot some predictions
     n_timesteps =  X.shape[1]
     aspect_ratio = float(X_hat.shape[2]) / X_hat.shape[3]
@@ -98,6 +108,18 @@ def save_predictions(X, X_hat, experiment_name, results_dir, output_mode,
 
         plt.savefig(plot_save_dir +  'plot_' + str(i) + '.png')
         plt.clf()
+        
+def save_features(X, X_hat, experiment_name, results_dir, **config):
+    # TODO
+    results_dir = os.path.join(results_dir, experiment_name + '_features')
+    save_experiment_config(results_dir, config)
+    
+        
+def save_results(X, preds, experiment_name, output_mode, config):
+    if output_mode == 'prediction':
+        save_predictions(X, preds, experiment_name, **config)
+    elif output_mode == 'features':
+        save_features(X, preds, experiment_name, **config)
 
 def evaluate(model, img_dir, img_sources, output_mode, n_timesteps=10, 
              frame_step=3, seq_overlap=5, max_seq_per_video=5, 
@@ -165,10 +187,23 @@ def evaluate(model, img_dir, img_sources, output_mode, n_timesteps=10,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate pre-trained model.')
     parser.add_argument('config', help='experiment config name defined in moments_setting.py')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--prediction', help='model will output image predictions', 
+                       action="store_true")
+    group.add_argument('--error', help='model will output prediction errors', 
+                       action="store_true")
+    group.add_argument('--features', help='model will output PredNet features (R) for all layers', 
+                       action="store_true")
     FLAGS, unparsed = parser.parse_known_args()
     
     experiment = experiments[FLAGS.config]
-    print('\n==> Starting experiment: {}\n'.format(experiment['description']))
+    
+    for arg in ['prediction', 'features', 'error']:
+        if getattr(FLAGS, arg):
+            output_mode = arg
+        
+    print('\n==> Starting experiment: {}'.format(experiment['description']))
+    print('==> Output mode: {}\n'.format(output_mode))
     
     print('Loading pre-trained model...')
     pretrained_model = load_model(**experiment)
@@ -176,10 +211,11 @@ if __name__ == '__main__':
     data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     
     print('Creating testing model...')
-    model = create_test_model(pretrained_model, **experiment)
+    model = create_test_model(pretrained_model, output_mode, **experiment)
     model.summary()
     
-    X, preds = evaluate(model, data_format=data_format, **experiment)
+    X, preds = evaluate(model, output_mode=output_mode, 
+                        data_format=data_format, **experiment)
     
-    if experiment['output_mode'] == 'prediction':
-        save_predictions(X, preds, FLAGS.config, **experiment)
+    save_results(X, preds, FLAGS.config, output_mode, experiment)
+    
