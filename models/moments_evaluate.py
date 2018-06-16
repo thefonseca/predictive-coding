@@ -57,14 +57,14 @@ def create_test_model(train_model, output_mode, n_timesteps=10, gpus=None, **ext
         
     return test_model
 
-def get_create_results_dir(experiment_name, output_mode, config):
-    results_dir = os.path.join(config['base_results_dir'], experiment_name + '_' + output_mode)
+def get_create_results_dir(dataset, experiment_name, output_mode, config):
+    results_dir = os.path.join(config['base_results_dir'], experiment_name + '_' + output_mode, dataset)
     if not os.path.exists(results_dir): os.makedirs(results_dir)
     return results_dir
 
-def save_experiment_config(experiment_name, output_mode, config):
+def save_experiment_config(dataset, experiment_name, output_mode, config):
     
-    results_dir = get_create_results_dir(experiment_name, output_mode, config)
+    results_dir = get_create_results_dir(dataset, experiment_name, output_mode, config)
     f = open(os.path.join(results_dir, 'experiment_config.txt'), 'w')
     
     for key in sorted(config):
@@ -121,9 +121,11 @@ def save_representation(rep, labels, results_dir, config):
     for i, label in enumerate(labels):
         
         target_dir = results_dir
-        if isinstance(label, tuple):
+        if len(label) > 1:
             category, source = label
             target_dir = os.path.join(results_dir, category)
+        else:
+            source = label[0]
         
         if not os.path.exists(target_dir): os.makedirs(target_dir)
             
@@ -136,7 +138,7 @@ def save_representation(rep, labels, results_dir, config):
         #pkl.dump(rep, open(filename, "wb"))
     
         
-def evaluate_prediction(model, experiment_name, output_mode, 
+def evaluate_prediction(model, dataset, experiment_name, output_mode, 
                         data_generator, n_batches, 
                         data_format=K.image_data_format(), **config):
     
@@ -170,17 +172,17 @@ def evaluate_prediction(model, experiment_name, output_mode,
         X = np.transpose(X, (0, 1, 3, 4, 2))
         preds = np.transpose(preds, (0, 1, 3, 4, 2))
         
-    results_dir = get_create_results_dir(experiment_name, output_mode, config)
+    results_dir = get_create_results_dir(dataset, experiment_name, output_mode, config)
     save_predictions(X, preds, mse_model, mse_prev, results_dir, **config)
     
     
     
-def evaluate_representation(model, experiment_name, output_mode, 
+def evaluate_representation(model, dataset, experiment_name, output_mode, 
                             data_generator, n_batches, 
                             timestep_start=-1, timestep_end=None,
                             data_format=K.image_data_format(), **config):
     
-    results_dir = get_create_results_dir(experiment_name, output_mode, config)
+    results_dir = get_create_results_dir(dataset, experiment_name, output_mode, config)
     y = []
 
     for i in tqdm(range(n_batches)):
@@ -215,7 +217,7 @@ def evaluate_representation(model, experiment_name, output_mode,
             csv_out.writerow(row)
 
 
-def evaluate(model, experiment_name, img_dir, img_sources, 
+def evaluate(model, dataset, img_dir, img_sources, experiment_name,
              output_mode, n_timesteps=10, frame_step=3, seq_overlap=5, 
              max_seq_per_video=5, shuffle=False, batch_size=5, 
              max_missing_frames=15, N_seq=None, seed=17, 
@@ -236,12 +238,12 @@ def evaluate(model, experiment_name, img_dir, img_sources,
     print('Number of batches: {}'.format(n_batches))
     
     if output_mode == 'prediction':
-        evaluate_prediction(model, experiment_name, output_mode, 
+        evaluate_prediction(model, dataset, experiment_name, output_mode, 
                             data_generator, n_batches, 
                             data_format=data_format, **config)
         
     elif output_mode == 'representation' or output_mode[:1] == 'R':
-        evaluate_representation(model, experiment_name, output_mode, 
+        evaluate_representation(model, dataset, experiment_name, output_mode, 
                                 data_generator, n_batches,
                                 data_format=data_format, **config)
         
@@ -258,6 +260,14 @@ if __name__ == '__main__':
     group.add_argument('--representation', help='model will output PredNet representation (R) for all layers', 
                        action="store_true")
     parser.add_argument('--layer', help='output specific layer number', type=int)
+    
+    data_group = parser.add_mutually_exclusive_group(required=True)
+    data_group.add_argument('--train', help='process training dataset', 
+                       action="store_true")
+    data_group.add_argument('--validation', help='process validation dataset', 
+                       action="store_true")
+    data_group.add_argument('--test', help='process test dataset', 
+                       action="store_true")
     FLAGS, unparsed = parser.parse_known_args()
     
     experiment = experiments[FLAGS.config]
@@ -265,15 +275,22 @@ if __name__ == '__main__':
     for arg in ['prediction', 'representation', 'error']:
         if getattr(FLAGS, arg):
             output_mode = arg
+            break
+            
+    for arg in ['train', 'validation', 'test']:
+        if getattr(FLAGS, arg):
+            img_dir = experiment[arg + '_img_dir']
+            img_sources = experiment[arg + '_img_sources']
+            dataset = arg
+            break
             
     if FLAGS.layer is not None:
         prednet_output_mode = output_mode[:1].upper() + str(FLAGS.layer)
     else:
         prednet_output_mode = output_mode
         
-    print(prednet_output_mode)
-        
     print('\n==> Starting experiment: {}'.format(experiment['description']))
+    print('==> Dataset: {}'.format(dataset))
     if FLAGS.layer is None:
         print('==> Output mode: {}\n'.format(output_mode))
     else:
@@ -288,9 +305,9 @@ if __name__ == '__main__':
     model = create_test_model(pretrained_model, prednet_output_mode, **experiment)
     model.summary()
     
-    evaluate(model, FLAGS.config, output_mode=prednet_output_mode, 
+    evaluate(model, dataset, img_dir, img_sources, FLAGS.config, 
+             output_mode=prednet_output_mode, 
              data_format=data_format, **experiment)
     
-    save_experiment_config(FLAGS.config, prednet_output_mode, experiment)
-    
+    save_experiment_config(dataset, FLAGS.config, prednet_output_mode, experiment)
     
