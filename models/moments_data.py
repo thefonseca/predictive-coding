@@ -174,7 +174,13 @@ class SequenceGenerator(Iterator):
             frame_file = self.sources[i]
             
             if '__' in self.sources[i]:
-                category_dir, frame_file = self.sources[i].split('__')
+                source_split = self.sources[i].split('__')
+                if len(source_split) > 2: # handling exceptions
+                    category_dir = source_split[0]
+                    frame_file = ''.join(source_split[1:])
+                else:
+                    category_dir, frame_file = self.sources[i].split('__')
+                    
                 
             frame_file = '{}__frame_{:03d}.jpg'.format(frame_file, (i-idx_start+1))
             #print('load img:', i, len(images))
