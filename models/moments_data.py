@@ -111,6 +111,7 @@ class SequenceGenerator(Iterator):
         #batch_x = np.zeros((current_batch_size, self.nt) + self.im_shape, np.float32)
         current_batch_size = len(index_array)
         images = []
+        labels = []
         
         # TODO: parallelize image loading
         for i, idx in enumerate(index_array):
@@ -124,6 +125,7 @@ class SequenceGenerator(Iterator):
                     idx_end = idx_start_next
                 
             images.extend(self.load_images(idx_start, idx_end))
+            labels.extend(self.sources[idx_start:idx_end])
             
         images = np.array(images)
         #print('images shape:', images.shape, images[0].shape)
@@ -147,7 +149,7 @@ class SequenceGenerator(Iterator):
                 
             if end <= len(images):
                 batch_x.append(images[start:end])
-                batch_y.append(self.sources[start:end])
+                batch_y.append(labels[start:end])
                 
         batch_x = np.array(batch_x)
         batch_y = np.array(batch_y)
