@@ -21,7 +21,12 @@ class SequenceGenerator(Iterator):
         self.frame_step = frame_step
         self.batch_size = batch_size
         self.data_format = data_format
-        assert output_mode in {'error', 'prediction'}, 'output_mode must be in {error, prediction}'
+        
+        #assert output_mode in {'error', 'prediction'}, 'output_mode must be in {error, prediction}'
+        default_output_modes = ['prediction', 'error', 'all', 'representation']
+        nb_layers = 4 # TODO: add to parameters 
+        layer_output_modes = [layer + str(n) for n in range(nb_layers) for layer in ['R', 'E', 'A', 'Ahat']]
+        assert output_mode in default_output_modes + layer_output_modes, 'Invalid output_mode: ' + str(output_mode)
         self.output_mode = output_mode
         assert (seq_overlap >= 0 and seq_overlap < self.nt), 'sequence overlap must be between >= 0 and < nt'
         self.seq_overlap = seq_overlap
@@ -119,11 +124,12 @@ class SequenceGenerator(Iterator):
                     idx_end = idx_start_next
                 
             images.extend(self.load_images(idx_start, idx_end))
-        
+            
         images = np.array(images)
         #print('images shape:', images.shape, images[0].shape)
         
-        batch_x = []# * current_batch_size
+        batch_x = []
+        batch_y = []
         
         for i in range(current_batch_size):
             
@@ -141,8 +147,10 @@ class SequenceGenerator(Iterator):
                 
             if end <= len(images):
                 batch_x.append(images[start:end])
+                batch_y.append(self.sources[start:end])
                 
         batch_x = np.array(batch_x)
+        batch_y = np.array(batch_y)
         
         if self.data_format == 'channels_first':
             batch_x = np.transpose(batch_x, (0, 1, 4, 2, 3))
@@ -152,18 +160,28 @@ class SequenceGenerator(Iterator):
             batch_y = np.zeros(current_batch_size, np.float32)
         elif self.output_mode == 'prediction':  # output actual pixels
             batch_y = batch_x
+            
         return batch_x, batch_y
     
     def load_images(self, idx_start, idx_end):
         #images = np.zeros((self.nt,) + self.im_shape, np.float32)
         images = []
         
-        #i = idx_start
         for i in range(idx_start, idx_end, self.frame_step):
-        #while i < idx_start + self.nt:
-            frame_file = '{}__frame_{:03d}.jpg'.format(self.sources[i], (i-idx_start+1))
+            category_dir = None
+            frame_file = self.sources[i]
+            
+            if '__' in self.sources[i]:
+                category_dir, frame_file = self.sources[i].split('__')
+                
+            frame_file = '{}__frame_{:03d}.jpg'.format(frame_file, (i-idx_start+1))
             #print('load img:', i, len(images))
-            img = imread(os.path.join(self.img_dir, frame_file))
+            
+            if category_dir:
+                img = imread(os.path.join(self.img_dir, category_dir, frame_file))
+            else:
+                img = imread(os.path.join(self.img_dir, frame_file))
+                
             images.append(self.preprocess(img))
         
         return images

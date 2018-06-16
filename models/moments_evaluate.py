@@ -23,6 +23,10 @@ from moments_settings import experiments
 
 from tqdm import tqdm
 import argparse
+import csv
+import cPickle as pkl
+#import gzip
+import bz2
 
 FLAGS = None
 
@@ -53,8 +57,14 @@ def create_test_model(train_model, output_mode, n_timesteps=10, gpus=None, **ext
         
     return test_model
 
-def save_experiment_config(results_dir, config):
+def get_create_results_dir(experiment_name, output_mode, config):
+    results_dir = os.path.join(config['base_results_dir'], experiment_name + '_' + output_mode)
     if not os.path.exists(results_dir): os.makedirs(results_dir)
+    return results_dir
+
+def save_experiment_config(experiment_name, output_mode, config):
+    
+    results_dir = get_create_results_dir(experiment_name, output_mode, config)
     f = open(os.path.join(results_dir, 'experiment_config.txt'), 'w')
     
     for key in sorted(config):
@@ -62,14 +72,12 @@ def save_experiment_config(results_dir, config):
         
     f.close()
 
-def save_predictions(X, X_hat, experiment_name, results_dir, n_plot=20, **config):
+def save_predictions(X, X_hat, mse_model, mse_prev, results_dir, 
+                     n_plot=20, **config):
     
     # Compare MSE of PredNet predictions vs. using last frame.  Write results to prediction_scores.txt
-    mse_model = np.mean((X[:, 1:] - X_hat[:, 1:]) ** 2)  # look at all timesteps except the first
-    mse_prev = np.mean((X[:, :-1] - X[:, 1:]) ** 2)
-    
-    #if not os.path.exists(results_dir): os.makedirs(results_dir)
-    save_experiment_config(results_dir, config)
+    #mse_model = np.mean((X[:, 1:] - X_hat[:, 1:]) ** 2)  # look at all timesteps except the first
+    #mse_prev = np.mean((X[:, :-1] - X[:, 1:]) ** 2)
     
     f = open(os.path.join(results_dir, 'prediction_scores.txt'), 'w')
     f.write("Model MSE: %f\n" % mse_model)
@@ -108,28 +116,114 @@ def save_predictions(X, X_hat, experiment_name, results_dir, n_plot=20, **config
         plt.savefig(plot_save_dir +  'plot_' + str(i) + '.png')
         plt.clf()
         
-def save_representation(X, X_hat, experiment_name, results_dir, config):
-    # TODO
-    save_experiment_config(results_dir, config)
+def save_representation(rep, labels, results_dir, config):
+    
+    for i, label in enumerate(labels):
+        
+        target_dir = results_dir
+        if isinstance(label, tuple):
+            category, source = label
+            target_dir = os.path.join(results_dir, category)
+        
+        if not os.path.exists(target_dir): os.makedirs(target_dir)
+            
+        rep_file = '{}__{:03d}.pkl'.format(source, i)
+        filename = os.path.join(target_dir, rep_file)
+        
+        #with gzip.GzipFile(filename, 'w') as f:
+        with bz2.BZ2File(filename, 'w') as f:
+            pkl.dump(rep[i].reshape(rep.shape[2:]), f)
+        #pkl.dump(rep, open(filename, "wb"))
     
         
-def save_results(X, preds, experiment_name, output_mode, results_dir, **config):
+def evaluate_prediction(model, experiment_name, output_mode, 
+                        data_generator, n_batches, 
+                        data_format=K.image_data_format(), **config):
     
-    results_dir = os.path.join(results_dir, experiment_name + '_' + output_mode)
+    n = 0
+    in_memory_ratio = 20
+    X = []
+    preds = []
+    mse_model = 0
+    mse_prev = 0
     
-    if output_mode == 'prediction':
-        save_predictions(X, preds, experiment_name, results_dir, **config)
-    else:
-        save_representation(X, preds, experiment_name, results_dir, config)
+    for i in tqdm(range(n_batches)):
+        X_, y_ = next(data_generator)
+        pred = model.predict(X_, data_generator.batch_size)
 
-def evaluate(model, img_dir, img_sources, output_mode, n_timesteps=10, 
-             frame_step=3, seq_overlap=5, max_seq_per_video=5, 
-             shuffle=False, batch_size=5, max_missing_frames=15, 
-             N_seq=None, seed=17, data_format=K.image_data_format(), 
-             **extras):
+        mse_model += np.mean((X_[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
+        mse_prev += np.mean((X_[:, :-1] - X_[:, 1:]) ** 2)
+        
+        if n % in_memory_ratio == 0:
+            X.extend(X_)
+            preds.extend(pred)
+            
+        n += 1
+
+    X = np.array(X)
+    preds = np.array(preds)
+
+    mse_model /= (n * data_generator.batch_size)
+    mse_prev /= (n * data_generator.batch_size)  
+            
+    if data_format == 'channels_first':
+        X = np.transpose(X, (0, 1, 3, 4, 2))
+        preds = np.transpose(preds, (0, 1, 3, 4, 2))
+        
+    results_dir = get_create_results_dir(experiment_name, output_mode, config)
+    save_predictions(X, preds, mse_model, mse_prev, results_dir, **config)
+    
+    
+    
+def evaluate_representation(model, experiment_name, output_mode, 
+                            data_generator, n_batches, 
+                            timestep_start=-1, timestep_end=None,
+                            data_format=K.image_data_format(), **config):
+    
+    results_dir = get_create_results_dir(experiment_name, output_mode, config)
+    y = []
+
+    for i in tqdm(range(n_batches)):
+        X_, y_ = next(data_generator)
+        rep = model.predict(X_, data_generator.batch_size)
+        
+        rep = rep[:, timestep_start:timestep_end]
+        y_ = y_[:, timestep_start:timestep_end].flatten()
+        
+        category_source = [tuple(label.split('__')) for label in y_]
+        y.extend(category_source)
+        
+        if output_mode == 'representation':
+            rep = model.get_layer('prednet_1').unflatten_features(X_.shape, rep)
+
+            if data_format == 'channels_first':
+                for f in preds: 
+                    f = np.transpose(f, (0, 1, 3, 4, 2))
+                    #print(f.shape)
+
+        elif data_format == 'channels_first':
+            rep = np.transpose(rep, (0, 1, 3, 4, 2))
+        
+        save_representation(rep, category_source, results_dir, config)
+    
+    # Save labels in csv file
+    f = os.path.join(results_dir, 'labels.csv')
+    with open(f, 'wb') as out:
+        csv_out=csv.writer(out)
+        csv_out.writerow(['category','source'])
+        for row in y:
+            csv_out.writerow(row)
+
+
+def evaluate(model, experiment_name, img_dir, img_sources, 
+             output_mode, n_timesteps=10, frame_step=3, seq_overlap=5, 
+             max_seq_per_video=5, shuffle=False, batch_size=5, 
+             max_missing_frames=15, N_seq=None, seed=17, 
+             data_format=K.image_data_format(), **config):
     
     print('Creating generator...')
     data_generator = SequenceGenerator(img_dir, img_sources, n_timesteps,
+                                       output_mode=output_mode,
                                        frame_step=frame_step, seq_overlap=5, 
                                        max_seq_per_video=max_seq_per_video, 
                                        N_seq=N_seq, shuffle=shuffle, 
@@ -137,52 +231,21 @@ def evaluate(model, img_dir, img_sources, output_mode, n_timesteps=10,
                                        max_missing_frames=max_missing_frames, 
                                        seed=seed, data_format=data_format)
     
-    n = 0
-    in_memory_ratio = 20
-    X = []
-    preds = []
-    #mse_model = 0
-    #mse_prev = 0
-    
     n_batches = ((len(data_generator.possible_starts) - 1) // batch_size) + 1 # ceil
     print('Number of sequences: {}'.format(len(data_generator.possible_starts)))
     print('Number of batches: {}'.format(n_batches))
-
-    for i in tqdm(range(n_batches)):
-        X_, y = next(data_generator)
-        pred = model.predict(X_, batch_size)
-
-        #mse_model += np.mean((X[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
-        #mse_prev += np.mean((X[:, :-1] - X[:, 1:]) ** 2)
-
-        if n % in_memory_ratio == 0:
-            X.extend(X_)
-            preds.extend(pred)
-
-        n += 1
-
-    X = np.array(X)
-    preds = np.array(preds)
-
-    #mse_model /= (n * batch_size)
-    #mse_prev /= (n * batch_size)
     
-    if output_mode == 'representation':
-        preds = model.get_layer('prednet_1').unflatten_features(X.shape, preds)
+    if output_mode == 'prediction':
+        evaluate_prediction(model, experiment_name, output_mode, 
+                            data_generator, n_batches, 
+                            data_format=data_format, **config)
         
-        if data_format == 'channels_first':
-            for f in preds: 
-                f = np.transpose(f, (0, 1, 3, 4, 2))
-                #print(f.shape)
-                
-    elif data_format == 'channels_first':
-        preds = np.transpose(preds, (0, 1, 3, 4, 2))
-            
-    if data_format == 'channels_first':
-        X = np.transpose(X, (0, 1, 3, 4, 2))
-    
-    return X, preds
-    
+    elif output_mode == 'representation' or output_mode[:1] == 'R':
+        evaluate_representation(model, experiment_name, output_mode, 
+                                data_generator, n_batches,
+                                data_format=data_format, **config)
+        
+        
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate pre-trained model.')
@@ -225,8 +288,9 @@ if __name__ == '__main__':
     model = create_test_model(pretrained_model, prednet_output_mode, **experiment)
     model.summary()
     
-    X, preds = evaluate(model, output_mode=prednet_output_mode, 
-                        data_format=data_format, **experiment)
+    evaluate(model, FLAGS.config, output_mode=prednet_output_mode, 
+             data_format=data_format, **experiment)
     
-    save_results(X, preds, FLAGS.config, prednet_output_mode, **experiment)
+    save_experiment_config(FLAGS.config, prednet_output_mode, experiment)
+    
     

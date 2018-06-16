@@ -19,7 +19,7 @@ on Moments in Time dataset.',
         'max_seq_per_video': 5,
         'batch_size': 5,
         'max_missing_frames': 15,
-        'N_seq': 2,
+        'N_seq': 5,
         'shuffle': False,
         'seed': 17,
         #'gpus': 4,
@@ -29,11 +29,11 @@ on Moments in Time dataset.',
         'model_json_file': './model_data/kitti_keras/prednet_kitti_model.json',
         
         # DATA
-        'img_dir': os.path.join(DATA_DIR, 'test'),
-        'img_sources': os.path.join(DATA_DIR, 'sources_test.pkl'),
+        'img_dir': os.path.join(DATA_DIR, 'validation'),
+        'img_sources': os.path.join(DATA_DIR, 'sources_validation.pkl'),
         
         # RESULTS
-        'results_dir': './results/',
+        'base_results_dir': './results/',
         'n_plot': 20
     }
     
