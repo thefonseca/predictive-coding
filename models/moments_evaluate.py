@@ -191,9 +191,18 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
         
         rep = rep[:, timestep_start:timestep_end]
         y_ = y_[:, timestep_start:timestep_end].flatten()
+        y_batch = []
         
-        category_source = [tuple(label.split('__')) for label in y_]
-        y.extend(category_source)
+        #category_source = () #[tuple(label.split('__')) for label in y_]
+        
+        for label in y_:
+            category_source = label.split('__')
+            category = category_source[0]
+            category_source = (category, '__'.join(category_source[1:]))
+            y_batch.append(category_source)
+            y.append(category_source)
+        
+        #y.extend(category_source)
         
         if output_mode == 'representation':
             rep = model.get_layer('prednet_1').unflatten_features(X_.shape, rep)
@@ -206,7 +215,7 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
         elif data_format == 'channels_first':
             rep = np.transpose(rep, (0, 1, 3, 4, 2))
         
-        save_representation(rep, category_source, results_dir, config)
+        save_representation(rep, y_batch, results_dir, config)
     
     # Save labels in csv file
     f = os.path.join(results_dir, 'labels.csv')
