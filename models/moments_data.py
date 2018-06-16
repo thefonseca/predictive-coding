@@ -177,7 +177,7 @@ class SequenceGenerator(Iterator):
                 source_split = self.sources[i].split('__')
                 if len(source_split) > 2: # handling exceptions
                     category_dir = source_split[0]
-                    frame_file = ''.join(source_split[1:])
+                    frame_file = '__'.join(source_split[1:]) # restore original '__' separators
                 else:
                     category_dir, frame_file = self.sources[i].split('__')
                     
