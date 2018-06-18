@@ -5,20 +5,27 @@ import argparse
 
 FLAGS = None
 
-def extract_frames(source_dir, dest_dir, splits, video_pattern='{}/**/*.mp4'):
+def extract_frames(source_dir, dest_dir, splits, categories=None, video_pattern='{}/**/*.mp4'):
     
-    video_pattern = os.path.join(source_dir, video_pattern)
-    video_pattern2 = video_pattern.replace('/**', '')
+    pattern_all_categories = os.path.join(source_dir, video_pattern)
+    pattern_no_categories = pattern_all_categories.replace('/**', '') # '{}/*.mp4'
+    pattern_category = pattern_no_categories.replace('{}', '{}/{}') # '{}/{}/*.mp4'
     
     for split in splits:
-
+        
         current_folder = None
         
-        videos = glob.glob(video_pattern.format(split))
+        videos = glob.glob(pattern_no_categories.format(split))
         
         if len(videos) == 0:
-            videos = glob.glob(video_pattern2.format(split))
+            if categories is None:
+                videos = glob.glob(pattern_all_categories.format(split))
+            else:
+                for c in categories:
+                    cat_videos = glob.glob(pattern_category.format(split, c))
+                    videos.extend(cat_videos)
 
+        print(len(videos))
         for video in tqdm(videos, desc='Processing {} set'.format(split)):
 
             folder, filename = os.path.split(video)
@@ -51,7 +58,10 @@ if __name__ == '__main__':
     parser.add_argument('--splits', type=str, nargs='+', 
                         default=['training', 'validation', 'test'],
                         help='subdirs of "source_dir" containing videos for each dataset split')
+    parser.add_argument('--categories', type=str, nargs='+', 
+                        help='a subset of categories to be processed. Default is all categories.')
     FLAGS, unparsed = parser.parse_known_args()
     
-    extract_frames(FLAGS.source_dir, FLAGS.dest_dir, FLAGS.splits)
+    extract_frames(FLAGS.source_dir, FLAGS.dest_dir, 
+                   FLAGS.splits,  FLAGS.categories)
     
