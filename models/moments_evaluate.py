@@ -193,16 +193,12 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
         y_ = y_[:, timestep_start:timestep_end].flatten()
         y_batch = []
         
-        #category_source = () #[tuple(label.split('__')) for label in y_]
-        
         for label in y_:
             category_source = label.split('__')
             category = category_source[0]
             category_source = (category, '__'.join(category_source[1:]))
             y_batch.append(category_source)
             y.append(category_source)
-        
-        #y.extend(category_source)
         
         if output_mode == 'representation':
             rep = model.get_layer('prednet_1').unflatten_features(X_.shape, rep)
@@ -271,7 +267,7 @@ if __name__ == '__main__':
     parser.add_argument('--layer', help='output specific layer number', type=int)
     
     data_group = parser.add_mutually_exclusive_group(required=True)
-    data_group.add_argument('--train', help='process training dataset', 
+    data_group.add_argument('--training', help='process training dataset', 
                        action="store_true")
     data_group.add_argument('--validation', help='process validation dataset', 
                        action="store_true")
@@ -286,7 +282,7 @@ if __name__ == '__main__':
             output_mode = arg
             break
             
-    for arg in ['train', 'validation', 'test']:
+    for arg in ['training', 'validation', 'test']:
         if getattr(FLAGS, arg):
             img_dir = experiment[arg + '_img_dir']
             img_sources = experiment[arg + '_img_sources']

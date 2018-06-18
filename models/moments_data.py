@@ -8,16 +8,16 @@ import os
 
 # Data generator that creates sequences for input into PredNet.
 class SequenceGenerator(Iterator):
-    def __init__(self, img_dir, source_file, nt, frame_step=1, seq_overlap=0,
+    def __init__(self, img_dir, source_file, n_timesteps, frame_step=1, seq_overlap=0,
                  batch_size=9, shuffle=False, seed=None, max_seq_per_video=None,
-                 output_mode='error', N_seq=None, max_missing_frames = 10,
+                 output_mode='error', N_seq=None, max_missing_frames=10,
                  data_format=K.image_data_format(), img_size=(128, 160)):
         
         # source for each image so when creating sequences 
         # can assure that consecutive frames are from same video
         self.sources = pkl.load(open(source_file, "rb")) 
         
-        self.nt = nt
+        self.n_timesteps = n_timesteps
         self.frame_step = frame_step
         self.batch_size = batch_size
         self.data_format = data_format
@@ -28,7 +28,7 @@ class SequenceGenerator(Iterator):
         layer_output_modes = [layer + str(n) for n in range(nb_layers) for layer in ['R', 'E', 'A', 'Ahat']]
         assert output_mode in default_output_modes + layer_output_modes, 'Invalid output_mode: ' + str(output_mode)
         self.output_mode = output_mode
-        assert (seq_overlap >= 0 and seq_overlap < self.nt), 'sequence overlap must be between >= 0 and < nt'
+        assert (seq_overlap >= 0 and seq_overlap < self.n_timesteps), 'sequence overlap must be between >= 0 and < n_timesteps'
         self.seq_overlap = seq_overlap
         self.max_seq_per_video = max_seq_per_video
         
@@ -41,14 +41,14 @@ class SequenceGenerator(Iterator):
         possible_starts = []
         self.seq_counts = {}
         
-        while curr_location < len(self.sources) - self.nt * self.frame_step + 1:
+        while curr_location < len(self.sources) - self.n_timesteps * self.frame_step + 1:
             
             count = self.seq_counts.get(self.sources[curr_location], 0)
             
             if self.max_seq_per_video is not None and count >= self.max_seq_per_video:
                 curr_location += self.frame_step
             
-            elif self.sources[curr_location] == self.sources[curr_location + self.nt * self.frame_step - 1]:
+            elif self.sources[curr_location] == self.sources[curr_location + self.n_timesteps * self.frame_step - 1]:
                 
                 #if self.sources[curr_location] == '33891':
                 #    print(curr_location, curr_location + self.nt * self.frame_step - 1)
@@ -60,11 +60,11 @@ class SequenceGenerator(Iterator):
                 self.seq_counts[self.sources[curr_location]] = count + 1
                 
                 old_location = curr_location
-                curr_location += self.nt * self.frame_step
+                curr_location += self.n_timesteps * self.frame_step
                 curr_location -= self.seq_overlap * self.frame_step
                 
-            elif (curr_location + self.nt * self.frame_step - max_missing_frames - 1 > curr_location) and \
-                 (self.sources[curr_location] == self.sources[curr_location + self.nt * self.frame_step - max_missing_frames - 1]):
+            elif (curr_location + self.n_timesteps * self.frame_step - max_missing_frames - 1 > curr_location) and \
+                 (self.sources[curr_location] == self.sources[curr_location + self.n_timesteps * self.frame_step - max_missing_frames - 1]):
                 ''' If videos have varying number of frames, the last sequence may be incomplete.
                     In this case, we adjust the sequence start to guarantee the desired number of frames.
                     Depending on the task, it may be important to assure that all videos have the same 
@@ -74,7 +74,7 @@ class SequenceGenerator(Iterator):
                 for i in range(1, max_missing_frames):
                     # look for last frame of current source video
                     
-                    if self.sources[curr_location] == self.sources[curr_location + self.nt * self.frame_step - i - 1]:
+                    if self.sources[curr_location] == self.sources[curr_location + self.n_timesteps * self.frame_step - i - 1]:
                         last_frame_offset = i
                         break
                 
@@ -82,7 +82,7 @@ class SequenceGenerator(Iterator):
                 if last_frame_offset is None or curr_location - last_frame_offset < 0:
                     
                     #print('Last frame sequence of video "{}" is incomplete\
-                    #(less than {} frames)'.format(self.sources[curr_location],                                                                           #                              self.nt * self.frame_step))
+                    #(less than {} frames)'.format(self.sources[curr_location],                                                                           #                              self.n_timesteps * self.frame_step))
                     #print('Skipping this frame sequence...')
                     curr_location += self.frame_step
                 
@@ -108,7 +108,7 @@ class SequenceGenerator(Iterator):
             index_array = next(self.index_generator)
             #index_array, current_index, current_batch_size = next(self.index_generator)
         
-        #batch_x = np.zeros((current_batch_size, self.nt) + self.im_shape, np.float32)
+        #batch_x = np.zeros((current_batch_size, self.n_timesteps) + self.im_shape, np.float32)
         current_batch_size = len(index_array)
         images = []
         labels = []
@@ -116,7 +116,7 @@ class SequenceGenerator(Iterator):
         # TODO: parallelize image loading
         for i, idx in enumerate(index_array):
             idx_start = self.possible_starts[idx]
-            idx_end = idx_start + self.nt * self.frame_step
+            idx_end = idx_start + self.n_timesteps * self.frame_step
             
             # Avoid reading the same image multiple times
             if i < current_batch_size - 1:
@@ -138,12 +138,12 @@ class SequenceGenerator(Iterator):
             if self.seq_overlap > 0:
                 start = i * self.seq_overlap
             else:
-                start = i * self.nt
+                start = i * self.n_timesteps
             
             if start < 0:
                 start = 0
                 
-            end = start + self.nt
+            end = start + self.n_timesteps
             
             #print('range:', start, end, len(images))
                 
@@ -166,7 +166,7 @@ class SequenceGenerator(Iterator):
         return batch_x, batch_y
     
     def load_images(self, idx_start, idx_end):
-        #images = np.zeros((self.nt,) + self.im_shape, np.float32)
+        #images = np.zeros((self.n_timesteps,) + self.im_shape, np.float32)
         images = []
         
         for i in range(idx_start, idx_end, self.frame_step):
@@ -175,12 +175,8 @@ class SequenceGenerator(Iterator):
             
             if '__' in self.sources[i]:
                 source_split = self.sources[i].split('__')
-                #if len(source_split) > 2: # handling exceptions
                 category_dir = source_split[0]
                 frame_file = '__'.join(source_split[1:]) # restore original '__' separators
-                #else:
-                #    category_dir, frame_file = self.sources[i].split('__')
-                    
                 
             frame_file = '{}__frame_{:03d}.jpg'.format(frame_file, (i-idx_start+1))
             #print('load img:', i, len(images))
