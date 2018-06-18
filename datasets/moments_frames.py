@@ -5,27 +5,29 @@ import argparse
 
 FLAGS = None
 
-def extract_frames(source_dir, dest_dir, splits, categories=None, video_pattern='{}/**/*.mp4'):
+def extract_frames(source_dir, dest_dir, splits, categories=None, 
+                   max_per_category=None, video_pattern='{}/**/*.mp4'):
     
     pattern_all_categories = os.path.join(source_dir, video_pattern)
     pattern_no_categories = pattern_all_categories.replace('/**', '') # '{}/*.mp4'
     pattern_category = pattern_no_categories.replace('{}', '{}/{}') # '{}/{}/*.mp4'
+    category_count = {}
     
     for split in splits:
         
         current_folder = None
-        
         videos = glob.glob(pattern_no_categories.format(split))
         
         if len(videos) == 0:
+            
             if categories is None:
-                videos = glob.glob(pattern_all_categories.format(split))
-            else:
-                for c in categories:
-                    cat_videos = glob.glob(pattern_category.format(split, c))
-                    videos.extend(cat_videos)
+                all_categories = os.walk(os.path.join(source_dir, split)).next()[1]
+                categories = all_categories
+                    
+            for c in categories:
+                cat_videos = glob.glob(pattern_category.format(split, c))[:max_per_category]
+                videos.extend(cat_videos)
 
-        print(len(videos))
         for video in tqdm(videos, desc='Processing {} set'.format(split)):
 
             folder, filename = os.path.split(video)
@@ -35,7 +37,7 @@ def extract_frames(source_dir, dest_dir, splits, categories=None, video_pattern=
 
             if split != category:
                 frame_folder = os.path.join(frame_folder, category)
-
+                
             frame_pattern = os.path.splitext(filename)[0] + '__frame_%03d.jpg'
 
             if not os.path.exists(frame_folder): 
@@ -60,8 +62,10 @@ if __name__ == '__main__':
                         help='subdirs of "source_dir" containing videos for each dataset split')
     parser.add_argument('--categories', type=str, nargs='+', 
                         help='a subset of categories to be processed. Default is all categories.')
+    parser.add_argument('--max_per_category', type=int,
+                        help='maximum number of videos per category. Default is all videos.')
     FLAGS, unparsed = parser.parse_known_args()
     
     extract_frames(FLAGS.source_dir, FLAGS.dest_dir, 
-                   FLAGS.splits,  FLAGS.categories)
+                   FLAGS.splits,  FLAGS.categories, FLAGS.max_per_category)
     
