@@ -4,5 +4,5 @@
 **/*.zip
 datasets/*_data*
 datasets/*_frames
-models/*_data*
-models/results/*
+**/model_data*
+**/results/*

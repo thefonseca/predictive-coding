@@ -2,8 +2,8 @@ import os
 
 # Where KITTI data will be saved if you run process_kitti.py
 # If you directly download the processed data, change to the path of the data.
-DATA_DIR = '../datasets/moments_data_frames/'
-DATA_DIR_TOY = '../datasets/moments_toy_frames/'
+DATA_DIR = '../../datasets/moments_data_frames/'
+DATA_DIR_TOY = '../../datasets/moments_toy_frames/'
 
 experiments = {
     'moments_toy_transfer_kitti': {
