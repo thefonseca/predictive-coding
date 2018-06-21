@@ -1,9 +1,9 @@
 EMBEDDINGS_PER_VIDEO = 5
 
 configs = {
-    'moments_toy_transfer_kitti_R3': {
+    'moments_2c_transfer_kitti_R3': {
         'description': 'A convnet classifier trained on the R3 PredNet model \
-(pretrained on KITTI) features extracted from the Moments in Time dataset (toy version).',
+(pretrained on KITTI) features extracted from the Moments in Time dataset (binary version).',
         'epochs': 10,
         'batch_size': 20,
         'shuffle': True,
