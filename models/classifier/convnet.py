@@ -62,11 +62,15 @@ def train(config_name, training_data_dir, validation_data_dir,
     csv_path = os.path.join(results_dir, 'training.log')
     csv_logger = CSVLogger(csv_path)
     
+    use_multiprocessing = config.get('use_multiprocessing', False)
+    workers = config.get('workers', 1)
+    
     model.fit_generator(generator=training_generator,
                         epochs=epochs,
                         validation_data=validation_generator,
                         callbacks=[checkpointer, csv_logger],
-                        use_multiprocessing=False, workers=1)
+                        use_multiprocessing=use_multiprocessing, 
+                        workers=workers)
     
     if test_data_dir:
         print('\nEvaluating model on test set...')
@@ -74,7 +78,8 @@ def train(config_name, training_data_dir, validation_data_dir,
         test_generator = DataGenerator(test_data_dir, batch_size=batch_size, 
                                        index_start=max_per_class)
         metrics = model.evaluate_generator(generator=training_generator,
-                                           use_multiprocessing=False, workers=1)
+                                           use_multiprocessing=use_multiprocessing, 
+                                           workers=workers)
         
         metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
         metric_str = ' - '.join(metric_str)

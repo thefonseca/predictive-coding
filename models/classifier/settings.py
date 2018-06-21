@@ -8,6 +8,8 @@ configs = {
         'batch_size': 20,
         'shuffle': True,
         'seed': 17,
+        'workers': 4,
+        'use_multiprocessing': True,
         #'gpus': 4,
         
         # WEIGHTS
