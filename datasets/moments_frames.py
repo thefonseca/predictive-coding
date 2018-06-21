@@ -16,7 +16,7 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
     for split in splits:
         
         current_folder = None
-        videos = glob.glob(pattern_no_categories.format(split))
+        videos = sorted(glob.glob(pattern_no_categories.format(split)))
         
         if len(videos) == 0:
             
@@ -25,7 +25,7 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
                 categories = all_categories
                     
             for c in categories:
-                cat_videos = glob.glob(pattern_category.format(split, c))[:max_per_category]
+                cat_videos = sorted(glob.glob(pattern_category.format(split, c)))[:max_per_category]
                 videos.extend(cat_videos)
 
         for video in tqdm(videos, desc='Processing {} set'.format(split)):

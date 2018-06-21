@@ -11,12 +11,15 @@ Adapted from: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-
 
 class DataGenerator(Sequence):
     'Generates data for Keras'
-    def __init__(self, data_dir, batch_size=16, shuffle=True):
+    def __init__(self, data_dir, batch_size=16, shuffle=True, 
+                 index_start=0, max_per_class=None):
         'Initialization'
         self.batch_size = batch_size
         self.labels = []
         self.data_dir = data_dir
         self.shuffle = shuffle
+        self.index_start = index_start
+        self.max_per_class = max_per_class
         
         self.classes = sorted(os.walk(data_dir).next()[1])
         self.n_classes = len(self.classes)
@@ -25,12 +28,18 @@ class DataGenerator(Sequence):
         
         for i, c in enumerate(self.classes):
             class_items = sorted(glob.glob(os.path.join(data_dir, data_pattern.format(c))))
+            
+            if max_per_class is None:
+                class_items = class_items[index_start:]
+            else:
+                class_items = class_items[index_start:index_start+max_per_class]
+            
             self.labels.extend([i] * len(class_items))
             self.data_list.extend(class_items)
             
         self.data_shape = self.__load_data(0).shape
             
-        print('Found {} samples in {} classes'.format(len(self.data_list), 
+        print('Found {} samples belonging to {} classes'.format(len(self.data_list), 
                                                       len(self.classes)))
         self.on_epoch_end()
         
@@ -54,9 +63,8 @@ class DataGenerator(Sequence):
             np.random.shuffle(self.indexes)
 
     def __data_generation(self, indexes):
-        'Generates data containing batch_size samples' # X : (n_samples, *dim, n_channels)
+        'Generates data containing batch_size samples' # X : (n_samples, *shape)
         # Initialization
-        #X = np.empty((self.batch_size,) + self.dim + (self.n_channels,))
         X = np.empty((self.batch_size,) + self.data_shape)
         y = np.empty((self.batch_size), dtype=int)
         

@@ -42,11 +42,13 @@ def get_model(input_shape):
     model.summary()
     return model
     
-def train(config_name, data_dir, base_results_dir, epochs=10, batch_size=10, **config):
+def train(config_name, training_data_dir, validation_data_dir, 
+          base_results_dir, test_data_dir=None, epochs=10, 
+          batch_size=10, **config):
     
-    training_data_dir = os.path.join(data_dir, 'training')
-    validation_data_dir = os.path.join(data_dir, 'validation')
-    training_generator = DataGenerator(training_data_dir, batch_size=batch_size)
+    max_per_class = config.get('training_max_per_class', None)
+    training_generator = DataGenerator(training_data_dir, batch_size=batch_size,
+                                       max_per_class=max_per_class)
     validation_generator = DataGenerator(validation_data_dir, batch_size=batch_size)
     
     model = get_model(training_generator.data_shape)
@@ -65,6 +67,18 @@ def train(config_name, data_dir, base_results_dir, epochs=10, batch_size=10, **c
                         validation_data=validation_generator,
                         callbacks=[checkpointer, csv_logger],
                         use_multiprocessing=False, workers=1)
+    
+    if test_data_dir:
+        print('\nEvaluating model on test set...')
+        # we use the remaining part of training set as test set
+        test_generator = DataGenerator(test_data_dir, batch_size=batch_size, 
+                                       index_start=max_per_class)
+        metrics = model.evaluate_generator(generator=training_generator,
+                                           use_multiprocessing=False, workers=1)
+        
+        metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
+        metric_str = ' - '.join(metric_str)
+        print('Test {}'.format(metric_str))
 
 
 if __name__ == '__main__':

@@ -1,6 +1,5 @@
 '''
 Evaluate trained PredNet on Moments in Time sequences.
-Calculates mean-squared error and plots predictions.
 '''
 
 import os
@@ -135,8 +134,7 @@ def save_representation(rep, labels, results_dir, config):
         #with gzip.GzipFile(filename, 'w') as f:
         with bz2.BZ2File(filename, 'w') as f:
             pkl.dump(rep[i].reshape(rep.shape[2:]), f)
-        #pkl.dump(rep, open(filename, "wb"))
-    
+        
         
 def evaluate_prediction(model, dataset, experiment_name, output_mode, 
                         data_generator, n_batches, 

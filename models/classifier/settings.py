@@ -1,3 +1,5 @@
+EMBEDDINGS_PER_VIDEO = 5
+
 configs = {
     'moments_toy_transfer_kitti_R3': {
         'description': 'A convnet classifier trained on the R3 PredNet model \
@@ -13,7 +15,10 @@ configs = {
         #'model_json_file': './model_data/kitti_keras/prednet_kitti_model.json',
         
         # DATA
-        'data_dir': '../prednet/results/moments_toy_transfer_kitti_R3',
+        'training_data_dir': '../prednet/results/moments_toy_transfer_kitti_R3/training',
+        'validation_data_dir': '../prednet/results/moments_toy_transfer_kitti_R3/validation',
+        'test_data_dir': '../prednet/results/moments_toy_transfer_kitti_R3/training',
+        'training_max_per_class': 400 * EMBEDDINGS_PER_VIDEO,
         
         # RESULTS
         'base_results_dir': './results/'
