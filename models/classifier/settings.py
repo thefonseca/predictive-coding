@@ -4,12 +4,12 @@ configs = {
     'moments_2c_transfer_kitti_R3': {
         'description': 'A convnet classifier trained on the R3 PredNet model \
 (pretrained on KITTI) features extracted from the Moments in Time dataset (binary version).',
-        'epochs': 10,
+        'epochs': 5,
         'batch_size': 20,
         'shuffle': True,
         'seed': 17,
         'workers': 8,
-        'use_multiprocessing': True,
+        #'use_multiprocessing': True,
         #'gpus': 4,
         
         # WEIGHTS

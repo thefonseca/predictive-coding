@@ -1,7 +1,7 @@
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, CSVLogger
 
@@ -11,31 +11,32 @@ import os
 import argparse
 
 
-def get_model(input_shape):
+def get_model(input_shape, n_classes, drop_rate=0.25):
     
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[2], input_shape[0], input_shape[1])
     
     model = Sequential()
-    model.add(Conv2D(64, (3, 3), input_shape=input_shape))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Conv2D(32, (3, 3)))
+    model.add(Conv2D(64, (3, 3), 
+              input_shape=input_shape, 
+              activation='relu'))
+    #model.add(BatchNormalization())
     model.add(Activation('relu'))
     #model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(drop_rate))
 
-    #model.add(Conv2D(64, (3, 3)))
+    #model.add(Conv2D(32, (3, 3)))
     #model.add(Activation('relu'))
     #model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Flatten())
-    model.add(Dense(64))
+    model.add(Dense(32))
+    #model.add(BatchNormalization())
     model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(2))
-    model.add(Activation('sigmoid'))
-
+    model.add(Dropout(drop_rate))
+    model.add(Dense(n_classes))
+    model.add(Activation('softmax'))
+    
     model.compile(loss='categorical_crossentropy',
                   optimizer='rmsprop',
                   metrics=['accuracy'])
@@ -51,7 +52,7 @@ def train(config_name, training_data_dir, validation_data_dir,
                                        max_per_class=max_per_class)
     validation_generator = DataGenerator(validation_data_dir, batch_size=batch_size)
     
-    model = get_model(training_generator.data_shape)
+    model = get_model(training_generator.data_shape, training_generator.n_classes)
     
     results_dir = os.path.join(base_results_dir, config_name)
     if not os.path.exists(results_dir): os.makedirs(results_dir)
@@ -65,9 +66,11 @@ def train(config_name, training_data_dir, validation_data_dir,
     use_multiprocessing = config.get('use_multiprocessing', False)
     workers = config.get('workers', 1)
     
-    model.fit_generator(generator=training_generator,
+    model.fit_generator(training_generator,
+                        len(training_generator),
                         epochs=epochs,
                         validation_data=validation_generator,
+                        validation_steps=len(validation_generator),
                         callbacks=[checkpointer, csv_logger],
                         use_multiprocessing=use_multiprocessing, 
                         workers=workers)
@@ -77,7 +80,8 @@ def train(config_name, training_data_dir, validation_data_dir,
         # we use the remaining part of training set as test set
         test_generator = DataGenerator(test_data_dir, batch_size=batch_size, 
                                        index_start=max_per_class)
-        metrics = model.evaluate_generator(generator=training_generator,
+        metrics = model.evaluate_generator(training_generator,
+                                           len(training_generator),
                                            use_multiprocessing=use_multiprocessing, 
                                            workers=workers)
         

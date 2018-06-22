@@ -38,9 +38,9 @@ class DataGenerator(Sequence):
             self.data_list.extend(class_items)
             
         self.data_shape = self.__load_data(0).shape
-            
-        print('Found {} samples belonging to {} classes'.format(len(self.data_list), 
-                                                      len(self.classes)))
+        
+        msg = 'Found {} samples belonging to {} classes in {}'
+        print(msg.format(len(self.data_list), len(self.classes), data_dir))
         self.on_epoch_end()
         
     def __len__(self):
