@@ -3,6 +3,7 @@ from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D
 from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, CSVLogger
+from keras.models import load_model
 
 from settings import configs
 from conv_lstm_data import DataGenerator
@@ -42,30 +43,33 @@ def get_model(input_shape, n_classes, drop_rate=0.25):
                   metrics=['accuracy'])
     model.summary()
     return model
+
+def get_create_results_dir(config_name, base_results_dir):
+    results_dir = os.path.join(base_results_dir, config_name)
+    if not os.path.exists(results_dir): os.makedirs(results_dir)
+    return results_dir
     
 def train(config_name, training_data_dir, validation_data_dir, 
-          base_results_dir, test_data_dir=None, epochs=10, 
-          batch_size=10, **config):
+          base_results_dir, test_data_dir=None, epochs=10, workers=1,
+          use_multiprocessing=False, batch_size=10, **config):
     
     max_per_class = config.get('training_max_per_class', None)
     training_generator = DataGenerator(training_data_dir, batch_size=batch_size,
                                        max_per_class=max_per_class)
     validation_generator = DataGenerator(validation_data_dir, batch_size=batch_size)
-    print(len(training_generator), len(validation_generator))
     
     model = get_model(training_generator.data_shape, training_generator.n_classes)
     
-    results_dir = os.path.join(base_results_dir, config_name)
-    if not os.path.exists(results_dir): os.makedirs(results_dir)
-    checkpoint_path = os.path.join(results_dir, 'weights.hdf5')
+    results_dir = get_create_results_dir(config_name, base_results_dir)
+    checkpoint_path = os.path.join(results_dir, 'conv_lstm.hdf5')
         
     checkpointer = ModelCheckpoint(filepath=checkpoint_path, 
                                    verbose=1, save_best_only=True)
-    csv_path = os.path.join(results_dir, 'training.log')
+    csv_path = os.path.join(results_dir, 'conv_lstm.log')
     csv_logger = CSVLogger(csv_path)
     
-    use_multiprocessing = config.get('use_multiprocessing', False)
-    workers = config.get('workers', 1)
+    #use_multiprocessing = config.get('use_multiprocessing', False)
+    #workers = config.get('workers', 1)
     
     model.fit_generator(training_generator,
                         len(training_generator),
@@ -76,19 +80,28 @@ def train(config_name, training_data_dir, validation_data_dir,
                         use_multiprocessing=use_multiprocessing, 
                         workers=workers)
     
-    if test_data_dir:
-        print('\nEvaluating model on test set...')
-        # we use the remaining part of training set as test set
-        test_generator = DataGenerator(test_data_dir, batch_size=batch_size, 
-                                       index_start=max_per_class)
-        metrics = model.evaluate_generator(training_generator,
-                                           len(training_generator),
-                                           use_multiprocessing=use_multiprocessing, 
-                                           workers=workers)
-        
-        metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
-        metric_str = ' - '.join(metric_str)
-        print('Test {}'.format(metric_str))
+def evaluate(config_name, test_data_dir, batch_size, 
+             index_start, base_results_dir, workers=1,
+             use_multiprocessing=False, **config):
+    
+    print('\nEvaluating model on test set...')
+    # we use the remaining part of training set as test set
+    test_generator = DataGenerator(test_data_dir, batch_size=batch_size, 
+                                   index_start=index_start)
+
+    # load best model
+    results_dir = get_create_results_dir(config_name, base_results_dir)
+    checkpoint_path = os.path.join(results_dir, 'conv_lstm.hdf5')
+    model = load_model(checkpoint_path)
+    
+    metrics = model.evaluate_generator(test_generator,
+                                       len(test_generator),
+                                       use_multiprocessing=use_multiprocessing, 
+                                       workers=workers)
+
+    metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
+    metric_str = ' - '.join(metric_str)
+    print('Test {}'.format(metric_str))
 
 
 if __name__ == '__main__':
@@ -100,4 +113,7 @@ if __name__ == '__main__':
     print('\n==> Starting traininig: {}'.format(config['description']))
     
     train(FLAGS.config, **config)
+    
+    if config['test_data_dir']:
+        evaluate(FLAGS.config, index_start=config['training_max_per_class'], **config)
 

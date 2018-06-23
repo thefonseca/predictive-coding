@@ -197,16 +197,16 @@ class SequenceGenerator(Iterator):
         return img[startx:startx+cropx,starty:starty+cropy]
 
     # resize and crop image
-    def preprocess(self, im):
+    def preprocess(self, img):
         larger_dim = np.argsort(self.img_size)[-1]
         smaller_dim = np.argsort(self.img_size)[-2]
-        target_ds = float(self.img_size[larger_dim])/im.shape[larger_dim]
+        target_ds = float(self.img_size[larger_dim])/img.shape[larger_dim]
 
-        im = resize(im, (int(np.round(target_ds * im.shape[0])), 
-                         int(np.round(target_ds * im.shape[1]))),
+        img = resize(img, (int(np.round(target_ds * img.shape[0])), 
+                          int(np.round(target_ds * img.shape[1]))),
                     mode='reflect')
 
         # crop
-        im = self.crop_center(im, self.img_size[0], self.img_size[1])
-        return im
+        img = self.crop_center(img, self.img_size[0], self.img_size[1])
+        return img
 

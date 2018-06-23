@@ -1,7 +1,7 @@
 EMBEDDINGS_PER_VIDEO = 5
 
 configs = {
-    'moments_2c_transfer_kitti_R3': {
+    'prednet_kitti__moments_2c__R3': {
         'description': 'A convnet classifier trained on the R3 PredNet model \
 (pretrained on KITTI) features extracted from the Moments in Time dataset (binary version).',
         'epochs': 5,
@@ -24,6 +24,18 @@ configs = {
         
         # RESULTS
         'base_results_dir': './results/'
+    },
+    
+    'vgg__moments_2c__features' : {
+        'description': 'Extract VGG features on Moments in Time dataset',
+        'input_shape': (224, 224, 3),
+        'batch_size': 10,
+        'frames_per_video': 90,
+        'max_videos_per_class': 150,
+        'sample_step': 3,
+        'base_results_dir': './results',
+        'training_data_dir': '../../datasets/moments_2c_frames/training',
+        'validation_data_dir': '../../datasets/moments_2c_frames/validation'
     }
     
 }
