@@ -36,6 +36,20 @@ configs = {
         'base_results_dir': './results',
         'training_data_dir': '../../datasets/moments_2c_frames/training',
         'validation_data_dir': '../../datasets/moments_2c_frames/validation'
+    },
+    
+    'convnet__moments_2c__vgg_features' : {
+        'description': 'A convnet classifier using VGG features',
+        'epochs': 5,
+        'batch_size': 20,
+        'shuffle': True,
+        'seed': 17,
+        'workers': 8,
+        'training_max_per_class': 30 * 50, # frames_per_video * max_videos_per_class
+        'base_results_dir': './results',
+        'training_data_dir': './results/vgg__moments_2c__features/training',
+        'validation_data_dir': './results/vgg__moments_2c__features/validation',
+        'test_data_dir': './results/vgg__moments_2c__features/training'
     }
     
 }

@@ -80,8 +80,8 @@ def train(config_name, training_data_dir, validation_data_dir,
         # we use the remaining part of training set as test set
         test_generator = DataGenerator(test_data_dir, batch_size=batch_size, 
                                        index_start=max_per_class)
-        metrics = model.evaluate_generator(training_generator,
-                                           len(training_generator),
+        metrics = model.evaluate_generator(test_generator,
+                                           len(test_generator),
                                            use_multiprocessing=use_multiprocessing, 
                                            workers=workers)
         
