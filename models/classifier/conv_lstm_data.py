@@ -18,7 +18,9 @@ class DataGenerator(Sequence):
     'Generates data for Keras'
     def __init__(self, batch_size=16, shuffle=True, fn_preprocess=None,
                  index_start=0, max_per_class=None, rescale=None,
-                 seq_length=None, sample_step=1, target_size=None):
+                 seq_length=None, sample_step=1, target_size=None, 
+                 return_sources=False):
+        
         'Initialization'
         self.batch_size = batch_size
         self.X = []
@@ -31,6 +33,7 @@ class DataGenerator(Sequence):
         self.rescale = rescale
         self.target_size = target_size
         self.fn_preprocess = fn_preprocess
+        self.return_sources = return_sources
         
     def flow_from_directory(self, data_dir):
         self.data_dir = data_dir
@@ -87,8 +90,7 @@ class DataGenerator(Sequence):
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
 
         # Generate data
-        X, y = self.__data_generation(indexes)
-        return X, y
+        return self.__data_generation(indexes)
 
     def on_epoch_end(self):
         'Updates indexes after each epoch'
@@ -101,6 +103,7 @@ class DataGenerator(Sequence):
         # Initialization
         X = np.empty((self.batch_size,) + self.data_shape)
         y = np.empty((self.batch_size), dtype=int)
+        sources = [] 
         
         # Generate data
         for i, index in enumerate(indexes):
@@ -108,8 +111,12 @@ class DataGenerator(Sequence):
             
             # Store class
             y[i] = self.y[index]
+            sources.append(self.X[index])
             
-        return X, to_categorical(y, num_classes=self.n_classes)
+        if self.return_sources:
+            return X, to_categorical(y, num_classes=self.n_classes), sources
+        else:
+            return X, to_categorical(y, num_classes=self.n_classes)
     
     def __preprocess(self, img):
         '''if self.target_size:

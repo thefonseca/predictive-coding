@@ -15,6 +15,9 @@ from keras.utils import to_categorical
 from conv_lstm_data import DataGenerator
 from settings import configs
 import argparse
+import cPickle as pkl
+import bz2
+from tqdm import tqdm
 
 
 def get_create_results_dir(config_name, base_results_dir):
@@ -22,59 +25,67 @@ def get_create_results_dir(config_name, base_results_dir):
     if not os.path.exists(results_dir): os.makedirs(results_dir)
     return results_dir
 
-def save_bottleneck_features(config_name, base_results_dir, 
-                             training_data_dir, validation_data_dir, 
+def save_representation(features, labels, results_dir, config):
+    
+    for i, label in enumerate(labels):
+        target_dir = results_dir
+        if len(label) > 1:
+            category, source = label
+            target_dir = os.path.join(results_dir, category)
+        else:
+            source = label[0]
+        
+        if not os.path.exists(target_dir): os.makedirs(target_dir)
+        
+        #count = source_count.get(source, 0)
+        #source_count[source] = count + 1
+        #features_file = '{}__{:03d}.pkl'.format(source, count)
+        features_file = '{}.pkl'.format(source)
+        filename = os.path.join(target_dir, features_file)
+        
+        with bz2.BZ2File(filename, 'w') as f:
+            pkl.dump(features[i], f)
+            
+
+def save_bottleneck_features(config_name, data_dir, base_results_dir, 
                              batch_size, input_shape, frames_per_video, 
                              max_videos_per_class, sample_step, **config):
     
     max_frames_per_class = frames_per_video * max_videos_per_class
-    training_generator = DataGenerator(batch_size=batch_size, 
-                                       fn_preprocess=preprocess_input,
-                                       shuffle=False, sample_step=sample_step, 
-                                       target_size=input_shape[:2])
-    training_generator = training_generator.flow_from_directory(training_data_dir)
+    
+    generator = DataGenerator(batch_size=batch_size, return_sources=True,
+                              fn_preprocess=preprocess_input,
+                              shuffle=False, sample_step=sample_step, 
+                              target_size=input_shape[:2],
+                              max_per_class=max_frames_per_class)
+    
+    generator = generator.flow_from_directory(data_dir)
+    output_generator = iter(generator)
     
     # build the VGG16 network
     model = VGG16(include_top=False, weights='imagenet',
-                  input_shape=training_generator.data_shape)
+                  input_shape=generator.data_shape)
 
-    features_train = model.predict_generator(training_generator, 
-                                             len(training_generator),
-                                             verbose=1)
-    
-    print(features_train.shape)
-    
-    features_train = {
-        'X': features_train,
-        'y': training_generator.y[:features_train.shape[0]],
-        'sources': training_generator.X[:features_train.shape[0]]
-    }
-    
     results_dir = get_create_results_dir(config_name, base_results_dir)
-    features_file = os.path.join(results_dir, 'bottleneck_features_train.npy')
-    np.save(open(features_file, 'w'), features_train)
-
-    validation_generator = DataGenerator(batch_size=batch_size,
-                                         fn_preprocess=preprocess_input,
-                                         shuffle=False, sample_step=sample_step,
-                                         target_size=input_shape[:2])
+    n_batches = len(generator)
+    print('Number of batches: {}'.format(n_batches))
     
-    validation_generator = validation_generator.flow_from_directory(validation_data_dir)
-    
-    features_validation = model.predict_generator(validation_generator, 
-                                                  len(validation_generator), 
-                                                  verbose=1)
-    
-    print(features_validation.shape)
-    
-    features_validation = {
-        'X': features_validation,
-        'y': validation_generator.y[:features_validation.shape[0]],
-        'sources': validation_generator.X[:features_validation.shape[0]]
-    }
-    
-    features_file = os.path.join(results_dir, 'bottleneck_features_validation.npy')
-    np.save(open(features_file, 'w'), features_validation)
+    for i in tqdm(range(n_batches)[:5]):
+        X_, y_, sources = next(output_generator)
+        features_train = model.predict(X_, generator.batch_size)
+        y_batch = []
+        
+        for s in sources:
+            path, source = os.path.split(s)
+            path, category = os.path.split(path)
+            path, data_split = os.path.split(path)
+            #source = '__'.join(source.split('__')[:-1])
+            source = source.replace('.jpg', '')
+            category_source = (category, source)
+            y_batch.append(category_source)
+        
+        target_dir = os.path.join(results_dir, data_split)
+        save_representation(features_train, y_batch, target_dir, config)    
 
     
 if __name__ == '__main__':
@@ -85,4 +96,5 @@ if __name__ == '__main__':
     config = configs[FLAGS.config]
     print('\n==> Starting feature extraction: {}'.format(config['description']))
     
-    save_bottleneck_features(FLAGS.config, **config)
+    save_bottleneck_features(FLAGS.config, config['training_data_dir'], **config)
+    save_bottleneck_features(FLAGS.config, config['validation_data_dir'], **config)
