@@ -42,10 +42,13 @@ configs = {
         'description': 'A convnet classifier using VGG features',
         'epochs': 5,
         'batch_size': 20,
+        'seq_length': 20,
         'shuffle': True,
+        'dropout': 0.5,
         'seed': 17,
         'workers': 8,
-        'training_max_per_class': 30 * 50, # frames_per_video * max_videos_per_class
+        'use_multiprocessing': True,
+        'training_max_per_class': 30 * 100, # frames_per_video * max_videos_per_class
         'base_results_dir': './results',
         'training_data_dir': './results/vgg__moments_2c__features/training',
         'validation_data_dir': './results/vgg__moments_2c__features/validation',

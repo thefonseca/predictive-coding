@@ -11,7 +11,7 @@ import os
 import argparse
 
 
-def get_model(input_shape, n_classes, drop_rate=0.25):
+def get_model(input_shape, n_classes, drop_rate=0.5):
     
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
@@ -51,14 +51,25 @@ def get_create_results_dir(config_name, base_results_dir):
     
 def train(config_name, training_data_dir, validation_data_dir, 
           base_results_dir, test_data_dir=None, epochs=10, workers=1,
-          use_multiprocessing=False, batch_size=10, **config):
+          use_multiprocessing=False, batch_size=10, seq_length=20, 
+          dropout=0.5, **config):
     
     max_per_class = config.get('training_max_per_class', None)
-    training_generator = DataGenerator(training_data_dir, batch_size=batch_size,
-                                       max_per_class=max_per_class)
-    validation_generator = DataGenerator(validation_data_dir, batch_size=batch_size)
+    training_generator = DataGenerator(batch_size=batch_size,
+                                       max_per_class=max_per_class, 
+                                       seq_length=seq_length)
     
-    model = get_model(training_generator.data_shape, training_generator.n_classes)
+    validation_generator = DataGenerator(batch_size=batch_size, 
+                                         seq_length=seq_length)
+    
+    training_generator = training_generator.flow_from_directory(training_data_dir)
+    validation_generator = validation_generator.flow_from_directory(validation_data_dir)
+    
+    print(len(training_generator), len(validation_generator))
+    
+    model = get_model(training_generator.data_shape, 
+                      training_generator.n_classes,
+                      drop_rate=dropout)
     
     results_dir = get_create_results_dir(config_name, base_results_dir)
     checkpoint_path = os.path.join(results_dir, 'conv_lstm.hdf5')
@@ -67,9 +78,6 @@ def train(config_name, training_data_dir, validation_data_dir,
                                    verbose=1, save_best_only=True)
     csv_path = os.path.join(results_dir, 'conv_lstm.log')
     csv_logger = CSVLogger(csv_path)
-    
-    #use_multiprocessing = config.get('use_multiprocessing', False)
-    #workers = config.get('workers', 1)
     
     model.fit_generator(training_generator,
                         len(training_generator),
@@ -82,12 +90,14 @@ def train(config_name, training_data_dir, validation_data_dir,
     
 def evaluate(config_name, test_data_dir, batch_size, 
              index_start, base_results_dir, workers=1,
-             use_multiprocessing=False, **config):
+             use_multiprocessing=False, seq_length=20, **config):
     
     print('\nEvaluating model on test set...')
     # we use the remaining part of training set as test set
-    test_generator = DataGenerator(test_data_dir, batch_size=batch_size, 
+    test_generator = DataGenerator(batch_size=batch_size, 
+                                   seq_length=seq_length,
                                    index_start=index_start)
+    test_generator = test_generator.flow_from_directory(test_data_dir)
 
     # load best model
     results_dir = get_create_results_dir(config_name, base_results_dir)
