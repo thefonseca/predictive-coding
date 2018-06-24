@@ -68,7 +68,8 @@ class DataGenerator(Sequence):
         self.on_epoch_end()
         
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
-        if self.max_per_class is None or self.index_start + self.max_per_class >= 0:
+        if self.max_per_class is None or \
+        (self.index_start < 0 and self.index_start + self.max_per_class >= 0):
             class_samples = class_samples[self.index_start::self.sample_step]
         else:
             index_end = self.index_start + self.max_per_class

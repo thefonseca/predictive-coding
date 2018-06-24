@@ -70,7 +70,7 @@ def save_bottleneck_features(config_name, data_dir, base_results_dir,
     n_batches = len(generator)
     print('Number of batches: {}'.format(n_batches))
     
-    for i in tqdm(range(n_batches)[:5]):
+    for i in tqdm(range(n_batches)):
         X_, y_, sources = next(output_generator)
         features_train = model.predict(X_, generator.batch_size)
         y_batch = []
