@@ -103,7 +103,7 @@ def evaluate(config_name, test_data_dir, batch_size,
     results_dir = get_create_results_dir(config_name, base_results_dir)
     checkpoint_path = os.path.join(results_dir, 'conv_lstm.hdf5')
     model = load_model(checkpoint_path)
-    
+    print(len(test_generator))
     metrics = model.evaluate_generator(test_generator,
                                        len(test_generator),
                                        use_multiprocessing=use_multiprocessing, 
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     config = configs[FLAGS.config]
     print('\n==> Starting traininig: {}'.format(config['description']))
     
-    train(FLAGS.config, **config)
+    #train(FLAGS.config, **config)
     
     if config['test_data_dir']:
         evaluate(FLAGS.config, index_start=config['training_max_per_class'], **config)

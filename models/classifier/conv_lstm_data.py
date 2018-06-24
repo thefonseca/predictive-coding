@@ -62,18 +62,23 @@ class DataGenerator(Sequence):
     
     def __postprocess(self):
         self.n_classes = len(self.classes)
-        self.data_shape = self.__load_data(0).shape
-        msg = 'Found {} samples belonging to {} classes in {}'
-        print(msg.format(len(self.X), self.n_classes, self.data_dir))
-        self.on_epoch_end()
+        if len(self.X) == 0:
+            print('No data found in {}!'.format(self.data_dir))
+        else:
+            self.data_shape = self.__load_data(0).shape
+            msg = 'Found {} samples belonging to {} classes in {}'
+            print(msg.format(len(self.X), self.n_classes, self.data_dir))
+            self.on_epoch_end()
         
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
         if self.max_per_class is None or \
         (self.index_start < 0 and self.index_start + self.max_per_class >= 0):
             class_samples = class_samples[self.index_start::self.sample_step]
+            class_sources = class_sources[self.index_start::self.sample_step]
         else:
             index_end = self.index_start + self.max_per_class
             class_samples = class_samples[self.index_start:index_end:self.sample_step]
+            class_sources = class_sources[self.index_start:index_end:self.sample_step]
 
         if self.seq_length:
             class_samples = self.__to_sequence(class_samples, class_sources)
@@ -157,6 +162,10 @@ class DataGenerator(Sequence):
         return np.array(seq_data)
     
     def __load_data(self, index):
+        
+        if len(self.X) <= index:
+            return None
+        
         if self.seq_length:
             data = self.__load_seq_data(index)
         else:
@@ -173,6 +182,7 @@ class DataGenerator(Sequence):
             source = '__'.join(s.split('__')[:-1]) # NAME_OF__SOURCE__frame_001.pkl => NAME_OF__SOURCE
 
             if prev_source is None or prev_source == source:
+                print(len(samples), len(sources))
                 seq.append(samples[i])
             else:
                 if len(seq) >= self.seq_length:
