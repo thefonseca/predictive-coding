@@ -1,3 +1,8 @@
+from numpy.random import seed
+seed(17)
+from tensorflow import set_random_seed
+set_random_seed(17)
+
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D
