@@ -1,0 +1,67 @@
+(prednet) vpn2-217:classifier mfonseca$ python convnet.py --config convlstm__moments_nano__vgg_features_hard
+Using TensorFlow backend.
+
+==> Starting traininig: A ConvLSTM classifier using VGG features
+Found 198 samples belonging to 2 classes in ./results/vgg__moments_nano__features/training
+Found 96 samples belonging to 2 classes in ./results/vgg__moments_nano__features/validation
+2018-06-25 22:28:54.851695: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+2018-06-25 22:28:54.851717: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+2018-06-25 22:28:54.851725: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+2018-06-25 22:28:54.851732: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv_lst_m2d_1 (ConvLSTM2D)  (None, 30, 5, 5, 10)      187960    
+_________________________________________________________________
+conv3d_1 (Conv3D)            (None, 30, 5, 5, 1)       271       
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 750)               0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 32)                24032     
+_________________________________________________________________
+activation_1 (Activation)    (None, 32)                0         
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 32)                0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 2)                 66        
+_________________________________________________________________
+activation_2 (Activation)    (None, 2)                 0         
+=================================================================
+Total params: 212,329
+Trainable params: 212,329
+Non-trainable params: 0
+_________________________________________________________________
+Epoch 1/20
+8/9 [=========================>....] - ETA: 4s - loss: 0.9123 - acc: 0.4688 Epoch 00000: val_loss improved from inf to 0.68368, saving model to ./results/convlstm__moments_nano__vgg_features_hard/convlstm.hdf5
+9/9 [==============================] - 154s - loss: 0.9117 - acc: 0.4556 - val_loss: 0.6837 - val_acc: 0.5625
+Epoch 2/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.7083 - acc: 0.5625Epoch 00001: val_loss did not improve
+9/9 [==============================] - 105s - loss: 0.7112 - acc: 0.5444 - val_loss: 0.6865 - val_acc: 0.5625
+Epoch 3/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.7247 - acc: 0.5063Epoch 00002: val_loss did not improve
+9/9 [==============================] - 109s - loss: 0.7159 - acc: 0.5111 - val_loss: 0.6887 - val_acc: 0.5250
+Epoch 4/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.6642 - acc: 0.5812Epoch 00003: val_loss improved from 0.68368 to 0.67038, saving model to ./results/convlstm__moments_nano__vgg_features_hard/convlstm.hdf5
+9/9 [==============================] - 109s - loss: 0.6637 - acc: 0.5722 - val_loss: 0.6704 - val_acc: 0.6125
+Epoch 5/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.6470 - acc: 0.6437Epoch 00004: val_loss did not improve
+9/9 [==============================] - 116s - loss: 0.6405 - acc: 0.6444 - val_loss: 0.7150 - val_acc: 0.5500
+Epoch 6/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.6139 - acc: 0.6687Epoch 00005: val_loss did not improve
+9/9 [==============================] - 111s - loss: 0.6153 - acc: 0.6611 - val_loss: 0.6714 - val_acc: 0.5375
+Epoch 7/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.4677 - acc: 0.8313Epoch 00006: val_loss did not improve
+9/9 [==============================] - 112s - loss: 0.4611 - acc: 0.8444 - val_loss: 0.6992 - val_acc: 0.5375
+Epoch 8/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.4620 - acc: 0.7625Epoch 00007: val_loss did not improve
+9/9 [==============================] - 112s - loss: 0.4509 - acc: 0.7778 - val_loss: 0.9554 - val_acc: 0.4875
+Epoch 9/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.3116 - acc: 0.8813Epoch 00008: val_loss did not improve
+9/9 [==============================] - 130s - loss: 0.2900 - acc: 0.8944 - val_loss: 0.7660 - val_acc: 0.5375
+Epoch 10/20
+8/9 [=========================>....] - ETA: 1s - loss: 0.1919 - acc: 0.9625Epoch 00009: val_loss did not improve
+9/9 [==============================] - 120s - loss: 0.1898 - acc: 0.9611 - val_loss: 0.8846 - val_acc: 0.4750
+
+Evaluating model on test set...
+Found 193 samples belonging to 2 classes in ./results/vgg__moments_nano__features/training
+Test loss: 0.6960351136 - acc: 0.477777779102

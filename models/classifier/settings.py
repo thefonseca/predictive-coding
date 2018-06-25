@@ -29,7 +29,6 @@ convnet_base_config = {
     'batch_size': 20,
     'shuffle': True,
     'dropout': 0.5,
-    'seed': 17,
     'workers': 4,
     #'use_multiprocessing': True,
     'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
@@ -52,10 +51,10 @@ add_config(configs, 'convlstm__moments_nano__vgg_features_easy',
              'seq_length': 30,
              'classes': ['cooking', 'walking']}, convnet_base_config)
 
-add_config(configs, 'lstm__moments_nano__vgg_features_easy', 
-           { 'description': 'An LSTM classifier using VGG features',
+add_config(configs, 'convlstm__moments_nano__vgg_features_hard', 
+           { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': 30,
-             'classes': ['cooking', 'walking']}, convnet_base_config)
+             'classes': ['running', 'walking']}, convnet_base_config)
 
 PREDNET_FEATURES_PER_VIDEO = 5
 
