@@ -26,7 +26,7 @@ configs = {
         'base_results_dir': './results/'
     },
     
-    'vgg_moments_2c' : {
+    'vgg__moments_nano__features' : {
         'description': 'Extract features from Moments in Time dataset',
         'input_shape': (160, 160, 3),
         'batch_size': 10,
@@ -34,11 +34,11 @@ configs = {
         'max_videos_per_class': 150,
         'sample_step': 3,
         'base_results_dir': './results',
-        'training_data_dir': '../../datasets/moments_2c_frames/training',
-        'validation_data_dir': '../../datasets/moments_2c_frames/validation'
+        'training_data_dir': '../../datasets/moments_nano_frames/training',
+        'validation_data_dir': '../../datasets/moments_nano_frames/validation'
     },
     
-    'moments_2c__vgg_features' : {
+    'convnet__moments_nano' : {
         'description': 'A convnet classifier using VGG features',
         'epochs': 5,
         'batch_size': 20,
@@ -50,9 +50,10 @@ configs = {
         'use_multiprocessing': True,
         'training_max_per_class': 30 * 100, # frames_per_video * max_videos_per_class
         'base_results_dir': './results',
-        'training_data_dir': './results/vgg__moments_2c__features/training',
-        'validation_data_dir': './results/vgg__moments_2c__features/validation',
-        'test_data_dir': './results/vgg__moments_2c__features/training'
+        'training_data_dir': './results/vgg__moments_nano__features/training',
+        'validation_data_dir': './results/vgg__moments_nano__features/validation',
+        'test_data_dir': './results/vgg__moments_nano__features/training',
+        'classes': ['cooking', 'walking']
     }
     
 }

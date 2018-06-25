@@ -8,6 +8,9 @@ FLAGS = None
 
 
 def generate_frame_list(source_dir, splits):
+    
+    ''' Generate list of frames to be used by the original PredNet generator. '''
+    
     image_pattern = os.path.join(source_dir, '{}/*/*.jpg')
     image_pattern2 = os.path.join(source_dir, '{}/*.jpg')
 

@@ -1,5 +1,6 @@
 import numpy as np
 from skimage.transform import resize
+import os
 
 
 def crop_center(img, cropx, cropy):
@@ -20,3 +21,8 @@ def resize_img(img, target_size):
     # crop
     img = crop_center(img, target_size[0], target_size[1])
     return img
+
+def get_create_results_dir(config_name, base_results_dir):
+    results_dir = os.path.join(base_results_dir, config_name)
+    if not os.path.exists(results_dir): os.makedirs(results_dir)
+    return results_dir

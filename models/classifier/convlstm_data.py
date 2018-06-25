@@ -19,7 +19,7 @@ class DataGenerator(Sequence):
     def __init__(self, batch_size=16, shuffle=True, fn_preprocess=None,
                  index_start=0, max_per_class=None, rescale=None,
                  seq_length=None, sample_step=1, target_size=None, 
-                 return_sources=False):
+                 classes=None, return_sources=False):
         
         'Initialization'
         self.batch_size = batch_size
@@ -34,10 +34,13 @@ class DataGenerator(Sequence):
         self.target_size = target_size
         self.fn_preprocess = fn_preprocess
         self.return_sources = return_sources
+        self.classes = classes
         
     def flow_from_directory(self, data_dir):
         self.data_dir = data_dir
-        self.classes = sorted(os.walk(data_dir).next()[1])
+        
+        if self.classes is None:
+            self.classes = sorted(os.walk(data_dir).next()[1])
         data_pattern = '{}/*'
         
         for i, c in enumerate(self.classes):
@@ -48,7 +51,8 @@ class DataGenerator(Sequence):
         return self
         
     def flow(self, X, y, sources=None):
-        self.classes = sorted(list(set(y)))
+        if self.classes is None:
+            self.classes = sorted(list(set(y)))
         self.sources = sources
         
         for i, c in enumerate(self.classes):
@@ -127,7 +131,6 @@ class DataGenerator(Sequence):
     def __preprocess(self, img):
         '''if self.target_size:
             img = utils.resize_img(img, self.target_size)
-        
         if self.rescale:
             img = self.rescale * img'''
         if self.fn_preprocess:
@@ -137,7 +140,6 @@ class DataGenerator(Sequence):
     def __load_image(self, filename):
         img = image.load_img(filename, target_size=self.target_size)
         img = image.img_to_array(img)
-        #img = np.expand_dims(img, axis=0)
         #img = imread(filename)
         return self.__preprocess(img)
     
@@ -182,7 +184,6 @@ class DataGenerator(Sequence):
             source = '__'.join(s.split('__')[:-1]) # NAME_OF__SOURCE__frame_001.pkl => NAME_OF__SOURCE
 
             if prev_source is None or prev_source == source:
-                print(len(samples), len(sources))
                 seq.append(samples[i])
             else:
                 if len(seq) >= self.seq_length:

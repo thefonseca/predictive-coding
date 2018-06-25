@@ -9,6 +9,7 @@ from settings import configs
 from conv_lstm_data import DataGenerator
 import os
 import argparse
+import utils
 
 
 def get_model(input_shape, n_classes, drop_rate=0.5):
@@ -44,11 +45,6 @@ def get_model(input_shape, n_classes, drop_rate=0.5):
     model.summary()
     return model
 
-def get_create_results_dir(config_name, base_results_dir):
-    results_dir = os.path.join(base_results_dir, config_name)
-    if not os.path.exists(results_dir): os.makedirs(results_dir)
-    return results_dir
-    
 def train(config_name, training_data_dir, validation_data_dir, 
           base_results_dir, test_data_dir=None, epochs=10, workers=1,
           use_multiprocessing=False, batch_size=10, seq_length=20, 
@@ -65,13 +61,11 @@ def train(config_name, training_data_dir, validation_data_dir,
     training_generator = training_generator.flow_from_directory(training_data_dir)
     validation_generator = validation_generator.flow_from_directory(validation_data_dir)
     
-    print(len(training_generator), len(validation_generator))
-    
     model = get_model(training_generator.data_shape, 
                       training_generator.n_classes,
                       drop_rate=dropout)
     
-    results_dir = get_create_results_dir(config_name, base_results_dir)
+    results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     checkpoint_path = os.path.join(results_dir, 'conv_lstm.hdf5')
         
     checkpointer = ModelCheckpoint(filepath=checkpoint_path, 
@@ -103,7 +97,6 @@ def evaluate(config_name, test_data_dir, batch_size,
     results_dir = get_create_results_dir(config_name, base_results_dir)
     checkpoint_path = os.path.join(results_dir, 'conv_lstm.hdf5')
     model = load_model(checkpoint_path)
-    print(len(test_generator))
     metrics = model.evaluate_generator(test_generator,
                                        len(test_generator),
                                        use_multiprocessing=use_multiprocessing, 
