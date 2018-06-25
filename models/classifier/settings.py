@@ -31,16 +31,18 @@ configs = {
         'input_shape': (160, 160, 3),
         'batch_size': 10,
         'frames_per_video': 90,
-        'max_videos_per_class': 150,
+        'max_videos_per_class': 200,
         'sample_step': 3,
         'base_results_dir': './results',
         'training_data_dir': '../../datasets/moments_nano_frames/training',
-        'validation_data_dir': '../../datasets/moments_nano_frames/validation'
+        'validation_data_dir': '../../datasets/moments_nano_frames/validation',
+        'classes': ['running', 'walking']
     },
     
     'convnet__moments_nano' : {
         'description': 'A convnet classifier using VGG features',
-        'epochs': 5,
+        'epochs': 20,
+        'stopping_patience': 5,
         'batch_size': 20,
         'seq_length': 20,
         'shuffle': True,
@@ -48,7 +50,7 @@ configs = {
         'seed': 17,
         'workers': 8,
         'use_multiprocessing': True,
-        'training_max_per_class': 30 * 100, # frames_per_video * max_videos_per_class
+        'training_max_per_class': 30 * 100, # features_per_video * max_videos_per_class
         'base_results_dir': './results',
         'training_data_dir': './results/vgg__moments_nano__features/training',
         'validation_data_dir': './results/vgg__moments_nano__features/validation',

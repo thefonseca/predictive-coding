@@ -12,7 +12,7 @@ from keras.applications.vgg16 import VGG16
 from keras.applications.vgg16 import preprocess_input
 from keras.utils import to_categorical
 
-from conv_lstm_data import DataGenerator
+from convlstm_data import DataGenerator
 from settings import configs
 import argparse
 import cPickle as pkl
@@ -37,9 +37,6 @@ def save_representation(features, labels, results_dir, config):
         
         if not os.path.exists(target_dir): os.makedirs(target_dir)
         
-        #count = source_count.get(source, 0)
-        #source_count[source] = count + 1
-        #features_file = '{}__{:03d}.pkl'.format(source, count)
         features_file = '{}.pkl'.format(source)
         filename = os.path.join(target_dir, features_file)
         
@@ -49,16 +46,16 @@ def save_representation(features, labels, results_dir, config):
 
 def save_bottleneck_features(config_name, data_dir, base_results_dir, 
                              batch_size, input_shape, frames_per_video, 
-                             max_videos_per_class, sample_step, **config):
+                             max_videos_per_class, sample_step, 
+                             classes=None, **config):
     
     max_frames_per_class = frames_per_video * max_videos_per_class
     
     generator = DataGenerator(batch_size=batch_size, return_sources=True,
                               fn_preprocess=preprocess_input,
                               shuffle=False, sample_step=sample_step, 
-                              target_size=input_shape[:2],
+                              target_size=input_shape[:2], classes=classes,
                               max_per_class=max_frames_per_class)
-    
     generator = generator.flow_from_directory(data_dir)
     output_generator = iter(generator)
     
