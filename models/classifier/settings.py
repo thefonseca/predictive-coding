@@ -26,9 +26,9 @@ configs = {
         'base_results_dir': './results/'
     },
     
-    'vgg__moments_2c__features' : {
-        'description': 'Extract VGG features on Moments in Time dataset',
-        'input_shape': (224, 224, 3),
+    'vgg_moments_2c' : {
+        'description': 'Extract features from Moments in Time dataset',
+        'input_shape': (160, 160, 3),
         'batch_size': 10,
         'frames_per_video': 90,
         'max_videos_per_class': 150,
@@ -38,7 +38,7 @@ configs = {
         'validation_data_dir': '../../datasets/moments_2c_frames/validation'
     },
     
-    'convnet__moments_2c__vgg_features' : {
+    'moments_2c__vgg_features' : {
         'description': 'A convnet classifier using VGG features',
         'epochs': 5,
         'batch_size': 20,
