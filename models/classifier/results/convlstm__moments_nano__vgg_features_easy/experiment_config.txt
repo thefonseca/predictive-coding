@@ -1,0 +1,15 @@
+base_results_dir: ./results
+batch_size: 20
+classes: ['cooking', 'walking']
+description: A ConvLSTM classifier using VGG features
+dropout: 0.5
+epochs: 20
+seed: 17
+seq_length: 30
+shuffle: True
+stopping_patience: 5
+test_data_dir: ./results/vgg__moments_nano__features/training
+training_data_dir: ./results/vgg__moments_nano__features/training
+training_max_per_class: 3000
+validation_data_dir: ./results/vgg__moments_nano__features/validation
+workers: 4

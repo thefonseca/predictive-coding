@@ -1,8 +1,9 @@
-
+**/.DS_Store
 *.pyc
 **/.ipynb_checkpoints*
 **/*.zip
+*.pkl
 datasets/*_data*
 datasets/*_frames
 **/model_data*
-**/results/*
+models/prednet/results/*

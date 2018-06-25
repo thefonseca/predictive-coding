@@ -7,7 +7,7 @@ from keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
 from keras.models import load_model
 
 from settings import configs
-from convlstm_data import DataGenerator
+from data import DataGenerator
 import os
 import argparse
 import utils
@@ -25,11 +25,6 @@ def convnet(input_shape, n_classes, drop_rate=0.5):
     model.add(Activation('relu'))
     #model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(drop_rate))
-
-    #model.add(Conv2D(32, (3, 3)))
-    #model.add(Activation('relu'))
-    #model.add(MaxPooling2D(pool_size=(2, 2)))
-
     model.add(Flatten())
     model.add(Dense(32))
     #model.add(BatchNormalization())
@@ -48,15 +43,9 @@ def convlstm(input_shape, n_classes, drop_rate=0.5):
                        input_shape=input_shape,
                        padding='same', return_sequences=True))
     #model.add(BatchNormalization())
-
-    #seq.add(ConvLSTM2D(filters=40, kernel_size=(3, 3),
-    #                   padding='same', return_sequences=True))
-    #seq.add(BatchNormalization())
-
     model.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
                      activation='sigmoid',
                      padding='same', data_format='channels_last'))
-    
     model.add(Flatten())
     model.add(Dense(32))
     #model.add(BatchNormalization())
@@ -115,7 +104,7 @@ def train(config_name, training_data_dir, validation_data_dir,
     if seq_length:
         model = convlstm(input_shape, n_classes, drop_rate=dropout)
         checkpoint_path = os.path.join(results_dir, 'convlstm.hdf5')
-        csv_path = os.path.join(results_dir, 'convnet.log')
+        csv_path = os.path.join(results_dir, 'convlstm.log')
     else:
         model = convnet(input_shape, n_classes, drop_rate=dropout)
         checkpoint_path = os.path.join(results_dir, 'convnet.hdf5')    
@@ -125,7 +114,6 @@ def train(config_name, training_data_dir, validation_data_dir,
                   optimizer='rmsprop',
                   metrics=['accuracy'])
     model.summary()
-        
     checkpointer = ModelCheckpoint(filepath=checkpoint_path, 
                                    verbose=1, save_best_only=True)
     
@@ -159,9 +147,13 @@ def evaluate(config_name, test_data_dir, batch_size,
     
     # load best model
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
-    checkpoint_path = os.path.join(results_dir, 'convnet.hdf5')
-    model = load_model(checkpoint_path)
     
+    if seq_length:
+        checkpoint_path = os.path.join(results_dir, 'convlstm.hdf5')
+    else:
+        checkpoint_path = os.path.join(results_dir, 'convnet.hdf5')    
+    
+    model = load_model(checkpoint_path)
     metrics = model.evaluate_generator(generator,
                                        len(generator),
                                        use_multiprocessing=use_multiprocessing, 

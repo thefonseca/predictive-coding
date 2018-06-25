@@ -48,7 +48,12 @@ add_config(configs, 'convnet__moments_nano__vgg_features_hard',
              'classes': ['running', 'walking']}, convnet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__vgg_features_easy', 
-           { 'description': 'A convnet classifier using VGG features',
+           { 'description': 'A ConvLSTM classifier using VGG features',
+             'seq_length': 30,
+             'classes': ['cooking', 'walking']}, convnet_base_config)
+
+add_config(configs, 'lstm__moments_nano__vgg_features_easy', 
+           { 'description': 'An LSTM classifier using VGG features',
              'seq_length': 30,
              'classes': ['cooking', 'walking']}, convnet_base_config)
 
