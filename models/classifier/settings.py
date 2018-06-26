@@ -25,7 +25,7 @@ VGG_FEATURES_PER_VIDEO = 30
 
 convnet_base_config = {
     'epochs': 100,
-    'stopping_patience': 5,
+    'stopping_patience': 10,
     'batch_size': 10,
     'shuffle': True,
     'dropout': 0.5,
