@@ -141,6 +141,9 @@ class SequenceGenerator(Iterator):
             
             end = start + self.n_timesteps
             
+            if end > len(labels):
+                continue
+            
             # if it is a transition between two different 
             # sources, we do not overlap
             if labels[start] != labels[end-1]:

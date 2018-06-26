@@ -236,7 +236,7 @@ def evaluate(model, dataset, img_dir, img_sources, experiment_name,
                                        seed=seed, data_format=data_format)
     
     n_batches = ((len(data_generator.possible_starts) - 1) // batch_size) + 1 # ceil
-    print('Number of sequences: {}'.format(len(data_generator.possible_starts)))
+    #print('Number of sequences: {}'.format(len(data_generator.possible_starts)))
     print('Number of batches: {}'.format(n_batches))
     
     if output_mode == 'prediction':
