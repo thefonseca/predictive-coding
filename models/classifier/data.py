@@ -72,7 +72,7 @@ class DataGenerator(Sequence):
             self.data_shape = self.__load_data(0).shape
             msg = 'Found {} samples belonging to {} classes in {}'
             print(msg.format(len(self.X), self.n_classes, self.data_dir))
-            self.on_epoch_end()
+        self.on_epoch_end()
         
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
         if self.max_per_class is None or \
