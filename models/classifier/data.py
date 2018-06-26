@@ -30,7 +30,6 @@ class DataGenerator(Sequence):
         self.max_per_class = max_per_class
         self.seq_length = seq_length
         self.sample_step = sample_step
-        self.rescale = rescale
         self.target_size = target_size
         self.fn_preprocess = fn_preprocess
         self.return_sources = return_sources

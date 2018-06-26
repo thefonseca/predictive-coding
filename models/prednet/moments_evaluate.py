@@ -42,26 +42,47 @@ def create_test_model(train_model, output_mode, n_timesteps=10, gpus=None, **ext
     # Create testing model (to output predictions)
     layer_config = train_model.layers[1].get_config()
     layer_config['output_mode'] = output_mode
-    data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     test_prednet = PredNet(weights=train_model.layers[1].get_weights(), **layer_config)
     input_shape = list(train_model.layers[0].batch_input_shape[1:])
     input_shape[0] = n_timesteps
     inputs = Input(shape=tuple(input_shape))
     predictions = test_prednet(inputs)
     test_model = Model(inputs=inputs, outputs=predictions)
-    
-    if gpus:
-        test_model = multi_gpu_model(test_model, gpus=gpus)
+    #if gpus:
+    #    test_model = multi_gpu_model(test_model, gpus=gpus)
         
     return test_model
+
+def create_model(n_channels, img_height, img_width, 
+                 n_timesteps=10, output_mode='error', 
+                 **extras):
+    # Model parameters
+    if K.image_data_format() == 'channels_first':
+        input_shape = (n_channels, img_height, img_width) 
+    else:
+        input_shape = (img_height, img_width, n_channels)
+        
+    stack_sizes = (n_channels, 48, 96, 192)
+    R_stack_sizes = stack_sizes
+    A_filt_sizes = (3, 3, 3)
+    Ahat_filt_sizes = (3, 3, 3, 3)
+    R_filt_sizes = (3, 3, 3, 3)
+    
+    prednet = PredNet(stack_sizes, R_stack_sizes,
+                      A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
+                      output_mode=output_mode, return_sequences=True) 
+    input_shape = (n_timesteps,) + input_shape
+    inputs = Input(shape=tuple(input_shape))
+    predictions = prednet(inputs)
+    model = Model(inputs=inputs, outputs=predictions)
+    return model 
 
 def get_create_results_dir(dataset, experiment_name, config):
     results_dir = os.path.join(config['base_results_dir'], experiment_name, dataset)
     if not os.path.exists(results_dir): os.makedirs(results_dir)
     return results_dir
 
-def save_experiment_config(dataset, experiment_name, config):
-    
+def save_experiment_config(dataset, experiment_name, config):   
     results_dir = get_create_results_dir(dataset, experiment_name, config)
     f = open(os.path.join(results_dir, 'experiment_config.txt'), 'w')
     
@@ -72,7 +93,6 @@ def save_experiment_config(dataset, experiment_name, config):
 
 def save_predictions(X, X_hat, mse_model, mse_prev, results_dir, 
                      n_plot=20, **config):
-    
     # Compare MSE of PredNet predictions vs. using last frame.  Write results to prediction_scores.txt
     #mse_model = np.mean((X[:, 1:] - X_hat[:, 1:]) ** 2)  # look at all timesteps except the first
     #mse_prev = np.mean((X[:, :-1] - X[:, 1:]) ** 2)
@@ -222,8 +242,10 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
 def evaluate(model, dataset, img_dir, img_sources, experiment_name,
              output_mode, n_timesteps=10, frame_step=3, seq_overlap=0, 
              max_seq_per_video=5, shuffle=False, batch_size=5, 
-             max_missing_frames=15, N_seq=None, seed=17, 
-             data_format=K.image_data_format(), **config):
+             max_missing_frames=15, N_seq=None, seed=17, **config):
+    
+    layer_config = model.layers[1].get_config()
+    data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     
     print('Creating generator...')
     data_generator = SequenceGenerator(img_dir, img_sources, n_timesteps,
@@ -258,15 +280,16 @@ if __name__ == '__main__':
     
     config = configs[FLAGS.config]
     
-    print('\n==> Starting experiment: {}'.format(config['description']))
+    print('\n==> Starting experiment: {}\n'.format(config['description']))
     
-    print('Loading pre-trained model...')
-    pretrained_model = load_model(**config)
-    layer_config = pretrained_model.layers[1].get_config()
-    data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
-    
-    print('Creating testing model...')
-    model = create_test_model(pretrained_model, **config)
+    if config.get('model_weights_file', None):
+        print('Loading pre-trained model...')
+        pretrained_model = load_model(**config)
+        model = create_test_model(pretrained_model, **config)
+    else:
+        print('Creating model with random weights...')
+        model = create_model(**config)
+        
     model.summary()
     
     for split in ['training', 'validation', 'test']:
@@ -275,8 +298,6 @@ if __name__ == '__main__':
         
         if img_dir and img_sources:
             print('==> Dataset split: {}'.format(split))
-            evaluate(model, split, img_dir, img_sources, FLAGS.config, 
-                     data_format=data_format, **config)
-    
+            evaluate(model, split, img_dir, img_sources, FLAGS.config, **config)
             save_experiment_config(split, FLAGS.config, config)
     

@@ -24,9 +24,9 @@ configs['vgg__moments_nano__features'] = {
 VGG_FEATURES_PER_VIDEO = 30
 
 convnet_base_config = {
-    'epochs': 20,
+    'epochs': 100,
     'stopping_patience': 5,
-    'batch_size': 20,
+    'batch_size': 10,
     'shuffle': True,
     'dropout': 0.5,
     'workers': 4,
