@@ -105,11 +105,10 @@ class SequenceGenerator(Iterator):
 
     def next(self):
         with self.lock:
-            index_array = next(self.index_generator)
-            #index_array, current_index, current_batch_size = next(self.index_generator)
+            #index_array = next(self.index_generator)
+            index_array, current_index, current_batch_size = next(self.index_generator)
         
-        #batch_x = np.zeros((current_batch_size, self.n_timesteps) + self.im_shape, np.float32)
-        current_batch_size = len(index_array)
+        #current_batch_size = len(index_array)
         images = []
         labels = []
         

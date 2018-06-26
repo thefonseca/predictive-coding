@@ -14,11 +14,10 @@ import math
 from keras import backend as K
 from keras.models import Model, model_from_json
 from keras.layers import Input, Dense, Flatten
-from keras.utils import multi_gpu_model
 
 from prednet import PredNet
 from moments_data import SequenceGenerator
-from moments_settings import experiments
+from moments_settings import configs
 
 from tqdm import tqdm
 import argparse
@@ -253,64 +252,31 @@ def evaluate(model, dataset, img_dir, img_sources, experiment_name,
         
     
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Evaluate pre-trained model.')
+    parser = argparse.ArgumentParser(description='Evaluate PredNet model.')
     parser.add_argument('config', help='experiment config name defined in moments_setting.py')
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--prediction', help='model will output image predictions', 
-                       action="store_true")
-    group.add_argument('--error', help='model will output prediction errors', 
-                       action="store_true")
-    group.add_argument('--representation', help='model will output PredNet representation (R) for all layers', 
-                       action="store_true")
-    parser.add_argument('--layer', help='output specific layer number', type=int)
-    
-    data_group = parser.add_mutually_exclusive_group(required=True)
-    data_group.add_argument('--training', help='process training dataset', 
-                       action="store_true")
-    data_group.add_argument('--validation', help='process validation dataset', 
-                       action="store_true")
-    data_group.add_argument('--test', help='process test dataset', 
-                       action="store_true")
     FLAGS, unparsed = parser.parse_known_args()
     
-    experiment = experiments[FLAGS.config]
+    config = configs[FLAGS.config]
     
-    for arg in ['prediction', 'representation', 'error']:
-        if getattr(FLAGS, arg):
-            output_mode = arg
-            break
-            
-    for arg in ['training', 'validation', 'test']:
-        if getattr(FLAGS, arg):
-            img_dir = experiment[arg + '_img_dir']
-            img_sources = experiment[arg + '_img_sources']
-            dataset = arg
-            break
-            
-    if FLAGS.layer is not None:
-        prednet_output_mode = output_mode[:1].upper() + str(FLAGS.layer)
-    else:
-        prednet_output_mode = output_mode
-        
-    print('\n==> Starting experiment: {}'.format(experiment['description']))
-    print('==> Dataset: {}'.format(dataset))
-    if FLAGS.layer is None:
-        print('==> Output mode: {}\n'.format(output_mode))
-    else:
-        print('==> Output mode: {} (layer {})\n'.format(output_mode, FLAGS.layer))
+    print('\n==> Starting experiment: {}'.format(config['description']))
     
     print('Loading pre-trained model...')
-    pretrained_model = load_model(**experiment)
+    pretrained_model = load_model(**config)
     layer_config = pretrained_model.layers[1].get_config()
     data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     
     print('Creating testing model...')
-    model = create_test_model(pretrained_model, prednet_output_mode, **experiment)
+    model = create_test_model(pretrained_model, **config)
     model.summary()
     
-    evaluate(model, dataset, img_dir, img_sources, FLAGS.config, 
-             output_mode=prednet_output_mode, 
-             data_format=data_format, **experiment)
+    for split in ['training', 'validation', 'test']:
+        img_dir = config.get(split + '_img_dir', None)
+        img_sources = config.get(split + '_img_sources', None)
+        
+        if img_dir and img_sources:
+            print('==> Dataset split: {}'.format(split))
+            evaluate(model, split, img_dir, img_sources, FLAGS.config, 
+                     data_format=data_format, **config)
     
-    save_experiment_config(dataset, FLAGS.config, prednet_output_mode, experiment)
+        save_experiment_config(split, FLAGS.config, config['output_mode'], config)
     
