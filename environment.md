@@ -55,3 +55,11 @@ unset ORIGINAL_LD_LIBRARY_PATH
 export DYLD_LIBRARY_PATH=$ORIGINAL_DYLD_LIBRARY_PATH
 unset ORIGINAL_DYLD_LIBRARY_PATH
 ```
+
+## Screen commands
+### Log terminal output
+From this [stackoverflow question](https://stackoverflow.com/questions/14208001/save-screen-program-output-to-a-file).
+
+> `Ctrl+a` then `Shift+h`. You can view the file `screenlog.0` while the program is still running.
+
+> If the log can’t be created, then try changing the screen window’s working directory: `Ctrl+a + :` and type for example `chdir /home/foobar/baz`
