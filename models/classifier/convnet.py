@@ -144,10 +144,12 @@ def evaluate(config_name, test_data_dir, batch_size,
     
     print('\nEvaluating model on test set...')
     # we use the remaining part of training set as test set
+    max_per_class = config.get('test_max_per_class', None)
     generator = DataGenerator(classes=classes,
                               batch_size=batch_size,
                               seq_length=seq_length,
-                              index_start=index_start)
+                              index_start=index_start, 
+                              max_per_class=max_per_class)
     generator = generator.flow_from_directory(test_data_dir)
     
     # load best model

@@ -65,4 +65,5 @@ add_config(configs, 'convnet__moments_nano__prednet_kitti_R3_easy',
              'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/moments_2c_transfer_kitti_R3/training',
              'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
+             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
              'classes': ['cooking', 'walking']}, convnet_base_config)

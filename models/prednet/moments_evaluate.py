@@ -55,14 +55,14 @@ def create_test_model(train_model, output_mode, n_timesteps=10, gpus=None, **ext
         
     return test_model
 
-def get_create_results_dir(dataset, experiment_name, output_mode, config):
-    results_dir = os.path.join(config['base_results_dir'], experiment_name + '_' + output_mode, dataset)
+def get_create_results_dir(dataset, experiment_name, config):
+    results_dir = os.path.join(config['base_results_dir'], experiment_name, dataset)
     if not os.path.exists(results_dir): os.makedirs(results_dir)
     return results_dir
 
-def save_experiment_config(dataset, experiment_name, output_mode, config):
+def save_experiment_config(dataset, experiment_name, config):
     
-    results_dir = get_create_results_dir(dataset, experiment_name, output_mode, config)
+    results_dir = get_create_results_dir(dataset, experiment_name, config)
     f = open(os.path.join(results_dir, 'experiment_config.txt'), 'w')
     
     for key in sorted(config):
@@ -135,7 +135,7 @@ def save_representation(rep, labels, results_dir, config):
             pkl.dump(rep[i].reshape(rep.shape[2:]), f)
         
         
-def evaluate_prediction(model, dataset, experiment_name, output_mode, 
+def evaluate_prediction(model, dataset, experiment_name, 
                         data_generator, n_batches, 
                         data_format=K.image_data_format(), **config):
     
@@ -169,7 +169,7 @@ def evaluate_prediction(model, dataset, experiment_name, output_mode,
         X = np.transpose(X, (0, 1, 3, 4, 2))
         preds = np.transpose(preds, (0, 1, 3, 4, 2))
         
-    results_dir = get_create_results_dir(dataset, experiment_name, output_mode, config)
+    results_dir = get_create_results_dir(dataset, experiment_name, config)
     save_predictions(X, preds, mse_model, mse_prev, results_dir, **config)
     
     
@@ -179,7 +179,7 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
                             timestep_start=-1, timestep_end=None,
                             data_format=K.image_data_format(), **config):
     
-    results_dir = get_create_results_dir(dataset, experiment_name, output_mode, config)
+    results_dir = get_create_results_dir(dataset, experiment_name, config)
     y = []
 
     for i in tqdm(range(n_batches)):
@@ -240,7 +240,7 @@ def evaluate(model, dataset, img_dir, img_sources, experiment_name,
     print('Number of batches: {}'.format(n_batches))
     
     if output_mode == 'prediction':
-        evaluate_prediction(model, dataset, experiment_name, output_mode, 
+        evaluate_prediction(model, dataset, experiment_name, 
                             data_generator, n_batches, 
                             data_format=data_format, **config)
         
@@ -278,5 +278,5 @@ if __name__ == '__main__':
             evaluate(model, split, img_dir, img_sources, FLAGS.config, 
                      data_format=data_format, **config)
     
-        save_experiment_config(split, FLAGS.config, config['output_mode'], config)
+            save_experiment_config(split, FLAGS.config, config)
     
