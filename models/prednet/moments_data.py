@@ -100,7 +100,10 @@ class SequenceGenerator(Iterator):
             self.possible_starts = np.random.permutation(self.possible_starts)
         if N_seq is not None and len(self.possible_starts) > N_seq:  # select a subset of sequences if want to
             self.possible_starts = self.possible_starts[:N_seq]
-        self.N_sequences = len(self.possible_starts)
+        #self.N_sequences = len(self.possible_starts)
+        
+        print('Found {} sequences in {} source frames'.format(len(self.possible_starts), 
+                                                              len(self.sources)))
         super(SequenceGenerator, self).__init__(len(self.possible_starts), batch_size, shuffle, seed)
 
     def next(self):
@@ -109,6 +112,7 @@ class SequenceGenerator(Iterator):
             index_array, current_index, current_batch_size = next(self.index_generator)
         
         #current_batch_size = len(index_array)
+        
         images = []
         labels = []
         
@@ -122,33 +126,43 @@ class SequenceGenerator(Iterator):
                 idx_start_next = self.possible_starts[idx+1]
                 if idx_end > idx_start_next:
                     idx_end = idx_start_next
-                
+                    
             images.extend(self.load_images(idx_start, idx_end))
-            labels.extend(self.sources[idx_start:idx_end])
+            labels.extend(self.sources[idx_start:idx_end:self.frame_step])
             
         images = np.array(images)
         #print('images shape:', images.shape, images[0].shape)
         
         batch_x = []
         batch_y = []
+        start = 0
         
         for i in range(current_batch_size):
             
-            if self.seq_overlap > 0:
-                start = i * self.seq_overlap
-            else:
-                start = i * self.n_timesteps
-            
-            if start < 0:
-                start = 0
-                
             end = start + self.n_timesteps
             
-            #print('range:', start, end, len(images))
+            # if it is a transition between two different 
+            # sources, we do not overlap
+            if labels[start] != labels[end-1]:
+                # search start index for next source
+                for j in range(start, end):
+                    if labels[j] == labels[end-1]:
+                        start = j
+                        break
+                # update end index
+                end = start + self.n_timesteps
+            
+            #print(i, 'range:', start, end, labels[start:end])
                 
             if end <= len(images):
                 batch_x.append(images[start:end])
                 batch_y.append(labels[start:end])
+            
+            # update start index
+            if self.seq_overlap > 0:
+                start += self.seq_overlap
+            else:
+                start += self.n_timesteps
                 
         batch_x = np.array(batch_x)
         batch_y = np.array(batch_y)

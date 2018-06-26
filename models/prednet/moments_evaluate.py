@@ -220,7 +220,7 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
 
 
 def evaluate(model, dataset, img_dir, img_sources, experiment_name,
-             output_mode, n_timesteps=10, frame_step=3, seq_overlap=5, 
+             output_mode, n_timesteps=10, frame_step=3, seq_overlap=0, 
              max_seq_per_video=5, shuffle=False, batch_size=5, 
              max_missing_frames=15, N_seq=None, seed=17, 
              data_format=K.image_data_format(), **config):
@@ -228,7 +228,7 @@ def evaluate(model, dataset, img_dir, img_sources, experiment_name,
     print('Creating generator...')
     data_generator = SequenceGenerator(img_dir, img_sources, n_timesteps,
                                        output_mode=output_mode,
-                                       frame_step=frame_step, seq_overlap=5, 
+                                       frame_step=frame_step, seq_overlap=seq_overlap, 
                                        max_seq_per_video=max_seq_per_video, 
                                        N_seq=N_seq, shuffle=shuffle, 
                                        batch_size=batch_size,

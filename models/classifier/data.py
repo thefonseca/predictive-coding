@@ -17,9 +17,9 @@ Adapted from: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-
 class DataGenerator(Sequence):
     'Generates data for Keras'
     def __init__(self, batch_size=16, shuffle=True, fn_preprocess=None,
-                 index_start=0, max_per_class=None, rescale=None,
-                 seq_length=None, sample_step=1, target_size=None, 
-                 classes=None, return_sources=False):
+                 index_start=0, max_per_class=None, seq_length=None, 
+                 sample_step=1, target_size=None, classes=None, 
+                 return_sources=False):
         
         'Initialization'
         self.batch_size = batch_size

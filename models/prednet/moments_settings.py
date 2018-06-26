@@ -1,7 +1,5 @@
 import os
 
-# Where KITTI data will be saved if you run process_kitti.py
-# If you directly download the processed data, change to the path of the data.
 DATA_DIR = '../../datasets/moments_nano_frames/'
 
 def add_config(configs, name, config, base_config=None):
