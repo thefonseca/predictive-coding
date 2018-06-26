@@ -7,7 +7,7 @@ This folder contains classification models that are trained on learned represent
 | Model  | Easy (loss) | Hard (loss) | Easy (acc) | Hard (acc) |
 | ------------- | :--: | :--: | :--: | :--: |
 | VGG ImageNet + CNN | 0.738 | 1.421 | 0.879 | 0.525 |
-| VGG ImageNet + ConvLSTM | 0.180 | 0.696 | 0.92 | 0.478 |
+| VGG ImageNet + ConvLSTM | 0.180 | 0.696 | __0.922__ | 0.478 |
 | PredNet random + CNN  | 0.576  | | 0.698 | |
 | PredNet random + ConvLSTM  |   | |  | |
 | PredNet KITTI + CNN  |   | | | |
@@ -71,5 +71,32 @@ activation_3 (Activation)    (None, 2)                 0
 =================================================================
 Total params: 173,186
 Trainable params: 173,186
+Non-trainable params: 0
+```
+
+### Convolutional LSTM (VGG)
+
+```
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv_lst_m2d_1 (ConvLSTM2D)  (None, 30, 5, 5, 10)      187960    
+_________________________________________________________________
+conv3d_1 (Conv3D)            (None, 30, 5, 5, 1)       271       
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 750)               0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 32)                24032     
+_________________________________________________________________
+activation_1 (Activation)    (None, 32)                0         
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 32)                0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 2)                 66        
+_________________________________________________________________
+activation_2 (Activation)    (None, 2)                 0         
+=================================================================
+Total params: 212,329
+Trainable params: 212,329
 Non-trainable params: 0
 ```
