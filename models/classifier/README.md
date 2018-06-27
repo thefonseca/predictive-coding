@@ -8,7 +8,7 @@ This folder contains classification models that are trained on learned represent
 | ------------- | :--: | :--: | :--: | :--: | :--: | :--: |
 | VGG ImageNet + ConvLSTM | 0.298 | 0.661 | 0.900 | 0.600 | 0.868 | 0.489 |
 | PredNet random + ConvLSTM  | 0.663 | 0.693 | 0.656 | 0.556 | 0.668 | 0.537 |
-| PredNet KITTI + ConvLSTM  | 0.570 | 0.692 | 0.733 | 0.556 | 0.737 | 0.511 |
+| PredNet KITTI + ConvLSTM  | 0.570 | 0.692 | 0.733 | 0.556 | 0.737 | 0.516 |
 | PredNet Moments 1k  |   | | | |  |  |
 | PredNet Moments 5k  |   | | | |  |  |
 
