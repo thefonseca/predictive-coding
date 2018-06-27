@@ -1,5 +1,5 @@
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D, TimeDistributed
+from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D, LSTM, TimeDistributed
 from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras import backend as K
 
@@ -52,7 +52,7 @@ def lstm(input_shape, n_classes, drop_rate=0.5):
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
     model = Sequential()
-    model.add(TimeDistributed(Flatten(input_shape=input_shape)))
+    model.add(TimeDistributed(Flatten(), input_shape=input_shape))
     model.add(LSTM(32, return_sequences=False, dropout=drop_rate))
     model.add(Dense(32))
     model.add(Activation('relu'))

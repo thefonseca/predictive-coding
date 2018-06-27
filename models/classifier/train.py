@@ -48,17 +48,12 @@ def train(config_name, training_data_dir, validation_data_dir,
     n_classes = train_generator.n_classes
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     
-    '''models = { 'convnet': convnet, 
-               'convlstm': convlstm,
-               'lstm': lstm }'''
     model = getattr(models, model_type)(input_shape, n_classes, drop_rate=dropout)
-    #model = models[model_type](input_shape, n_classes, drop_rate=dropout)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')
     csv_path = os.path.join(results_dir, model_type + '.log')
 
     model.compile(loss='categorical_crossentropy',
-                  optimizer='rmsprop',
-                  metrics=['accuracy'])
+                  optimizer='adam', metrics=['accuracy'])
     model.summary()
     checkpointer = ModelCheckpoint(filepath=checkpoint_path, 
                                    verbose=1, save_best_only=True)
@@ -82,7 +77,8 @@ def train(config_name, training_data_dir, validation_data_dir,
 def evaluate(config_name, test_data_dir, batch_size, 
              index_start, base_results_dir, classes=None,
              workers=1, use_multiprocessing=False,
-             seq_length=None, input_shape=None, **config):
+             seq_length=None, input_shape=None, 
+             model_type='convnet', **config):
     
     print('\nEvaluating model on test set...')
     # we use the remaining part of training set as test set
@@ -97,12 +93,7 @@ def evaluate(config_name, test_data_dir, batch_size,
     
     # load best model
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
-    
-    if seq_length:
-        checkpoint_path = os.path.join(results_dir, 'convlstm.hdf5')
-    else:
-        checkpoint_path = os.path.join(results_dir, 'convnet.hdf5')    
-    
+    checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')       
     model = load_model(checkpoint_path)
     metrics = model.evaluate_generator(generator,
                                        len(generator),
@@ -115,16 +106,20 @@ def evaluate(config_name, test_data_dir, batch_size,
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Train convnet classifier.')
+    parser = argparse.ArgumentParser(description='Train classifier.')
     parser.add_argument('config', help='experiment config name defined in setting.py')
+    parser.add_argument('--eval', help="perform only evaluation using pretrained model",
+                        action="store_true")
     FLAGS, unparsed = parser.parse_known_args()
     
     config = configs[FLAGS.config]
     print('\n==> Starting traininig: {}'.format(config['description']))
     
-    train(FLAGS.config, **config)
+    if not FLAGS.eval:
+        train(FLAGS.config, **config)
+        save_experiment_config(FLAGS.config, config['base_results_dir'], config)
     
     if config['test_data_dir']:
         evaluate(FLAGS.config, index_start=config['training_max_per_class'], **config)
 
-    save_experiment_config(FLAGS.config, config['base_results_dir'], config)
+    
