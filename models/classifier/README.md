@@ -17,7 +17,7 @@ This folder contains classification models that are trained on learned represent
 
 ## Models
 
-### Convolutional Neural Network (PredNet)
+### Convolutional Neural Network (PredNet features)
 
 ```
 Layer (type)                 Output Shape              Param #   
@@ -45,7 +45,7 @@ Trainable params: 383,106
 Non-trainable params: 0
 ```
 
-### Convolutional Neural Network (VGG)
+### Convolutional Neural Network (VGG features)
 
 ```
 _________________________________________________________________
@@ -74,7 +74,32 @@ Trainable params: 173,186
 Non-trainable params: 0
 ```
 
-### Convolutional LSTM (VGG)
+### Convolutional LSTM (PredNet features)
+```
+Layer (type)                 Output Shape              Param #   
+=================================================================
+conv_lst_m2d_1 (ConvLSTM2D)  (None, 5, 16, 20, 10)     72760     
+_________________________________________________________________
+conv3d_1 (Conv3D)            (None, 5, 16, 20, 1)      271       
+_________________________________________________________________
+flatten_1 (Flatten)          (None, 1600)              0         
+_________________________________________________________________
+dense_1 (Dense)              (None, 32)                51232     
+_________________________________________________________________
+activation_1 (Activation)    (None, 32)                0         
+_________________________________________________________________
+dropout_1 (Dropout)          (None, 32)                0         
+_________________________________________________________________
+dense_2 (Dense)              (None, 2)                 66        
+_________________________________________________________________
+activation_2 (Activation)    (None, 2)                 0         
+=================================================================
+Total params: 124,329
+Trainable params: 124,329
+Non-trainable params: 0
+```
+
+### Convolutional LSTM (VGG features)
 
 ```
 _________________________________________________________________
