@@ -11,6 +11,7 @@ This folder contains classification models that are trained on learned represent
 | PredNet random + CNN  | 0.576  | 0.757 | 0.698 | 0.500 |
 | PredNet random + ConvLSTM  |   | |  | |
 | PredNet KITTI + CNN  | 0.740 | 0.812 | 0.731 | 0.554 |
+| PredNet KITTI + ConvLSTM  | 0.607 |  | 0.684 |  |
 | PredNet Moments 1k  |   | | | |
 | PredNet Moments 5k  |   | | | |
 
