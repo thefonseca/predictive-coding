@@ -12,11 +12,10 @@ from keras.applications.vgg16 import VGG16
 from keras.applications.vgg16 import preprocess_input
 from keras.utils import to_categorical
 
-from convlstm_data import DataGenerator
+from data import DataGenerator
 from settings import configs
 import argparse
 import cPickle as pkl
-import bz2
 from tqdm import tqdm
 
 
@@ -40,7 +39,7 @@ def save_representation(features, labels, results_dir, config):
         features_file = '{}.pkl'.format(source)
         filename = os.path.join(target_dir, features_file)
         
-        with bz2.BZ2File(filename, 'w') as f:
+        with open(filename, 'w') as f:
             pkl.dump(features[i], f)
             
 
@@ -87,7 +86,7 @@ def save_bottleneck_features(config_name, data_dir, base_results_dir,
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract VGG features.')
-    parser.add_argument('config', help='experiment config name defined in setting.py')
+    parser.add_argument('config', help='experiment config name defined in settings.py')
     FLAGS, unparsed = parser.parse_known_args()
     
     config = configs[FLAGS.config]

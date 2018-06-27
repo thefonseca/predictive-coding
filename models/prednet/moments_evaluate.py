@@ -23,8 +23,6 @@ from tqdm import tqdm
 import argparse
 import csv
 import cPickle as pkl
-#import gzip
-import bz2
 
 FLAGS = None
 
@@ -150,8 +148,7 @@ def save_representation(rep, labels, results_dir, config):
         rep_file = '{}__{:03d}.pkl'.format(source, i)
         filename = os.path.join(target_dir, rep_file)
         
-        #with gzip.GzipFile(filename, 'w') as f:
-        with bz2.BZ2File(filename, 'w') as f:
+        with open(filename, 'w') as f:
             pkl.dump(rep[i].reshape(rep.shape[2:]), f)
         
         

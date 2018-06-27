@@ -4,7 +4,6 @@ from keras.preprocessing import image
 import glob
 import os
 import numpy as np
-import bz2
 import pickle as pkl
 #from imageio import imread
 
@@ -143,7 +142,7 @@ class DataGenerator(Sequence):
         return self.__preprocess(img)
     
     def __load_pickle(self, filename):
-        with bz2.BZ2File(filename, 'rb') as f:
+        with open(filename, 'rb') as f:
             return pkl.load(f)
         
     def __load_sample(self, filename):

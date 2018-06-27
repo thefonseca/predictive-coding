@@ -1,82 +1,24 @@
-from numpy.random import seed
-seed(17)
+import os
+import argparse
+import numpy as np
 from tensorflow import set_random_seed
+np.random.seed(17)
 set_random_seed(17)
 
-from keras.preprocessing.image import ImageDataGenerator
-from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D
-from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
 from keras.models import load_model
 
-from settings import configs
 from data import DataGenerator
-import os
-import argparse
+from settings import configs
+import models
 import utils
-
-
-def convnet(input_shape, n_classes, drop_rate=0.5):
-    if K.image_data_format() == 'channels_first':
-        input_shape = (input_shape[2], input_shape[0], input_shape[1])
-    
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), padding='same',
-              input_shape=input_shape, 
-              activation='relu'))
-    #model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    #model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(drop_rate))
-    model.add(Flatten())
-    model.add(Dense(32))
-    #model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(Dropout(drop_rate))
-    model.add(Dense(n_classes))
-    model.add(Activation('softmax'))
-    return model
-
-def convlstm(input_shape, n_classes, drop_rate=0.5):
-    if K.image_data_format() == 'channels_first':
-        input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
-    
-    model = Sequential()
-    model.add(ConvLSTM2D(filters=10, kernel_size=(3, 3),
-                       input_shape=input_shape,
-                       padding='same', return_sequences=True))
-    #model.add(BatchNormalization())
-    model.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
-                     activation='sigmoid',
-                     padding='same', data_format='channels_last'))
-    model.add(Flatten())
-    model.add(Dense(32))
-    #model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(Dropout(drop_rate))
-    model.add(Dense(n_classes))
-    model.add(Activation('softmax'))
-    return model
-
-
-def lstm(input_shape, n_classes, drop_rate=0.5):
-    model = Sequential()
-    model.add(Flatten(input_shape=self.input_shape))
-    model.add(LSTM(32, return_sequences=False, dropout=drop_rate))
-    model.add(Dense(32, activation='relu'))
-    model.add(Dropout(drop_rate))
-    model.add(Dense(n_classes, activation='softmax'))
-
 
 def save_experiment_config(config_name, base_results_dir, config):
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     f = open(os.path.join(results_dir, 'experiment_config.txt'), 'w')
-    
     for key in sorted(config):
         f.write('{}: {}\n'.format(key, config[key]))
-        
     f.close()
 
     
@@ -85,7 +27,7 @@ def train(config_name, training_data_dir, validation_data_dir,
           use_multiprocessing=False, workers=1, dropout=0.5, 
           seq_length=None, batch_size=10, stopping_patience=0, 
           classes=None, input_shape=None, max_queue_size=10, 
-          **config):
+          model_type='convnet', **config):
     
     max_per_class = config.get('training_max_per_class', None)
     train_generator = DataGenerator(batch_size=batch_size,
@@ -106,15 +48,14 @@ def train(config_name, training_data_dir, validation_data_dir,
     n_classes = train_generator.n_classes
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     
-    if seq_length:
-        model = convlstm(input_shape, n_classes, drop_rate=dropout)
-        checkpoint_path = os.path.join(results_dir, 'convlstm.hdf5')
-        csv_path = os.path.join(results_dir, 'convlstm.log')
-    else:
-        model = convnet(input_shape, n_classes, drop_rate=dropout)
-        checkpoint_path = os.path.join(results_dir, 'convnet.hdf5')    
-        csv_path = os.path.join(results_dir, 'convnet.log')
-        
+    '''models = { 'convnet': convnet, 
+               'convlstm': convlstm,
+               'lstm': lstm }'''
+    model = getattr(models, model_type)(input_shape, n_classes, drop_rate=dropout)
+    #model = models[model_type](input_shape, n_classes, drop_rate=dropout)
+    checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')
+    csv_path = os.path.join(results_dir, model_type + '.log')
+
     model.compile(loss='categorical_crossentropy',
                   optimizer='rmsprop',
                   metrics=['accuracy'])
@@ -140,7 +81,7 @@ def train(config_name, training_data_dir, validation_data_dir,
 
 def evaluate(config_name, test_data_dir, batch_size, 
              index_start, base_results_dir, classes=None,
-             workers=1, use_multiprocessing=False, 
+             workers=1, use_multiprocessing=False,
              seq_length=None, input_shape=None, **config):
     
     print('\nEvaluating model on test set...')
