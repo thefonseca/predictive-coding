@@ -30,8 +30,8 @@ def convlstm(input_shape, n_classes, drop_rate=0.5):
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
     model = Sequential()
-    model.add(ConvLSTM2D(filters=20, kernel_size=(3, 3),
-                       input_shape=input_shape,
+    model.add(ConvLSTM2D(filters=200, kernel_size=(3, 3),
+                       input_shape=input_shape, dropout=drop_rate,
                        padding='same', return_sequences=True))
     #model.add(BatchNormalization())
     model.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
