@@ -84,16 +84,18 @@ def train(config_name, training_data_dir, validation_data_dir,
           base_results_dir, test_data_dir=None, epochs=10, 
           use_multiprocessing=False, workers=1, dropout=0.5, 
           seq_length=None, batch_size=10, stopping_patience=0, 
-          classes=None, **config):
+          classes=None, input_shape=None, **config):
     
     max_per_class = config.get('training_max_per_class', None)
     train_generator = DataGenerator(batch_size=batch_size,
                                     classes=classes,
                                     seq_length=seq_length,
+                                    target_size=input_shape,
                                     max_per_class=max_per_class)
     
     val_generator = DataGenerator(classes=classes,
                                   seq_length=seq_length,
+                                  target_size=input_shape,
                                   batch_size=batch_size)
     
     train_generator = train_generator.flow_from_directory(training_data_dir)
@@ -130,14 +132,15 @@ def train(config_name, training_data_dir, validation_data_dir,
                         validation_data=val_generator,
                         validation_steps=len(val_generator),
                         callbacks=[checkpointer, csv_logger, stopper],
-                        use_multiprocessing=use_multiprocessing, 
+                        use_multiprocessing=use_multiprocessing,
+                        max_queue_size=max_queue_size, 
                         workers=workers)
     
 
 def evaluate(config_name, test_data_dir, batch_size, 
              index_start, base_results_dir, classes=None,
              workers=1, use_multiprocessing=False, 
-             seq_length=None, **config):
+             seq_length=None, input_shape=None, **config):
     
     print('\nEvaluating model on test set...')
     # we use the remaining part of training set as test set
@@ -146,6 +149,7 @@ def evaluate(config_name, test_data_dir, batch_size,
                               batch_size=batch_size,
                               seq_length=seq_length,
                               index_start=index_start, 
+                              target_size=input_shape,
                               max_per_class=max_per_class)
     generator = generator.flow_from_directory(test_data_dir)
     

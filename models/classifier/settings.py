@@ -37,21 +37,38 @@ convnet_base_config = {
     'validation_data_dir': './results/vgg__moments_nano__features/validation',
     'test_data_dir': './results/vgg__moments_nano__features/training',
 }
+
+add_config(configs, 'convnet__moments_nano__images_easy', 
+           { 'description': 'A convnet classifier using Moments in Time images',
+             'training_data_dir': '../../datasets/moments_nano_frames/training',
+             'validation_data_dir': '../../datasets/moments_nano_frames/validation',
+             'test_data_dir': '../../datasets/moments_nano_frames/training',
+             'input_shape': (128, 160, 3),
+             'sample_step': 3,
+             'classes': ['cooking', 'walking']}, convnet_base_config)
+
+add_config(configs, 'convnet__moments_nano__images_hard', 
+           { 'description': 'A convnet classifier using Moments in Time images',
+             'training_data_dir': '../../datasets/moments_nano_frames/training',
+             'validation_data_dir': '../../datasets/moments_nano_frames/validation',
+             'test_data_dir': '../../datasets/moments_nano_frames/training',
+             'sample_step': 3,
+             'classes': ['running', 'walking']}, convnet_base_config)
     
-add_config(configs, 'convnet__moments_nano__vgg_features_easy', 
+add_config(configs, 'convnet__moments_nano__vgg_imagenet_easy', 
            { 'description': 'A convnet classifier using VGG features',
              'classes': ['cooking', 'walking']}, convnet_base_config)
 
-add_config(configs, 'convnet__moments_nano__vgg_features_hard', 
+add_config(configs, 'convnet__moments_nano__vgg_imagenet_hard', 
            { 'description': 'A convnet classifier using VGG features',
              'classes': ['running', 'walking']}, convnet_base_config)
 
-add_config(configs, 'convlstm__moments_nano__vgg_features_easy', 
+add_config(configs, 'convlstm__moments_nano__vgg_imagenet_easy', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
              'classes': ['cooking', 'walking']}, convnet_base_config)
 
-add_config(configs, 'convlstm__moments_nano__vgg_features_hard', 
+add_config(configs, 'convlstm__moments_nano__vgg_imagenet_hard', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
              'classes': ['running', 'walking']}, convnet_base_config)
@@ -108,3 +125,27 @@ add_config(configs, 'convlstm__moments_nano__prednet_kitti_R3_easy',
              'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
              'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
              'classes': ['cooking', 'walking']}, convnet_base_config)
+
+add_config(configs, 'convlstm__moments_nano__prednet_random_R3_easy', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(random weights) R3 features extracted from the Moments in Time dataset.',
+             'seq_length': PREDNET_FEATURES_PER_VIDEO,
+             'max_queue_size': 5,
+             'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
+             'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
+             'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
+             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
+             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
+             'classes': ['cooking', 'walking']}, convnet_base_config)
+
+add_config(configs, 'convlstm__moments_nano__prednet_random_R3_hard', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(random weights) R3 features extracted from the Moments in Time dataset.',
+             'seq_length': PREDNET_FEATURES_PER_VIDEO,
+             'max_queue_size': 5,
+             'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
+             'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
+             'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
+             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
+             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
+             'classes': ['running', 'walking']}, convnet_base_config)
