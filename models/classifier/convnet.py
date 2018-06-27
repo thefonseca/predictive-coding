@@ -84,7 +84,8 @@ def train(config_name, training_data_dir, validation_data_dir,
           base_results_dir, test_data_dir=None, epochs=10, 
           use_multiprocessing=False, workers=1, dropout=0.5, 
           seq_length=None, batch_size=10, stopping_patience=0, 
-          classes=None, input_shape=None, **config):
+          classes=None, input_shape=None, max_queue_size=10, 
+          **config):
     
     max_per_class = config.get('training_max_per_class', None)
     train_generator = DataGenerator(batch_size=batch_size,
