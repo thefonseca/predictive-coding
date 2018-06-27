@@ -1,6 +1,3 @@
-import numpy as np
-np.random.seed(17)
-
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D, LSTM, TimeDistributed
 from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
