@@ -9,7 +9,7 @@ def add_config(configs, name, config, base_config=None):
 
 configs = {}
 
-configs['vgg__moments_nano__features'] = {
+configs['vgg_imagenet__moments_nano__features'] = {
     'description': 'Extract features from Moments in Time dataset',
     'input_shape': (160, 160, 3),
     'batch_size': 10,
@@ -33,9 +33,9 @@ convnet_base_config = {
     #'use_multiprocessing': True,
     'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'base_results_dir': './results',
-    'training_data_dir': './results/vgg__moments_nano__features/training',
-    'validation_data_dir': './results/vgg__moments_nano__features/validation',
-    'test_data_dir': './results/vgg__moments_nano__features/training',
+    'training_data_dir': './results/vgg_imagenet__moments_nano__features/training',
+    'validation_data_dir': './results/vgg_imagenet__moments_nano__features/validation',
+    'test_data_dir': './results/vgg_imagenet__moments_nano__features/training',
 }
 
 add_config(configs, 'convnet__moments_nano__images_easy', 
@@ -52,6 +52,7 @@ add_config(configs, 'convnet__moments_nano__images_hard',
              'training_data_dir': '../../datasets/moments_nano_frames/training',
              'validation_data_dir': '../../datasets/moments_nano_frames/validation',
              'test_data_dir': '../../datasets/moments_nano_frames/training',
+             'input_shape': (128, 160, 3),
              'sample_step': 3,
              'classes': ['running', 'walking']}, convnet_base_config)
     
@@ -73,6 +74,18 @@ add_config(configs, 'convlstm__moments_nano__vgg_imagenet_hard',
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
              'model_type': 'convlstm',
+             'classes': ['running', 'walking']}, convnet_base_config)
+
+add_config(configs, 'lstm__moments_nano__vgg_imagenet_easy', 
+           { 'description': 'A ConvLSTM classifier using VGG features',
+             'seq_length': VGG_FEATURES_PER_VIDEO,
+             'model_type': 'lstm',
+             'classes': ['cooking', 'walking']}, convnet_base_config)
+
+add_config(configs, 'lstm__moments_nano__vgg_imagenet_hard', 
+           { 'description': 'A ConvLSTM classifier using VGG features',
+             'seq_length': VGG_FEATURES_PER_VIDEO,
+             'model_type': 'lstm',
              'classes': ['running', 'walking']}, convnet_base_config)
 
 PREDNET_FEATURES_PER_VIDEO = 5
