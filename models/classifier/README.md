@@ -4,16 +4,16 @@ This folder contains classification models that are trained on learned represent
 
 ## Results
 
-| Model  | Easy (loss) | Hard (loss) | Easy (acc) | Hard (acc) |
-| ------------- | :--: | :--: | :--: | :--: |
-| VGG ImageNet + CNN | 0.738 | 1.421 | 0.879 | 0.525 |
-| VGG ImageNet + ConvLSTM | 0.180 | 0.696 | __0.922__ | 0.478 |
-| PredNet random + CNN  | 0.576  | 0.757 | 0.698 | 0.500 |
-| PredNet random + ConvLSTM  |   | |  | |
-| PredNet KITTI + CNN  | 0.740 | 0.812 | 0.731 | 0.554 |
-| PredNet KITTI + ConvLSTM  | 0.607 |  | 0.684 |  |
-| PredNet Moments 1k  |   | | | |
-| PredNet Moments 5k  |   | | | |
+| Model  | Easy (loss) | Hard (loss) | Easy (acc) | Hard (acc) | Easy (test acc) | Hard (test acc) |
+| ------------- | :--: | :--: | :--: | :--: | :--: | :--: |
+| VGG ImageNet + LSTM | 0.222 | 0.704 | 0.922 | 0.544 | 0.879 | 0.526 |
+| VGG ImageNet + ConvLSTM | 0.298 | 0.661 | 0.900 | 0.600 | 0.868 | 0.489 |
+| PredNet random + LSTM  |  |  |  |  |  |  |
+| PredNet random + ConvLSTM  |   | |  | |  |  |
+| PredNet KITTI + CNN  | 0.740 | 0.812 | 0.731 | 0.554 |  |  |
+| PredNet KITTI + ConvLSTM  | 0.607 |  | 0.684 |  |  |  |
+| PredNet Moments 1k  |   | | | |  |  |
+| PredNet Moments 5k  |   | | | |  |  |
 
 
 ## Models
