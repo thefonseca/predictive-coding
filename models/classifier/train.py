@@ -66,20 +66,22 @@ def save_experiment_config(config_name, base_results_dir, config):
 def train(config_name, training_data_dir, validation_data_dir, 
           base_results_dir, test_data_dir=None, epochs=10, 
           use_multiprocessing=False, workers=1, dropout=0.5, 
-          seq_length=None, batch_size=10, stopping_patience=0, 
-          classes=None, input_shape=None, max_queue_size=10, 
-          model_type='convnet', **config):
+          seq_length=None, sample_step=1, batch_size=10, 
+          stopping_patience=3, classes=None, input_shape=None, 
+          max_queue_size=10, model_type='convnet', 
+          training_max_per_class=None, **config):
     
-    max_per_class = config.get('training_max_per_class', None)
     train_generator = DataGenerator(batch_size=batch_size,
                                     classes=classes,
                                     seq_length=seq_length,
                                     target_size=input_shape,
-                                    max_per_class=max_per_class)
+                                    sample_step=sample_step,
+                                    max_per_class=training_max_per_class)
     
     val_generator = DataGenerator(classes=classes,
                                   seq_length=seq_length,
                                   target_size=input_shape,
+                                  sample_step=sample_step,
                                   batch_size=batch_size)
     
     train_generator = train_generator.flow_from_directory(training_data_dir)
@@ -119,25 +121,24 @@ def evaluate(config_name, test_data_dir, batch_size,
              index_start, base_results_dir, classes=None,
              workers=1, use_multiprocessing=False,
              seq_length=None, input_shape=None, 
-             model_type='convnet', **config):
+             model_type='convnet', test_max_per_class=None,
+             **config):
     
     print('\nEvaluating model on test set...')
     # we use the remaining part of training set as test set
-    max_per_class = config.get('test_max_per_class', None)
     generator = DataGenerator(classes=classes,
                               batch_size=batch_size,
                               seq_length=seq_length,
                               index_start=index_start, 
                               target_size=input_shape,
-                              max_per_class=max_per_class)
+                              max_per_class=test_max_per_class)
     generator = generator.flow_from_directory(test_data_dir)
     
     # load best model
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')       
     model = load_model(checkpoint_path)
-    metrics = model.evaluate_generator(generator,
-                                       len(generator),
+    metrics = model.evaluate_generator(generator, len(generator),
                                        use_multiprocessing=use_multiprocessing, 
                                        workers=workers)
 

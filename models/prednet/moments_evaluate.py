@@ -12,12 +12,13 @@ import matplotlib.gridspec as gridspec
 import math
 
 from keras import backend as K
-from keras.models import Model, model_from_json
+#from keras.models import Model, model_from_json
 from keras.layers import Input, Dense, Flatten
 
 from prednet import PredNet
 from moments_data import SequenceGenerator
 from moments_settings import configs
+import utils
 
 from tqdm import tqdm
 import argparse
@@ -26,68 +27,6 @@ import cPickle as pkl
 
 FLAGS = None
 
-
-def load_model(model_json_file, model_weights_file, **extras):
-    # Load trained model
-    f = open(model_json_file, 'r')
-    json_string = f.read()
-    f.close()
-    train_model = model_from_json(json_string, custom_objects = {'PredNet': PredNet})
-    train_model.load_weights(model_weights_file)
-    return train_model
-
-def create_test_model(train_model, output_mode, n_timesteps=10, gpus=None, **extras):
-    # Create testing model (to output predictions)
-    layer_config = train_model.layers[1].get_config()
-    layer_config['output_mode'] = output_mode
-    test_prednet = PredNet(weights=train_model.layers[1].get_weights(), **layer_config)
-    input_shape = list(train_model.layers[0].batch_input_shape[1:])
-    input_shape[0] = n_timesteps
-    inputs = Input(shape=tuple(input_shape))
-    predictions = test_prednet(inputs)
-    test_model = Model(inputs=inputs, outputs=predictions)
-    #if gpus:
-    #    test_model = multi_gpu_model(test_model, gpus=gpus)
-        
-    return test_model
-
-def create_model(n_channels, img_height, img_width, 
-                 n_timesteps=10, output_mode='error', 
-                 **extras):
-    # Model parameters
-    if K.image_data_format() == 'channels_first':
-        input_shape = (n_channels, img_height, img_width) 
-    else:
-        input_shape = (img_height, img_width, n_channels)
-        
-    stack_sizes = (n_channels, 48, 96, 192)
-    R_stack_sizes = stack_sizes
-    A_filt_sizes = (3, 3, 3)
-    Ahat_filt_sizes = (3, 3, 3, 3)
-    R_filt_sizes = (3, 3, 3, 3)
-    
-    prednet = PredNet(stack_sizes, R_stack_sizes,
-                      A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
-                      output_mode=output_mode, return_sequences=True) 
-    input_shape = (n_timesteps,) + input_shape
-    inputs = Input(shape=tuple(input_shape))
-    predictions = prednet(inputs)
-    model = Model(inputs=inputs, outputs=predictions)
-    return model 
-
-def get_create_results_dir(dataset, experiment_name, config):
-    results_dir = os.path.join(config['base_results_dir'], experiment_name, dataset)
-    if not os.path.exists(results_dir): os.makedirs(results_dir)
-    return results_dir
-
-def save_experiment_config(dataset, experiment_name, config):   
-    results_dir = get_create_results_dir(dataset, experiment_name, config)
-    f = open(os.path.join(results_dir, 'experiment_config.txt'), 'w')
-    
-    for key in sorted(config):
-        f.write('{}: {}\n'.format(key, config[key]))
-        
-    f.close()
 
 def save_predictions(X, X_hat, mse_model, mse_prev, results_dir, 
                      n_plot=20, **config):
@@ -153,7 +92,7 @@ def save_representation(rep, labels, results_dir, config):
         
         
 def evaluate_prediction(model, dataset, experiment_name, 
-                        data_generator, n_batches, 
+                        data_generator, n_batches, base_results_dir,
                         data_format=K.image_data_format(), **config):
     
     n = 0
@@ -186,17 +125,21 @@ def evaluate_prediction(model, dataset, experiment_name,
         X = np.transpose(X, (0, 1, 3, 4, 2))
         preds = np.transpose(preds, (0, 1, 3, 4, 2))
         
-    results_dir = get_create_results_dir(dataset, experiment_name, config)
+    results_dir = utils.get_create_results_dir(experiment_name, 
+                                               base_results_dir, 
+                                               dataset=dataset)
     save_predictions(X, preds, mse_model, mse_prev, results_dir, **config)
     
     
     
 def evaluate_representation(model, dataset, experiment_name, output_mode, 
-                            data_generator, n_batches, 
+                            data_generator, n_batches, base_results_dir,
                             timestep_start=-1, timestep_end=None,
                             data_format=K.image_data_format(), **config):
     
-    results_dir = get_create_results_dir(dataset, experiment_name, config)
+    results_dir = utils.get_create_results_dir(experiment_name, 
+                                               base_results_dir, 
+                                               dataset=dataset)
     y = []
 
     for i in tqdm(range(n_batches)):
@@ -272,29 +215,23 @@ def evaluate(model, dataset, img_dir, img_sources, experiment_name,
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate PredNet model.')
-    parser.add_argument('config', help='experiment config name defined in moments_setting.py')
+    parser.add_argument('config', help='experiment config name defined in moments_settings.py')
     FLAGS, unparsed = parser.parse_known_args()
     
     config = configs[FLAGS.config]
     
     print('\n==> Starting experiment: {}\n'.format(config['description']))
     
-    if config.get('model_weights_file', None):
-        print('Loading pre-trained model...')
-        pretrained_model = load_model(**config)
-        model = create_test_model(pretrained_model, **config)
-    else:
-        print('Creating model with random weights...')
-        model = create_model(**config)
-        
+    model = utils.create_model(**config)
     model.summary()
     
     for split in ['training', 'validation', 'test']:
-        img_dir = config.get(split + '_img_dir', None)
-        img_sources = config.get(split + '_img_sources', None)
+        img_dir = config.get(split + '_data_dir', None)
+        img_sources = config.get(split + '_data_sources', None)
         
         if img_dir and img_sources:
             print('==> Dataset split: {}'.format(split))
             evaluate(model, split, img_dir, img_sources, FLAGS.config, **config)
-            save_experiment_config(split, FLAGS.config, config)
+            utils.save_experiment_config(FLAGS.config, config['base_results_dir'], 
+                                         config, dataset=split)
     

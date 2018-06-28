@@ -2,8 +2,7 @@
 def add_config(configs, name, config, base_config=None):
     new_config = dict()
     if base_config:
-        new_config.update(base_config)
-        
+        new_config.update(base_config)        
     new_config.update(config)
     configs[name] = new_config
 

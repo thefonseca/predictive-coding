@@ -1,5 +1,6 @@
 from keras.utils import Sequence, to_categorical
 from keras.preprocessing import image
+from keras import backend as K
 
 import glob
 import os
@@ -15,9 +16,10 @@ Adapted from: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-
 
 class DataGenerator(Sequence):
     'Generates data for Keras'
-    def __init__(self, batch_size=16, shuffle=True, fn_preprocess=None,
+    def __init__(self, batch_size=16, shuffle=False, fn_preprocess=None,
                  index_start=0, max_per_class=None, seq_length=None, 
                  sample_step=1, target_size=None, classes=None, 
+                 data_format=K.image_data_format(), output_mode=None,
                  return_sources=False):
         
         'Initialization'
@@ -33,6 +35,8 @@ class DataGenerator(Sequence):
         self.fn_preprocess = fn_preprocess
         self.return_sources = return_sources
         self.classes = classes
+        self.data_format = data_format
+        self.output_mode = output_mode
         
     def flow_from_directory(self, data_dir):
         self.data_dir = data_dir
@@ -70,6 +74,7 @@ class DataGenerator(Sequence):
             self.data_shape = self.__load_data(0).shape
             msg = 'Found {} samples belonging to {} classes in {}'
             print(msg.format(len(self.X), self.n_classes, self.data_dir))
+            print('Data shape: {}'.format(self.data_shape))
         self.on_epoch_end()
         
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
@@ -121,10 +126,18 @@ class DataGenerator(Sequence):
             y[i] = self.y[index]
             sources.append(self.X[index])
             
-        if self.return_sources:
-            return X, to_categorical(y, num_classes=self.n_classes), sources
+        if self.data_format == 'channels_first':
+            X = np.transpose(X, (0, 1, 4, 2, 3))
+         
+        if self.output_mode is not None and self.output_mode == 'error':  
+            data = (X, np.zeros(self.batch_size, np.float32))
         else:
-            return X, to_categorical(y, num_classes=self.n_classes)
+            data = (X, to_categorical(y, num_classes=self.n_classes))
+        
+        if self.return_sources:
+            data += (sources,)
+        
+        return data
     
     def __preprocess(self, img):
         '''if self.target_size:
@@ -162,7 +175,6 @@ class DataGenerator(Sequence):
         return np.array(seq_data)
     
     def __load_data(self, index):
-        
         if len(self.X) <= index:
             return None
         
@@ -189,6 +201,5 @@ class DataGenerator(Sequence):
                     
                 seq = [s]
 
-            prev_source = source
-            
+            prev_source = source            
         return seqs
