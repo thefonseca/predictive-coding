@@ -18,9 +18,9 @@ class DataGenerator(Sequence):
     'Generates data for Keras'
     def __init__(self, batch_size=16, shuffle=False, fn_preprocess=None,
                  index_start=0, max_per_class=None, seq_length=None, 
-                 sample_step=1, target_size=None, classes=None, 
-                 data_format=K.image_data_format(), output_mode=None,
-                 return_sources=False):
+                 sample_step=1, seq_overlap=0, target_size=None, 
+                 classes=None, data_format=K.image_data_format(), 
+                 output_mode=None, return_sources=False):
         
         'Initialization'
         self.batch_size = batch_size
@@ -37,6 +37,7 @@ class DataGenerator(Sequence):
         self.classes = classes
         self.data_format = data_format
         self.output_mode = output_mode
+        self.seq_overlap = seq_overlap
         
     def flow_from_directory(self, data_dir):
         self.data_dir = data_dir
@@ -79,19 +80,20 @@ class DataGenerator(Sequence):
         
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
         if self.max_per_class is None or \
-        (self.index_start < 0 and self.index_start + self.max_per_class >= 0):
+        (self.index_start < 0 and self.index_start + self.max_per_class * self.sample_step >= 0):
             class_samples = class_samples[self.index_start::self.sample_step]
             class_sources = class_sources[self.index_start::self.sample_step]
         else:
-            index_end = self.index_start + self.max_per_class
+            index_end = self.index_start + self.max_per_class * self.sample_step
             class_samples = class_samples[self.index_start:index_end:self.sample_step]
             class_sources = class_sources[self.index_start:index_end:self.sample_step]
 
         if self.seq_length:
             class_samples = self.__to_sequence(class_samples, class_sources)
-
+        
         self.y.extend([class_index] * len(class_samples))
-        self.X.extend(class_samples)
+        #self.X.extend(class_samples)
+        self.X = class_samples
         
     def __len__(self):
         'Denotes the number of batches per epoch'
@@ -186,11 +188,32 @@ class DataGenerator(Sequence):
         return data
     
     def __to_sequence(self, samples, sources):
-        seq = []
+        
         prev_source = None
         seqs = []
-
-        for i, s in enumerate(sources):
+        
+        i = 0
+        while i < len(sources) - self.seq_length:
+            seq = []
+            prev_source = None
+            for j in range(i, i + self.seq_length):
+                # NAME_OF__SOURCE__frame_001.pkl => NAME_OF__SOURCE
+                source = '__'.join(sources[j].split('__')[:-1]) 
+                
+                if prev_source is None or prev_source == source:# and len(seq) < self.seq_length:
+                    seq.append(samples[j])
+                    if len(seq) == self.seq_length:
+                        seqs.append(seq)
+                        i = (j - self.seq_overlap + 1)
+                else:
+                    i = j
+                    break
+                    
+                prev_source = source
+                if j == len(sources):
+                    i = j
+            
+        '''for i, s in enumerate(sources):
             source = '__'.join(s.split('__')[:-1]) # NAME_OF__SOURCE__frame_001.pkl => NAME_OF__SOURCE
 
             if prev_source is None or prev_source == source:
@@ -201,5 +224,5 @@ class DataGenerator(Sequence):
                     
                 seq = [s]
 
-            prev_source = source            
+            prev_source = source'''            
         return seqs
