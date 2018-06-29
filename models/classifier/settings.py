@@ -145,6 +145,24 @@ add_config(configs, 'convlstm__moments_nano__prednet_moments_v10_R3_hard',
              'test_data_dir': '../prednet/results/prednet_10v__moments_nano__R3/training',
              'classes': ['running', 'walking']}, prednet_base_config)
 
+add_config(configs, 'convlstm__moments_nano__prednet_moments_v50_R3_easy', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
+             'model_type': 'convlstm',
+             'training_data_dir': '../prednet/results/prednet_50v__moments_nano__R3/training',
+             'validation_data_dir': '../prednet/results/prednet_50v__moments_nano__R3/validation',
+             'test_data_dir': '../prednet/results/prednet_50v__moments_nano__R3/training',
+             'classes': ['cooking', 'walking']}, prednet_base_config)
+
+add_config(configs, 'convlstm__moments_nano__prednet_moments_v50_R3_hard', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
+             'model_type': 'convlstm',
+             'training_data_dir': '../prednet/results/prednet_50v__moments_nano__R3/training',
+             'validation_data_dir': '../prednet/results/prednet_50v__moments_nano__R3/validation',
+             'test_data_dir': '../prednet/results/prednet_50v__moments_nano__R3/training',
+             'classes': ['running', 'walking']}, prednet_base_config)
+
 add_config(configs, 'lstm__moments_nano__prednet_kitti_R3_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
