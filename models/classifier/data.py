@@ -9,6 +9,12 @@ import pickle as pkl
 
 import utils
 
+# Getting reproducible results:
+# https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
+os.environ['PYTHONHASHSEED'] = '0'
+np.random.seed(42)
+rn.seed(12345)
+
 '''
 Adapted from: https://stanford.edu/~shervine/blog/keras-how-to-generate-data-on-the-fly.html
 '''

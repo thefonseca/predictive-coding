@@ -41,21 +41,23 @@ def train(config_name, training_data_dir, validation_data_dir,
           use_multiprocessing=False, workers=1, dropout=0.5, 
           seq_length=None, sample_step=1, batch_size=10, 
           stopping_patience=3, classes=None, input_shape=None, 
-          max_queue_size=10, model_type='convnet', 
+          max_queue_size=10, model_type='convnet', shuffle=False,
           training_max_per_class=None, **config):
     
     train_generator = DataGenerator(batch_size=batch_size,
+                                    shuffle=shuffle,
                                     classes=classes,
                                     seq_length=seq_length,
                                     target_size=input_shape,
                                     sample_step=sample_step,
                                     max_per_class=training_max_per_class)
     
-    val_generator = DataGenerator(classes=classes,
+    val_generator = DataGenerator(batch_size=batch_size,
+                                  shuffle=shuffle,
+                                  classes=classes,
                                   seq_length=seq_length,
                                   target_size=input_shape,
-                                  sample_step=sample_step,
-                                  batch_size=batch_size)
+                                  sample_step=sample_step)
     
     train_generator = train_generator.flow_from_directory(training_data_dir)
     val_generator = val_generator.flow_from_directory(validation_data_dir)

@@ -26,9 +26,9 @@ convnet_base_config = {
     'epochs': 100,
     'stopping_patience': 10,
     'batch_size': 10,
-    'shuffle': True,
+    'shuffle': False,
     'dropout': 0.5,
-    'workers': 4,
+    #'workers': 4,
     #'use_multiprocessing': True,
     'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'base_results_dir': './results',
@@ -55,14 +55,6 @@ add_config(configs, 'convnet__moments_nano__images_hard',
              'sample_step': 3,
              'classes': ['running', 'walking']}, convnet_base_config)
     
-add_config(configs, 'convnet__moments_nano__vgg_imagenet_easy', 
-           { 'description': 'A convnet classifier using VGG features',
-             'classes': ['cooking', 'walking']}, convnet_base_config)
-
-add_config(configs, 'convnet__moments_nano__vgg_imagenet_hard', 
-           { 'description': 'A convnet classifier using VGG features',
-             'classes': ['running', 'walking']}, convnet_base_config)
-
 add_config(configs, 'convlstm__moments_nano__vgg_imagenet_easy', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
