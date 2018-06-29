@@ -135,20 +135,20 @@ add_config(configs, 'convlstm__moments_nano__prednet_random_R3_hard',
 
 add_config(configs, 'convlstm__moments_nano__prednet_moments_v10_R3_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
-(random weights) R3 features extracted from the Moments in Time dataset.',
+(pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
              'model_type': 'convlstm',
-             'training_data_dir': '../prednet/results/prednet__moments_nano__train_10v/training',
-             'validation_data_dir': '../prednet/results/prednet__moments_nano__train_10v/validation',
-             'test_data_dir': '../prednet/results/prednet__moments_nano__train_10v/training',
+             'training_data_dir': '../prednet/results/prednet_10v__moments_nano__R3/training',
+             'validation_data_dir': '../prednet/results/prednet_10v__moments_nano__R3/validation',
+             'test_data_dir': '../prednet/results/prednet_10v__moments_nano__R3/training',
              'classes': ['cooking', 'walking']}, prednet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__prednet_moments_v10_R3_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
-(random weights) R3 features extracted from the Moments in Time dataset.',
+(pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
              'model_type': 'convlstm',
-             'training_data_dir': '../prednet/results/prednet__moments_nano__train_10v/training',
-             'validation_data_dir': '../prednet/results/prednet__moments_nano__train_10v/validation',
-             'test_data_dir': '../prednet/results/prednet__moments_nano__train_10v/training',
+             'training_data_dir': '../prednet/results/prednet_10v__moments_nano__R3/training',
+             'validation_data_dir': '../prednet/results/prednet_10v__moments_nano__R3/validation',
+             'test_data_dir': '../prednet/results/prednet_10v__moments_nano__R3/training',
              'classes': ['running', 'walking']}, prednet_base_config)
 
 add_config(configs, 'lstm__moments_nano__prednet_kitti_R3_easy', 
