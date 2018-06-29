@@ -90,12 +90,13 @@ add_config(configs, 'lstm__moments_nano__vgg_imagenet_hard',
 
 PREDNET_FEATURES_PER_VIDEO = 5
 
-prednet_base_config = {
+prednet_base_config = dict()
+prednet_base_config.update(convnet_base_config)
+prednet_base_config.update({
     'seq_length': PREDNET_FEATURES_PER_VIDEO,
     'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class,
     'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-}
-prednet_base_config.update(convnet_base_config)
+})
 
 add_config(configs, 'convlstm__moments_nano__prednet_kitti_R3_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
