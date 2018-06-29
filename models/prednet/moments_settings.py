@@ -100,6 +100,9 @@ add_config(configs, 'prednet_scratch__moments_nano_10v__model',
              'stopping_patience': 20,
              'model_weights_file': None,
              'model_json_file': None,
+             'input_shape': (64,64,3),
+             'img_height': 64, 
+             'img_width': 64,
              # We start at video #250 to avoid using the same videos
              # present in the classifier (convnet) dataset
              'training_index_start': FRAMES_PER_VIDEO * 250,
