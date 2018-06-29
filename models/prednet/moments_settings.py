@@ -59,6 +59,18 @@ add_config(configs, 'prednet_10v__moments_nano__R3',
              'model_json_file': './results/prednet__moments_nano_10v__model/model.json',
              'output_mode': 'R3' }, base_config)
 
+add_config(configs, 'prednet_50v__moments_nano__R3', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
+             'model_weights_file': './results/prednet__moments_nano_50v__model/weights.hdf5',
+             'model_json_file': './results/prednet__moments_nano_50v__model/model.json',
+             'output_mode': 'R3' }, base_config)
+
+add_config(configs, 'prednet_100v__moments_nano__R3', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
+             'model_weights_file': './results/prednet__moments_nano_100v__model/weights.hdf5',
+             'model_json_file': './results/prednet__moments_nano_100v__model/model.json',
+             'output_mode': 'R3' }, base_config)
+
 FRAMES_PER_VIDEO = 90
 
 add_config(configs, 'prednet__moments_nano_10v__model', 
@@ -96,4 +108,16 @@ add_config(configs, 'prednet__moments_nano_100v__model',
              # present in the classifier (convnet) dataset
              'training_index_start': FRAMES_PER_VIDEO * 250,
              'training_max_per_class': FRAMES_PER_VIDEO * 100 }, base_config)
+
+add_config(configs, 'prednet__moments_nano_200v__model', 
+           { 'description': 'Training PredNet on Moments in Time dataset.',
+             'output_mode': 'error',
+             'epochs': 150,
+             'batch_size': 4,
+             'shuffle': True,
+             'stopping_patience': 20,
+             # We start at video #250 to avoid using the same videos
+             # present in the classifier (convnet) dataset
+             'training_index_start': FRAMES_PER_VIDEO * 250,
+             'training_max_per_class': FRAMES_PER_VIDEO * 200 }, base_config)
     

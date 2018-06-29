@@ -31,6 +31,7 @@ convnet_base_config = {
     #'workers': 4,
     #'use_multiprocessing': True,
     'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
+    'test_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'base_results_dir': './results',
     'training_data_dir': './results/vgg_imagenet__moments_nano__features/training',
     'validation_data_dir': './results/vgg_imagenet__moments_nano__features/validation',
