@@ -4,13 +4,18 @@ This folder contains classification models that are trained on learned represent
 
 ## Results
 
+### ConvLSTM
+
 | Model  | Easy (loss) | Hard (loss) | Easy (acc) | Hard (acc) | Easy (test acc) | Hard (test acc) |
 | ------------- | :--: | :--: | :--: | :--: | :--: | :--: |
-| VGG ImageNet + ConvLSTM | 0.298 | 0.661 | 0.900 | 0.600 | 0.868 | 0.489 |
-| PredNet random + ConvLSTM  | 0.663 | 0.693 | 0.656 | 0.556 | 0.668 | 0.537 |
-| PredNet KITTI + ConvLSTM  | 0.570 | 0.692 | 0.733 | 0.556 | 0.737 | 0.516 |
-| PredNet Moments 1k  |   | | | |  |  |
-| PredNet Moments 5k  |   | | | |  |  |
+| VGG ImageNet + ConvLSTM | 0.287 | 0.661 | 0.878 | 0.600 | 0.853 | 0.489 |
+| PredNet random + ConvLSTM  | 0.667 | 0.693 | 0.511 | 0.556 | 0.653 | 0.537 |
+| PredNet KITTI + ConvLSTM  | 0.605 | 0.692 | 0.711 | 0.556 | 0.700 | 0.516 |
+| PredNet Moments KITTI+10v  | 0.604 | | 0.789 | | 0.679 |  |
+| PredNet Moments KITTI+50v  | 0.636 | | 0.689 | | 0.621 |  |
+| PredNet Moments KITTI+100v  |  | |  | |  |  |
+
+### LSTM
 
 | Model  | Easy (loss) | Hard (loss) | Easy (acc) | Hard (acc) | Easy (test acc) | Hard (test acc) |
 | ------------- | :--: | :--: | :--: | :--: | :--: | :--: |
