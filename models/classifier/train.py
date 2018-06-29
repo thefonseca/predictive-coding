@@ -118,6 +118,10 @@ def evaluate(config_name, test_data_dir, batch_size,
     metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
     metric_str = ' - '.join(metric_str)
     print('Test {}'.format(metric_str))
+    f = open(os.path.join(results_dir, 'test.txt'), 'w')
+    f.write('Test results:\n')
+    f.write(metric_str)
+    f.close()
 
 
 if __name__ == '__main__':
@@ -128,7 +132,7 @@ if __name__ == '__main__':
     FLAGS, unparsed = parser.parse_known_args()
     
     config = configs[FLAGS.config]
-    print('\n==> Starting traininig: {}'.format(config['description']))
+    print('\n==> Starting experiment: {}'.format(config['description']))
     
     if not FLAGS.eval:
         train(FLAGS.config, **config)

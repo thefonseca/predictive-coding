@@ -3,6 +3,9 @@ Train PredNet on Moments in Time sequences.
 Adapted from https://github.com/coxlab/prednet/blob/master/kitti_train.py
 '''
 import os
+import numpy as np
+import tensorflow as tf
+import random as rn
 
 from keras import backend as K
 from keras.models import Model

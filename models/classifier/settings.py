@@ -17,7 +17,7 @@ configs['vgg_imagenet__moments_nano__features'] = {
     'sample_step': 3,
     'base_results_dir': './results',
     'training_data_dir': '../../datasets/moments_nano_frames/training',
-    'validation_data_dir': '../../datasets/moments_nano_frames/validation',
+    'validation_data_dir': '../../datasets/moments_nano_frames/validation'
 }
 
 VGG_FEATURES_PER_VIDEO = 30
@@ -87,140 +87,102 @@ add_config(configs, 'lstm__moments_nano__vgg_imagenet_hard',
              'model_type': 'lstm',
              'classes': ['running', 'walking']}, convnet_base_config)
 
+
 PREDNET_FEATURES_PER_VIDEO = 5
 
-add_config(configs, 'convnet__moments_nano__prednet_kitti_R3_easy', 
-           { 'description': 'A convnet classifier trained on the PredNet \
-(pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
-             'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
-             'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['cooking', 'walking']}, convnet_base_config)
-
-add_config(configs, 'convnet__moments_nano__prednet_random_R3_easy', 
-           { 'description': 'A convnet classifier trained on the PredNet \
-(random weights) R3 features extracted from the Moments in Time dataset.',
-             'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
-             'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['cooking', 'walking']}, convnet_base_config)
-
-add_config(configs, 'convnet__moments_nano__prednet_kitti_R3_hard', 
-           { 'description': 'A convnet classifier trained on the PredNet \
-(pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
-             'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
-             'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['running', 'walking']}, convnet_base_config)
-
-add_config(configs, 'convnet__moments_nano__prednet_random_R3_hard', 
-           { 'description': 'A convnet classifier trained on the PredNet \
-(random weights) R3 features extracted from the Moments in Time dataset.',
-             'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
-             'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['running', 'walking']}, convnet_base_config)
+prednet_base_config = {
+    'seq_length': PREDNET_FEATURES_PER_VIDEO,
+    'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class,
+    'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
+}
+prednet_base_config.update(convnet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__prednet_kitti_R3_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
-             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'model_type': 'convlstm',
              'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
              'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['cooking', 'walking']}, convnet_base_config)
+             'classes': ['cooking', 'walking']}, prednet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__prednet_kitti_R3_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
-             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'model_type': 'convlstm',
              'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
              'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['running', 'walking']}, convnet_base_config)
+             'classes': ['running', 'walking']}, prednet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__prednet_random_R3_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (random weights) R3 features extracted from the Moments in Time dataset.',
-             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'model_type': 'convlstm',
              'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
              'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['cooking', 'walking']}, convnet_base_config)
+             'classes': ['cooking', 'walking']}, prednet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__prednet_random_R3_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (random weights) R3 features extracted from the Moments in Time dataset.',
-             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'model_type': 'convlstm',
              'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
              'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['running', 'walking']}, convnet_base_config)
+             'classes': ['running', 'walking']}, prednet_base_config)
+
+add_config(configs, 'convlstm__moments_nano__prednet_moments_v10_R3_easy', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(random weights) R3 features extracted from the Moments in Time dataset.',
+             'model_type': 'convlstm',
+             'training_data_dir': '../prednet/results/prednet__moments_nano__train_10v/training',
+             'validation_data_dir': '../prednet/results/prednet__moments_nano__train_10v/validation',
+             'test_data_dir': '../prednet/results/prednet__moments_nano__train_10v/training',
+             'classes': ['cooking', 'walking']}, prednet_base_config)
+
+add_config(configs, 'convlstm__moments_nano__prednet_moments_v10_R3_hard', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(random weights) R3 features extracted from the Moments in Time dataset.',
+             'model_type': 'convlstm',
+             'training_data_dir': '../prednet/results/prednet__moments_nano__train_10v/training',
+             'validation_data_dir': '../prednet/results/prednet__moments_nano__train_10v/validation',
+             'test_data_dir': '../prednet/results/prednet__moments_nano__train_10v/training',
+             'classes': ['running', 'walking']}, prednet_base_config)
 
 add_config(configs, 'lstm__moments_nano__prednet_kitti_R3_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
-             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'model_type': 'lstm',
              'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
              'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['cooking', 'walking']}, convnet_base_config)
+             'classes': ['cooking', 'walking']}, prednet_base_config)
 
 add_config(configs, 'lstm__moments_nano__prednet_kitti_R3_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
-             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'model_type': 'lstm',
              'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
              'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['running', 'walking']}, convnet_base_config)
+             'classes': ['running', 'walking']}, prednet_base_config)
 
 add_config(configs, 'lstm__moments_nano__prednet_random_R3_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (random weights) R3 features extracted from the Moments in Time dataset.',
-             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'model_type': 'lstm',
              'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
              'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['cooking', 'walking']}, convnet_base_config)
+             'classes': ['cooking', 'walking']}, prednet_base_config)
 
 add_config(configs, 'lstm__moments_nano__prednet_random_R3_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (random weights) R3 features extracted from the Moments in Time dataset.',
-             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'model_type': 'lstm',
              'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
              'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
              'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-             'classes': ['running', 'walking']}, convnet_base_config)
+             'classes': ['running', 'walking']}, prednet_base_config)
