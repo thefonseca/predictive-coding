@@ -4,6 +4,7 @@ Adapted from https://github.com/coxlab/prednet/blob/master/kitti_train.py
 '''
 import os
 
+from keras import backend as K
 from keras.models import Model
 from keras.callbacks import LearningRateScheduler, ModelCheckpoint
 from keras.callbacks import CSVLogger, EarlyStopping
@@ -16,9 +17,22 @@ import sys
 sys.path.append("../classifier")
 from data import DataGenerator
 
+# Getting reproducible results:
+# https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
+os.environ['PYTHONHASHSEED'] = '0'
+np.random.seed(42)
+rn.seed(12345)
+# Force TensorFlow to use single thread.
+# Multiple threads are a potential source of
+# non-reproducible results.
+# For further details, see: https://stackoverflow.com/questions/42022950/which-seeds-have-to-be-set-where-to-realize-100-reproducibility-of-training-res
+session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+tf.set_random_seed(1234)
+sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
+K.set_session(sess)
+
 
 def get_callbacks(results_dir, stopping_patience=None):
-    
     # start with lr of 0.001 and then drop to 0.0001 after 75 epochs
     lr_schedule = lambda epoch: 0.001 if epoch < 75 else 0.0001    
     callbacks = [LearningRateScheduler(lr_schedule)]
@@ -56,6 +70,7 @@ def train(config_name, training_data_dir, validation_data_dir,
                                     seq_length=n_timesteps,
                                     sample_step=frame_step,
                                     target_size=input_shape,
+                                    rescale= 1./255,
                                     batch_size=batch_size, shuffle=shuffle,
                                     data_format=data_format,
                                     output_mode='error',
@@ -65,6 +80,7 @@ def train(config_name, training_data_dir, validation_data_dir,
                                   seq_length=n_timesteps,
                                   sample_step=frame_step,
                                   target_size=input_shape,
+                                  rescale= 1./255,
                                   batch_size=batch_size,
                                   data_format=data_format,
                                   output_mode='error')
@@ -95,7 +111,6 @@ if __name__ == '__main__':
     FLAGS, unparsed = parser.parse_known_args()
     
     config = configs[FLAGS.config]
-    
     print('\n==> Starting experiment: {}\n'.format(config['description']))
     
     train(FLAGS.config, **config)

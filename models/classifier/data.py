@@ -19,7 +19,7 @@ class DataGenerator(Sequence):
                  index_start=0, max_per_class=None, seq_length=None, 
                  sample_step=1, seq_overlap=0, target_size=None, 
                  classes=None, data_format=K.image_data_format(), 
-                 output_mode=None, return_sources=False):
+                 output_mode=None, rescale=None, return_sources=False):
         
         'Initialization'
         self.batch_size = batch_size
@@ -37,6 +37,7 @@ class DataGenerator(Sequence):
         self.data_format = data_format
         self.output_mode = output_mode
         self.seq_overlap = seq_overlap
+        self.rescale = rescale
         
     def flow_from_directory(self, data_dir):
         self.data_dir = data_dir
@@ -143,9 +144,9 @@ class DataGenerator(Sequence):
     
     def __preprocess(self, img):
         '''if self.target_size:
-            img = utils.resize_img(img, self.target_size)
+            img = utils.resize_img(img, self.target_size)'''
         if self.rescale:
-            img = self.rescale * img'''
+            img = self.rescale * img
         if self.fn_preprocess:
             img = self.fn_preprocess(img)
         return img
