@@ -6,7 +6,6 @@ import glob
 import os
 import numpy as np
 import pickle as pkl
-#from imageio import imread
 
 import utils
 
@@ -61,7 +60,9 @@ class DataGenerator(Sequence):
         for i, c in enumerate(self.classes):
             sample_indices = [k for k, y_ in enumerate(y) if y_ == c]
             class_samples = X[sample_indices]
-            class_sources = sources[sample_indices]
+            class_sources = None
+            if sources:
+                class_sources = sources[sample_indices]
             self.__process_class_samples(i, class_samples, class_sources)
             
         self.__postprocess()
@@ -80,11 +81,11 @@ class DataGenerator(Sequence):
         
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
         if self.max_per_class is None or \
-        (self.index_start < 0 and self.index_start + self.max_per_class * self.sample_step >= 0):
+        (self.index_start < 0 and self.index_start + self.max_per_class >= 0):
             class_samples = class_samples[self.index_start::self.sample_step]
             class_sources = class_sources[self.index_start::self.sample_step]
         else:
-            index_end = self.index_start + self.max_per_class * self.sample_step
+            index_end = self.index_start + self.max_per_class
             class_samples = class_samples[self.index_start:index_end:self.sample_step]
             class_sources = class_sources[self.index_start:index_end:self.sample_step]
 
@@ -92,8 +93,7 @@ class DataGenerator(Sequence):
             class_samples = self.__to_sequence(class_samples, class_sources)
         
         self.y.extend([class_index] * len(class_samples))
-        #self.X.extend(class_samples)
-        self.X = class_samples
+        self.X.extend(class_samples)
         
     def __len__(self):
         'Denotes the number of batches per epoch'
@@ -200,7 +200,7 @@ class DataGenerator(Sequence):
                 # NAME_OF__SOURCE__frame_001.pkl => NAME_OF__SOURCE
                 source = '__'.join(sources[j].split('__')[:-1]) 
                 
-                if prev_source is None or prev_source == source:# and len(seq) < self.seq_length:
+                if prev_source is None or prev_source == source:
                     seq.append(samples[j])
                     if len(seq) == self.seq_length:
                         seqs.append(seq)
@@ -213,16 +213,4 @@ class DataGenerator(Sequence):
                 if j == len(sources):
                     i = j
             
-        '''for i, s in enumerate(sources):
-            source = '__'.join(s.split('__')[:-1]) # NAME_OF__SOURCE__frame_001.pkl => NAME_OF__SOURCE
-
-            if prev_source is None or prev_source == source:
-                seq.append(samples[i])
-            else:
-                if len(seq) >= self.seq_length:
-                    seqs.append(seq[:self.seq_length])
-                    
-                seq = [s]
-
-            prev_source = source'''            
         return seqs
