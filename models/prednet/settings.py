@@ -69,11 +69,23 @@ add_config(configs, 'prednet_kitti_10v__moments_nano__R3',
              'model_json_file': './results/prednet_kitti__moments_nano_10v__model/model.json',
              'output_mode': 'R3' }, base_config)
 
+add_config(configs, 'prednet_kitti_10v__moments_nano__representation', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
+             'model_weights_file': './results/prednet_kitti__moments_nano_10v__model/weights.hdf5',
+             'model_json_file': './results/prednet_kitti__moments_nano_10v__model/model.json',
+             'output_mode': 'representation' }, base_config)
+
 add_config(configs, 'prednet_scratch_10v__moments_nano__R3', 
            { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
              'model_weights_file': './results/prednet_scratch__moments_nano_10v__model/weights.hdf5',
              'model_json_file': './results/prednet_scratch__moments_nano_10v__model/model.json',
              'output_mode': 'R3' }, base_config)
+
+add_config(configs, 'prednet_scratch_10v__moments_nano__representation', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
+             'model_weights_file': './results/prednet_scratch__moments_nano_10v__model/weights.hdf5',
+             'model_json_file': './results/prednet_scratch__moments_nano_10v__model/model.json',
+             'output_mode': 'representation' }, base_config)
 
 add_config(configs, 'prednet_kitti_50v__moments_nano__R3', 
            { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
@@ -81,11 +93,23 @@ add_config(configs, 'prednet_kitti_50v__moments_nano__R3',
              'model_json_file': './results/prednet_kitti__moments_nano_50v__model/model.json',
              'output_mode': 'R3' }, base_config)
 
+add_config(configs, 'prednet_kitti_50v__moments_nano__representation', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
+             'model_weights_file': './results/prednet_kitti__moments_nano_50v__model/weights.hdf5',
+             'model_json_file': './results/prednet_kitti__moments_nano_50v__model/model.json',
+             'output_mode': 'representation' }, base_config)
+
 add_config(configs, 'prednet_kitti_100v__moments_nano__R3', 
            { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
              'model_weights_file': './results/prednet_kitti__moments_nano_100v__model/weights.hdf5',
              'model_json_file': './results/prednet_kitti__moments_nano_100v__model/model.json',
              'output_mode': 'R3' }, base_config)
+
+add_config(configs, 'prednet_kitti_100v__moments_nano__representation', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
+             'model_weights_file': './results/prednet_kitti__moments_nano_100v__model/weights.hdf5',
+             'model_json_file': './results/prednet_kitti__moments_nano_100v__model/model.json',
+             'output_mode': 'representation' }, base_config)
 
 FRAMES_PER_VIDEO = 90
 
