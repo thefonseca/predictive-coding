@@ -49,9 +49,19 @@ add_config(configs, 'prednet_random__moments_nano__R3',
              'model_weights_file': None,
              'model_json_file': None }, base_config)
 
+add_config(configs, 'prednet_random__moments_nano__representation', 
+           { 'description': 'Using PredNet with random weights to extract R3 features.',
+             'output_mode': 'representation',
+             'model_weights_file': None,
+             'model_json_file': None }, base_config)
+
 add_config(configs, 'prednet_kitti__moments_nano__R3', 
            { 'description': 'Using PredNet pre-trained on KITTI dataset to extract R3 features.',
              'output_mode': 'R3' }, base_config)
+
+add_config(configs, 'prednet_kitti__moments_nano__representation', 
+           { 'description': 'Using PredNet pre-trained on KITTI dataset to extract All features.',
+             'output_mode': 'representation' }, base_config)
 
 add_config(configs, 'prednet_kitti_10v__moments_nano__R3', 
            { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',

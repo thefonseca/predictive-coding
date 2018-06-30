@@ -24,6 +24,7 @@ from tqdm import tqdm
 import argparse
 import csv
 import cPickle as pkl
+from skimage.measure import block_reduce
 
 FLAGS = None
 
@@ -158,16 +159,22 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
             y.append(category_source)
         
         if output_mode == 'representation':
-            rep = model.get_layer('prednet_1').unflatten_features(X_.shape, rep)
-
-            if data_format == 'channels_first':
-                for f in preds: 
-                    f = np.transpose(f, (0, 1, 3, 4, 2))
-                    #print(f.shape)
-
-        elif data_format == 'channels_first':
+            rep_layers = model.get_layer('prednet_1').unflatten_features(X_.shape, rep)
+            rep = []
+            
+            for i, rep_layer in enumerate(rep_layers): 
+                # Do avg spatial pooling to make all representation layers have 
+                # the same dimension as the highest representation layer.
+                ratio = rep_layer.shape[-1] / rep_layers[-1].shape[-1]
+                if ratio > 1:
+                    rep_layer = block_reduce(rep_layer, block_size=(1, 1, 1, ratio, ratio), 
+                                             func=np.mean)
+                rep.append(rep_layer)
+            rep = np.concatenate(rep, axis=2)
+            
+        if data_format == 'channels_first':
             rep = np.transpose(rep, (0, 1, 3, 4, 2))
-        
+            
         save_representation(rep, y_batch, results_dir, config)
     
     # Save labels in csv file
