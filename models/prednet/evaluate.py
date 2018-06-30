@@ -16,8 +16,8 @@ from keras import backend as K
 from keras.layers import Input, Dense, Flatten
 
 from prednet import PredNet
-from moments_data import SequenceGenerator
-from moments_settings import configs
+from prednet_data import SequenceGenerator
+from settings import configs
 import utils
 
 from tqdm import tqdm

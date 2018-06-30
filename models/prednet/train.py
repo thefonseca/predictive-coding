@@ -13,13 +13,6 @@ from keras.callbacks import LearningRateScheduler, ModelCheckpoint
 from keras.callbacks import CSVLogger, EarlyStopping
 from keras.optimizers import Adam
 
-from moments_settings import *
-import utils
-import argparse
-import sys
-sys.path.append("../classifier")
-from data import DataGenerator
-
 # Getting reproducible results:
 # https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
 os.environ['PYTHONHASHSEED'] = '0'
@@ -33,6 +26,13 @@ session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_paralleli
 tf.set_random_seed(1234)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
 K.set_session(sess)
+
+from settings import *
+import utils
+import argparse
+import sys
+sys.path.append("../classifier")
+from data import DataGenerator
 
 
 def get_callbacks(results_dir, stopping_patience=None):

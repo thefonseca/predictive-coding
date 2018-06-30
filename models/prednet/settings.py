@@ -32,8 +32,8 @@ base_config = {
     'training_data_sources': os.path.join(DATA_DIR, 'sources_training.pkl'),
     'validation_data_dir': os.path.join(DATA_DIR, 'validation'),
     'validation_data_sources': os.path.join(DATA_DIR, 'sources_validation.pkl'),
-    'model_weights_file': './model_data/kitti_keras/prednet_kitti_weights.hdf5',
-    'model_json_file': './model_data/kitti_keras/prednet_kitti_model.json',
+    'model_weights_file': './kitti/model_data/kitti_keras/prednet_kitti_weights.hdf5',
+    'model_json_file': './kitti/model_data/kitti_keras/prednet_kitti_model.json',
     # RESULTS
     'base_results_dir': './results/',
     'n_plot': 20
