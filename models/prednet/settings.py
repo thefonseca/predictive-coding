@@ -111,6 +111,12 @@ add_config(configs, 'prednet_kitti_100v__moments_nano__representation',
              'model_json_file': './results/prednet_kitti__moments_nano_100v__model/model.json',
              'output_mode': 'representation' }, base_config)
 
+add_config(configs, 'prednet_kitti_500v__moments_nano__representation', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract features.',
+             'model_weights_file': './results/prednet_kitti__moments_nano_500v__model/weights.hdf5',
+             'model_json_file': './results/prednet_kitti__moments_nano_500v__model/model.json',
+             'output_mode': 'representation' }, base_config)
+
 FRAMES_PER_VIDEO = 90
 
 train_base_config = dict()
@@ -147,4 +153,9 @@ add_config(configs, 'prednet_kitti__moments_nano_100v__model',
 add_config(configs, 'prednet_kitti__moments_nano_200v__model', 
            { 'description': 'Training PredNet on Moments in Time dataset.',
              'training_max_per_class': FRAMES_PER_VIDEO * 200 }, train_base_config)
+
+add_config(configs, 'prednet_kitti__moments_nano_500v__model', 
+           { 'description': 'Training PredNet on Moments in Time dataset.',
+             'training_index_start': 0,
+             'training_max_per_class': FRAMES_PER_VIDEO * 500 }, train_base_config)
     
