@@ -135,11 +135,7 @@ if __name__ == '__main__':
     
     config = configs[FLAGS.config]
     print('\n==> Starting experiment: {}'.format(config['description']))
-    config_str = ''
-    for k, v in sorted(config.items()):
-        if k != 'description':
-            config_str += '    {}: {}\n'.format(k, v)
-        
+    config_str = utils.get_config_str(config)
     print('\n==> Using configuration:\n{}'.format(config_str))
     
     if not FLAGS.eval:

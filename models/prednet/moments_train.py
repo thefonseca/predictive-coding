@@ -59,8 +59,9 @@ def train(config_name, training_data_dir, validation_data_dir,
           base_results_dir, test_data_dir=None, epochs=150, 
           use_multiprocessing=False, workers=1, shuffle=True,
           n_timesteps=10, batch_size=4, stopping_patience=None, 
-          classes=None, input_shape=None, max_queue_size=10, 
-          training_max_per_class=None, frame_step=1, **config):
+          input_channels=3, input_width=160, input_height=128, 
+          max_queue_size=10, classes=None, training_max_per_class=None, 
+          frame_step=1, **config):
     
     model = utils.create_model(train=True, **config)
     model.summary()
@@ -69,12 +70,16 @@ def train(config_name, training_data_dir, validation_data_dir,
     layer_config = model.layers[1].get_config()
     data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     
+    resize = lambda img: utils.resize_img(img, target_size=(input_height, 
+                                                            input_width))
+    
     train_generator = DataGenerator(classes=classes,
                                     seq_length=n_timesteps,
                                     seq_overlap=5,
                                     sample_step=frame_step,
-                                    target_size=input_shape,
+                                    target_size=None, #input_shape,
                                     rescale= 1./255,
+                                    fn_preprocess=resize,
                                     batch_size=batch_size, shuffle=shuffle,
                                     data_format=data_format,
                                     output_mode='error',
@@ -84,8 +89,9 @@ def train(config_name, training_data_dir, validation_data_dir,
                                   seq_length=n_timesteps,
                                   seq_overlap=5,
                                   sample_step=frame_step,
-                                  target_size=input_shape,
+                                  target_size=None, #input_shape,
                                   rescale= 1./255,
+                                  fn_preprocess=resize,
                                   batch_size=batch_size,
                                   data_format=data_format,
                                   output_mode='error')
@@ -117,6 +123,8 @@ if __name__ == '__main__':
     
     config = configs[FLAGS.config]
     print('\n==> Starting experiment: {}\n'.format(config['description']))
+    config_str = utils.get_config_str(config)
+    print('==> Using configuration:\n{}'.format(config_str))
     
     train(FLAGS.config, **config)
     utils.save_experiment_config(FLAGS.config, config['base_results_dir'], config)

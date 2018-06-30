@@ -221,6 +221,8 @@ if __name__ == '__main__':
     config = configs[FLAGS.config]
     
     print('\n==> Starting experiment: {}\n'.format(config['description']))
+    config_str = utils.get_config_str(config)
+    print('==> Using configuration:\n{}'.format(config_str))
     
     model = utils.create_model(**config)
     model.summary()

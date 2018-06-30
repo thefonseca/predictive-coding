@@ -26,3 +26,10 @@ def get_create_results_dir(config_name, base_results_dir):
     results_dir = os.path.join(base_results_dir, config_name)
     if not os.path.exists(results_dir): os.makedirs(results_dir)
     return results_dir
+
+def get_config_str(config):
+    config_str = ''
+    for k, v in sorted(config.items()):
+        if k != 'description':
+            config_str += '    {}: {}\n'.format(k, v)
+    return config_str
