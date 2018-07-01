@@ -9,8 +9,8 @@ import random as rn
 
 from keras import backend as K
 from keras.models import Model
-from keras.callbacks import LearningRateScheduler, ModelCheckpoint
-from keras.callbacks import CSVLogger, EarlyStopping
+from keras.callbacks import Callback, LearningRateScheduler, ModelCheckpoint
+from keras.callbacks import CSVLogger, EarlyStopping, LambdaCallback
 from keras.optimizers import Adam
 
 # Getting reproducible results:
@@ -35,7 +35,11 @@ sys.path.append("../classifier")
 from data import DataGenerator
 
 
-def get_callbacks(results_dir, stopping_patience=None):
+class StateResetter(Callback):
+    def on_batch_end(self, batch, logs={}):
+        self.model.reset_states()
+
+def get_callbacks(results_dir, stopping_patience=None, stateful=False):
     # start with lr of 0.001 and then drop to 0.0001 after 75 epochs
     lr_schedule = lambda epoch: 0.001 if epoch < 75 else 0.0001    
     callbacks = [LearningRateScheduler(lr_schedule)]
@@ -53,6 +57,9 @@ def get_callbacks(results_dir, stopping_patience=None):
                                 patience=stopping_patience, 
                                 verbose=0, mode='auto')
         callbacks.append(stopper)
+    
+    if stateful:
+        callbacks.append(StateResetter())
     return callbacks
     
 def train(config_name, training_data_dir, validation_data_dir, 
@@ -61,9 +68,13 @@ def train(config_name, training_data_dir, validation_data_dir,
           n_timesteps=10, batch_size=4, stopping_patience=None, 
           input_channels=3, input_width=160, input_height=128, 
           max_queue_size=10, classes=None, training_max_per_class=None, 
-          frame_step=1, **config):
+          frame_step=1, stateful=False, **config):
     
-    model = utils.create_model(train=True, **config)
+    model = utils.create_model(train=True, stateful=stateful,
+                               input_channels=input_channels, 
+                               input_width=input_width, 
+                               batch_size=batch_size,
+                               input_height=input_height, **config)
     model.summary()
     model.compile(loss='mean_absolute_error', optimizer='adam')
     
@@ -100,7 +111,7 @@ def train(config_name, training_data_dir, validation_data_dir,
     val_generator = val_generator.flow_from_directory(validation_data_dir)
     
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
-    callbacks = get_callbacks(results_dir, stopping_patience)
+    callbacks = get_callbacks(results_dir, stopping_patience, stateful)
     
     history = model.fit_generator(train_generator, 
                                   len(train_generator), 

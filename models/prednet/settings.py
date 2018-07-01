@@ -124,15 +124,17 @@ add_config(configs, 'prednet_scratch_500v__moments_nano__representation',
              'output_mode': 'representation' }, base_config)
 
 FRAMES_PER_VIDEO = 90
+SEQUENCES_PER_VIDEO = 5
 
 train_base_config = dict()
 train_base_config.update(base_config)
 train_base_config.update({
     'output_mode': 'error',
     'epochs': 150,
-    'batch_size': 4,
+    'batch_size': SEQUENCES_PER_VIDEO,
     'shuffle': True,
     'stopping_patience': 20,
+    'stateful': True,
     # We start at video #250 to avoid using the same videos
     # present in the classifier dataset
     'training_index_start': FRAMES_PER_VIDEO * 250,

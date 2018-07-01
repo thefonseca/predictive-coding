@@ -155,7 +155,7 @@ class PredNet(Recurrent):
             return (input_shape[0], input_shape[1]) + out_shape
         else:
             return (input_shape[0],) + out_shape
-
+        
     def get_initial_state(self, x):
         input_shape = self.input_spec[0].shape
         init_nb_row = input_shape[self.row_axis]
@@ -253,6 +253,57 @@ class PredNet(Recurrent):
         if self.extrap_start_time is not None:
             self.t_extrap = K.variable(self.extrap_start_time, int if K.backend() != 'tensorflow' else 'int32')
             self.states += [None] * 2  # [previous frame prediction, timestep]
+        
+        if self.stateful:
+            self.reset_states()
+            
+    def reset_states(self, states=None):
+        if not self.stateful:
+            raise AttributeError('Layer must be stateful.')
+        batch_size = self.input_spec[0].shape[0]
+        if not batch_size:
+            raise ValueError('If a RNN is stateful, it needs to know '
+                             'its batch size. Specify the batch size '
+                             'of your input tensors: \n'
+                             '- If using a Sequential model, '
+                             'specify the batch size by passing '
+                             'a `batch_input_shape` '
+                             'argument to your first layer.\n'
+                             '- If using the functional API, specify '
+                             'the time dimension by passing a '
+                             '`batch_shape` argument to your Input layer.')
+        
+        initial_states = self.get_initial_state(K.zeros(self.input_spec[0].shape))
+        
+        # initialize state if None
+        if self.states[0] is None:
+            #self.states = [K.zeros((batch_size, self.units))
+            #               for _ in self.states]
+            self.states = [K.zeros(s.shape)
+                           for s in initial_states]
+        elif states is None:
+            #for state in self.states:
+                #K.set_value(state, np.zeros((batch_size, self.units)))
+            for i, state in enumerate(self.states):
+                K.set_value(state, np.zeros(initial_states[i].shape))
+        else:
+            if not isinstance(states, (list, tuple)):
+                states = [states]
+            if len(states) != len(self.states):
+                raise ValueError('Layer ' + self.name + ' expects ' +
+                                 str(len(self.states)) + ' states, '
+                                 'but it received ' + str(len(states)) +
+                                 ' state values. Input received: ' +
+                                 str(states))
+            for index, (value, state) in enumerate(zip(states, self.states)):
+                if value.shape != (batch_size, self.units):
+                    raise ValueError('State ' + str(index) +
+                                     ' is incompatible with layer ' +
+                                     self.name + ': expected shape=' +
+                                     str((batch_size, self.units)) +
+                                     ', found shape=' + str(value.shape))
+                K.set_value(state, value)
+                
 
     def step(self, a, states):
         r_tm1 = states[:self.nb_layers]

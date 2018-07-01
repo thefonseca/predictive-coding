@@ -28,15 +28,22 @@ def create_model(model_json_file=None, model_weights_file=None,
     #    model = multi_gpu_model(model, gpus=gpus)
     return model
 
-def pretrained_prednet(pretrained, output_mode='error', 
-                       train=False, n_timesteps=10, **config):
+def pretrained_prednet(pretrained, output_mode='error', train=False, 
+                       n_timesteps=10, stateful=False, batch_size=None, 
+                       **config):
     # Create testing model (to output predictions)
     layer_config = pretrained.layers[1].get_config()
     layer_config['output_mode'] = output_mode
+    layer_config['stateful'] = stateful
     prednet = PredNet(weights=pretrained.layers[1].get_weights(), **layer_config)
     input_shape = list(pretrained.layers[0].batch_input_shape[1:])
     input_shape[0] = n_timesteps
     inputs = Input(shape=tuple(input_shape))
+    if batch_size:
+        input_shape = (batch_size,) + input_shape
+        inputs = Input(batch_shape=input_shape)
+    else:
+        inputs = Input(shape=input_shape)
     outputs = prednet(inputs)
     
     if train:
@@ -45,7 +52,10 @@ def pretrained_prednet(pretrained, output_mode='error',
     return model
 
 def prednet(input_channels, input_height, input_width, n_timesteps=10, 
-            train=False, output_mode='error', **config):
+            train=False, output_mode='error', stateful=False, 
+            batch_size=None, **config):
+    
+    print(stateful)
     # Model parameters
     if K.image_data_format() == 'channels_first':
         input_shape = (input_channels, input_height, input_width) 
@@ -60,9 +70,14 @@ def prednet(input_channels, input_height, input_width, n_timesteps=10,
     
     prednet = PredNet(stack_sizes, R_stack_sizes,
                       A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
-                      output_mode=output_mode, return_sequences=True) 
+                      output_mode=output_mode, return_sequences=True, 
+                      stateful=stateful)
     input_shape = (n_timesteps,) + input_shape
-    inputs = Input(shape=input_shape)
+    if batch_size:
+        input_shape = (batch_size,) + input_shape
+        inputs = Input(batch_shape=input_shape)
+    else:
+        inputs = Input(shape=input_shape)
     outputs = prednet(inputs)
     
     if train:
