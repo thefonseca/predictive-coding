@@ -12,13 +12,13 @@ import matplotlib.gridspec as gridspec
 import math
 
 from keras import backend as K
-#from keras.models import Model, model_from_json
-from keras.layers import Input, Dense, Flatten
 
 from prednet import PredNet
-from prednet_data import SequenceGenerator
 from settings import configs
 import utils
+import sys
+sys.path.append("../classifier")
+from data import DataGenerator
 
 from tqdm import tqdm
 import argparse
@@ -72,9 +72,9 @@ def save_predictions(X, X_hat, mse_model, mse_prev, results_dir,
         plt.savefig(plot_save_dir +  'plot_' + str(i) + '.png')
         plt.clf()
         
-def save_representation(rep, labels, results_dir, config):
+def save_representation(rep, sources, results_dir, config):
     
-    for i, label in enumerate(labels):
+    for i, label in enumerate(sources):
         
         target_dir = results_dir
         if len(label) > 1:
@@ -104,7 +104,7 @@ def evaluate_prediction(model, dataset, experiment_name,
     mse_prev = 0
     
     for i in tqdm(range(n_batches)):
-        X_, y_ = next(data_generator)
+        X_, y_, _ = next(data_generator)
         pred = model.predict(X_, data_generator.batch_size)
 
         mse_model += np.mean((X_[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
@@ -141,22 +141,24 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
     results_dir = utils.get_create_results_dir(experiment_name, 
                                                base_results_dir, 
                                                dataset=dataset)
-    y = []
-
+    sources = []
+    data_iterator = iter(data_generator)
     for i in tqdm(range(n_batches)):
-        X_, y_ = next(data_generator)
+        X_, y_, sources_ = next(data_iterator)
         rep = model.predict(X_, data_generator.batch_size)
         
         rep = rep[:, timestep_start:timestep_end]
-        y_ = y_[:, timestep_start:timestep_end].flatten()
-        y_batch = []
+        sources_ = sources_[:, timestep_start:timestep_end].flatten()
+        source_batch = []
         
-        for label in y_:
-            category_source = label.split('__')
-            category = category_source[0]
-            category_source = (category, '__'.join(category_source[1:]))
-            y_batch.append(category_source)
-            y.append(category_source)
+        for s in sources_:
+            path, source = os.path.split(s)
+            path, category = os.path.split(path)
+            path, data_split = os.path.split(path)
+            source = source.replace('.jpg', '')
+            category_source = (category, source)
+            source_batch.append(category_source)
+            sources.append(category_source)
         
         if output_mode == 'representation':
             rep_layers = model.layers[1].unflatten_features(X_.shape, rep)
@@ -184,49 +186,58 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
         if data_format == 'channels_first':
             rep = np.transpose(rep, (0, 1, 3, 4, 2))
             
-        save_representation(rep, y_batch, results_dir, config)
+        save_representation(rep, source_batch, results_dir, config)
     
     # Save labels in csv file
-    f = os.path.join(results_dir, 'labels.csv')
+    f = os.path.join(results_dir, 'sources.csv')
     with open(f, 'wb') as out:
         csv_out=csv.writer(out)
         csv_out.writerow(['category','source'])
-        for row in y:
+        for row in sources:
             csv_out.writerow(row)
 
-
-def evaluate(model, dataset, img_dir, img_sources, experiment_name,
-             output_mode, n_timesteps=10, frame_step=3, seq_overlap=0, 
-             max_seq_per_video=5, shuffle=False, batch_size=5, 
-             max_missing_frames=15, N_seq=None, seed=17,
-             input_width=160, input_height=128, **config):
+            
+def evaluate(config_name, dataset, data_dir, output_mode, 
+             classes=None, n_timesteps=10, frame_step=3, 
+             seq_overlap=0, input_width=160, input_height=128, 
+             shuffle=False, batch_size=5, 
+             stateful=False, rescale=None, **config):
+    
+    model = utils.create_model(train=False, stateful=stateful, 
+                               batch_size=batch_size, 
+                               output_mode=output_mode, **config)
+    model.summary()
     
     layer_config = model.layers[1].get_config()
     data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     
     print('Creating generator...')
-    data_generator = SequenceGenerator(img_dir, img_sources, n_timesteps,
-                                       output_mode=output_mode,
-                                       frame_step=frame_step, 
-                                       seq_overlap=seq_overlap, 
-                                       img_size=(input_height, input_width),
-                                       max_seq_per_video=max_seq_per_video, 
-                                       N_seq=N_seq, shuffle=shuffle, 
-                                       batch_size=batch_size,
-                                       max_missing_frames=max_missing_frames, 
-                                       seed=seed, data_format=data_format)
+    resize = lambda img: utils.resize_img(img, target_size=(input_height, 
+                                                            input_width))
     
-    n_batches = ((len(data_generator.possible_starts) - 1) // batch_size) + 1 # ceil
-    #print('Number of sequences: {}'.format(len(data_generator.possible_starts)))
+    data_generator = DataGenerator(classes=classes,
+                                   seq_length=n_timesteps,
+                                   seq_overlap=seq_overlap,
+                                   sample_step=frame_step,
+                                   target_size=None, #input_shape,
+                                   rescale=rescale,
+                                   fn_preprocess=resize,
+                                   batch_size=batch_size, 
+                                   shuffle=shuffle,
+                                   return_sources=True,
+                                   data_format=data_format)
+    
+    data_generator = data_generator.flow_from_directory(data_dir)
+    n_batches = len(data_generator)
     print('Number of batches: {}'.format(n_batches))
     
     if output_mode == 'prediction':
-        evaluate_prediction(model, dataset, experiment_name, 
+        evaluate_prediction(model, dataset, config_name, 
                             data_generator, n_batches, 
                             data_format=data_format, **config)
         
     elif output_mode == 'representation' or output_mode[:1] == 'R':
-        evaluate_representation(model, dataset, experiment_name, output_mode, 
+        evaluate_representation(model, dataset, config_name, output_mode, 
                                 data_generator, n_batches,
                                 data_format=data_format, **config)
         
@@ -243,16 +254,13 @@ if __name__ == '__main__':
     config_str = utils.get_config_str(config)
     print('==> Using configuration:\n{}'.format(config_str))
     
-    model = utils.create_model(**config)
-    model.summary()
-    
     for split in ['training', 'validation', 'test']:
         img_dir = config.get(split + '_data_dir', None)
         img_sources = config.get(split + '_data_sources', None)
         
         if img_dir and img_sources:
             print('==> Dataset split: {}'.format(split))
-            evaluate(model, split, img_dir, img_sources, FLAGS.config, **config)
+            evaluate(FLAGS.config, split, img_dir, **config)
             utils.save_experiment_config(FLAGS.config, config['base_results_dir'], 
                                          config, dataset=split)
     

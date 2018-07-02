@@ -80,6 +80,8 @@ def prednet(input_channels, input_height, input_width, n_timesteps=10,
     outputs = prednet(inputs)
     
     if train:
+        if output_mode != 'error':
+            raise ValueError('When training, output_mode must be equal to "error"')
         outputs = get_error_layer(outputs, n_timesteps)
     model = Model(inputs=inputs, outputs=outputs)
     return model

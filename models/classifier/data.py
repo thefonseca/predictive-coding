@@ -145,7 +145,7 @@ class DataGenerator(Sequence):
             data = (X, to_categorical(y, num_classes=self.n_classes))
         
         if self.return_sources:
-            data += (sources,)
+            data += (np.array(sources),)
         
         return data
     
