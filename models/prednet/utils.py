@@ -17,12 +17,12 @@ def load_model(model_json_file, model_weights_file, **extras):
     return train_model
 
 def create_model(model_json_file=None, model_weights_file=None, 
-                 train=False, n_timesteps=10, **config):
+                 train=False, **config):
     if model_json_file and model_weights_file:
         pretrained_model = load_model(model_json_file, model_weights_file)
         model = pretrained_prednet(pretrained_model, train=train, **config)
     else:
-        model = prednet(train=train, **config)
+        model = random_prednet(train=train, **config)
         
     #if gpus:
     #    model = multi_gpu_model(model, gpus=gpus)
@@ -51,9 +51,9 @@ def pretrained_prednet(pretrained, output_mode='error', train=False,
     model = Model(inputs=inputs, outputs=outputs)
     return model
 
-def prednet(input_channels, input_height, input_width, n_timesteps=10, 
-            train=False, output_mode='error', stateful=False, 
-            batch_size=None, **config):
+def random_prednet(input_channels, input_height, input_width, n_timesteps=10, 
+                   train=False, output_mode='error', stateful=False, 
+                   batch_size=None, **config):
     
     # Model parameters
     if K.image_data_format() == 'channels_first':

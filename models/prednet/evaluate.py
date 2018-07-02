@@ -201,8 +201,11 @@ def evaluate(config_name, dataset, data_dir, output_mode,
              shuffle=False, batch_size=5, 
              stateful=False, rescale=None, **config):
     
-    model = utils.create_model(train=False, stateful=stateful, 
+    model = utils.create_model(train=False, 
+                               stateful=stateful, 
                                batch_size=batch_size, 
+                               input_width=input_width, 
+                               input_height=input_height,
                                output_mode=output_mode, **config)
     model.summary()
     
