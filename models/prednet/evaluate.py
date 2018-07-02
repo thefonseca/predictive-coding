@@ -84,7 +84,7 @@ def save_representation(rep, sources, results_dir, config):
         
         if not os.path.exists(target_dir): os.makedirs(target_dir)
             
-        features_file = '{}.pkl'.format(source)
+        rep_file = '{}.pkl'.format(source)
         filename = os.path.join(target_dir, rep_file)
         
         with open(filename, 'w') as f:

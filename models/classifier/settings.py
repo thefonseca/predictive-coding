@@ -24,7 +24,7 @@ VGG_FEATURES_PER_VIDEO = 30
 
 convnet_base_config = {
     'epochs': 100,
-    'stopping_patience': 10,
+    'stopping_patience': 30,
     'batch_size': 10,
     'shuffle': False,
     'dropout': 0.5,
@@ -208,14 +208,23 @@ add_config(configs, 'convlstm__moments_nano__prednet_kitti_moments_v500_rep_easy
              'test_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
              'classes': ['cooking', 'walking']}, prednet_base_config)
 
-add_config(configs, 'convlstm__moments_nano__prednet_scratch_moments_v500_rep_easy', 
+add_config(configs, 'convlstm__moments_nano__prednet_kitti_moments_v500_rep_hard', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
+             'model_type': 'convlstm',
+             'training_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
+             'classes': ['running', 'walking']}, prednet_base_config)
+
+add_config(configs, 'convlstm__moments_nano__prednet_scratch_moments_v500_rep_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
              'model_type': 'convlstm',
              'training_data_dir': '../prednet/results/prednet_scratch_500v__moments_nano__representation/training',
              'validation_data_dir': '../prednet/results/prednet_scratch_500v__moments_nano__representation/validation',
              'test_data_dir': '../prednet/results/prednet_scratch_500v__moments_nano__representation/training',
-             'classes': ['cooking', 'walking']}, prednet_base_config)
+             'classes': ['running', 'walking']}, prednet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__prednet_moments_v50_R3_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
