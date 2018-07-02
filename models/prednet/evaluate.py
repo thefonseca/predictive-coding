@@ -75,7 +75,6 @@ def save_predictions(X, X_hat, mse_model, mse_prev, results_dir,
 def save_representation(rep, sources, results_dir, config):
     
     for i, label in enumerate(sources):
-        
         target_dir = results_dir
         if len(label) > 1:
             category, source = label
@@ -85,12 +84,11 @@ def save_representation(rep, sources, results_dir, config):
         
         if not os.path.exists(target_dir): os.makedirs(target_dir)
             
-        rep_file = '{}__{:03d}.pkl'.format(source, i)
+        features_file = '{}.pkl'.format(source)
         filename = os.path.join(target_dir, rep_file)
         
         with open(filename, 'w') as f:
             pkl.dump(rep[i].reshape(rep.shape[2:]), f)
-        
         
 def evaluate_prediction(model, dataset, experiment_name, 
                         data_generator, n_batches, base_results_dir,
