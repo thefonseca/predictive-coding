@@ -199,22 +199,22 @@ add_config(configs, 'convlstm__moments_nano__prednet_moments_v50_R3_easy',
              'test_data_dir': '../prednet/results/prednet_kitti_50v__moments_nano__R3/training',
              'classes': ['cooking', 'walking']}, prednet_base_config)
 
-add_config(configs, 'convlstm__moments_nano__prednet_moments_v500_rep_easy', 
+add_config(configs, 'convlstm__moments_nano__prednet_kitti_moments_v500_rep_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
 (pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
              'model_type': 'convlstm',
-             'training_data_dir': '../prednet/results/prednet_kitti_50v__moments_nano__representation/training',
-             'validation_data_dir': '../prednet/results/prednet_kitti_50v__moments_nano__representation/validation',
-             'test_data_dir': '../prednet/results/prednet_kitti_50v__moments_nano__representation/training',
+             'training_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
              'classes': ['cooking', 'walking']}, prednet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__prednet_scratch_moments_v500_rep_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
-(pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
+(pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
              'model_type': 'convlstm',
-             'training_data_dir': '../prednet/results/prednet_scratch_50v__moments_nano__representation/training',
-             'validation_data_dir': '../prednet/results/prednet_scratch_50v__moments_nano__representation/validation',
-             'test_data_dir': '../prednet/results/prednet_scratch_50v__moments_nano__representation/training',
+             'training_data_dir': '../prednet/results/prednet_scratch_500v__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_scratch_500v__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_scratch_500v__moments_nano__representation/training',
              'classes': ['cooking', 'walking']}, prednet_base_config)
 
 add_config(configs, 'convlstm__moments_nano__prednet_moments_v50_R3_hard', 
