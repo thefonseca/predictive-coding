@@ -40,72 +40,14 @@ add_config(configs, 'prednet_kitti__moments_nano__prediction',
            { 'description': 'Using PredNet pre-trained on KITTI dataset to evaluate predictions.',
              'output_mode': 'prediction' }, base_config)
 
-add_config(configs, 'prednet_random__moments_nano__R3', 
-           { 'description': 'Using PredNet with random weights to extract R3 features.',
-             'output_mode': 'R3',
-             'model_weights_file': None,
-             'model_json_file': None }, base_config)
-
 add_config(configs, 'prednet_random__moments_nano__representation', 
            { 'description': 'Using PredNet with random weights to extract R3 features.',
              'output_mode': 'representation',
              'model_weights_file': None,
              'model_json_file': None }, base_config)
 
-add_config(configs, 'prednet_kitti__moments_nano__R3', 
-           { 'description': 'Using PredNet pre-trained on KITTI dataset to extract R3 features.',
-             'output_mode': 'R3' }, base_config)
-
 add_config(configs, 'prednet_kitti__moments_nano__representation', 
            { 'description': 'Using PredNet pre-trained on KITTI dataset to extract All features.',
-             'output_mode': 'representation' }, base_config)
-
-add_config(configs, 'prednet_kitti_10v__moments_nano__R3', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
-             'model_weights_file': './results/prednet_kitti__moments_nano_10v__model/weights.hdf5',
-             'model_json_file': './results/prednet_kitti__moments_nano_10v__model/model.json',
-             'output_mode': 'R3' }, base_config)
-
-add_config(configs, 'prednet_kitti_10v__moments_nano__representation', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
-             'model_weights_file': './results/prednet_kitti__moments_nano_10v__model/weights.hdf5',
-             'model_json_file': './results/prednet_kitti__moments_nano_10v__model/model.json',
-             'output_mode': 'representation' }, base_config)
-
-add_config(configs, 'prednet_scratch_10v__moments_nano__R3', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
-             'model_weights_file': './results/prednet_scratch__moments_nano_10v__model/weights.hdf5',
-             'model_json_file': './results/prednet_scratch__moments_nano_10v__model/model.json',
-             'output_mode': 'R3' }, base_config)
-
-add_config(configs, 'prednet_scratch_10v__moments_nano__representation', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract features.',
-             'model_weights_file': './results/prednet_scratch__moments_nano_10v__model/weights.hdf5',
-             'model_json_file': './results/prednet_scratch__moments_nano_10v__model/model.json',
-             'output_mode': 'representation' }, base_config)
-
-add_config(configs, 'prednet_kitti_50v__moments_nano__R3', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
-             'model_weights_file': './results/prednet_kitti__moments_nano_50v__model/weights.hdf5',
-             'model_json_file': './results/prednet_kitti__moments_nano_50v__model/model.json',
-             'output_mode': 'R3' }, base_config)
-
-add_config(configs, 'prednet_kitti_50v__moments_nano__representation', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
-             'model_weights_file': './results/prednet_kitti__moments_nano_50v__model/weights.hdf5',
-             'model_json_file': './results/prednet_kitti__moments_nano_50v__model/model.json',
-             'output_mode': 'representation' }, base_config)
-
-add_config(configs, 'prednet_kitti_100v__moments_nano__R3', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
-             'model_weights_file': './results/prednet_kitti__moments_nano_100v__model/weights.hdf5',
-             'model_json_file': './results/prednet_kitti__moments_nano_100v__model/model.json',
-             'output_mode': 'R3' }, base_config)
-
-add_config(configs, 'prednet_kitti_100v__moments_nano__representation', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
-             'model_weights_file': './results/prednet_kitti__moments_nano_100v__model/weights.hdf5',
-             'model_json_file': './results/prednet_kitti__moments_nano_100v__model/model.json',
              'output_mode': 'representation' }, base_config)
 
 add_config(configs, 'prednet_kitti_500v__moments_nano__representation', 
@@ -120,6 +62,18 @@ add_config(configs, 'prednet_scratch_500v__moments_nano__representation',
              'model_json_file': './results/prednet_scratch__moments_nano_500v__model/model.json',
              'output_mode': 'representation' }, base_config)
 
+add_config(configs, 'prednet_kitti_stateful_500v__moments_nano__representation', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract features.',
+             'model_weights_file': './results/prednet_kitti_stateful__moments_nano_500v__model/weights.hdf5',
+             'model_json_file': './results/prednet_kitti_stateful__moments_nano_500v__model/model.json',
+             'output_mode': 'representation' }, base_config)
+
+add_config(configs, 'prednet_scratch_stateful_500v__moments_nano__representation', 
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract features.',
+             'model_weights_file': './results/prednet_scratch_stateful__moments_nano_500v__model/weights.hdf5',
+             'model_json_file': './results/prednet_scratch_stateful__moments_nano_500v__model/model.json',
+             'output_mode': 'representation' }, base_config)
+
 FRAMES_PER_VIDEO = 90
 SEQUENCES_PER_VIDEO = 5
 
@@ -131,21 +85,11 @@ train_base_config.update({
     'batch_size': SEQUENCES_PER_VIDEO,
     'shuffle': True,
     'stopping_patience': 20,
-    'stateful': True,
+    'stateful': False,
     # We start at video #250 to avoid using the same videos
     # present in the classifier dataset
     'training_index_start': FRAMES_PER_VIDEO * 250,
 })
-
-add_config(configs, 'prednet_kitti__moments_nano_10v__model', 
-           { 'description': 'Training PredNet on Moments in Time dataset.',
-             'training_max_per_class': FRAMES_PER_VIDEO * 10 }, train_base_config)
-
-add_config(configs, 'prednet_scratch__moments_nano_10v__model', 
-           { 'description': 'Training PredNet (from scratch) on Moments in Time dataset.',
-             'model_weights_file': None,
-             'model_json_file': None,
-             'training_max_per_class': FRAMES_PER_VIDEO * 10 }, train_base_config)
 
 add_config(configs, 'prednet_kitti__moments_nano_50v__model', 
            { 'description': 'Training PredNet on Moments in Time dataset.',
@@ -155,12 +99,14 @@ add_config(configs, 'prednet_kitti__moments_nano_100v__model',
            { 'description': 'Training PredNet on Moments in Time dataset.',
              'training_max_per_class': FRAMES_PER_VIDEO * 100 }, train_base_config)
 
-add_config(configs, 'prednet_kitti__moments_nano_200v__model', 
-           { 'description': 'Training PredNet on Moments in Time dataset.',
-             'training_max_per_class': FRAMES_PER_VIDEO * 200 }, train_base_config)
-
 add_config(configs, 'prednet_kitti__moments_nano_500v__model', 
            { 'description': 'Training PredNet on Moments in Time dataset.',
+             'training_index_start': 0,
+             'training_max_per_class': FRAMES_PER_VIDEO * 500 }, train_base_config)
+
+add_config(configs, 'prednet_kitti_stateful__moments_nano_500v__model', 
+           { 'description': 'Training PredNet on Moments in Time dataset.',
+             'stateful': True,
              'training_index_start': 0,
              'training_max_per_class': FRAMES_PER_VIDEO * 500 }, train_base_config)
 
@@ -168,6 +114,14 @@ add_config(configs, 'prednet_scratch__moments_nano_500v__model',
            { 'description': 'Training PredNet on Moments in Time dataset.',
              'model_weights_file': None,
              'model_json_file': None,
+             'training_index_start': 0,
+             'training_max_per_class': FRAMES_PER_VIDEO * 500 }, train_base_config)
+
+add_config(configs, 'prednet_scratch_stateful__moments_nano_500v__model', 
+           { 'description': 'Training PredNet on Moments in Time dataset.',
+             'model_weights_file': None,
+             'model_json_file': None,
+             'stateful': True,
              'training_index_start': 0,
              'training_max_per_class': FRAMES_PER_VIDEO * 500 }, train_base_config)
     
