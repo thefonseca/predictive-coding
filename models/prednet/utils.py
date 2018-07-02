@@ -40,7 +40,7 @@ def pretrained_prednet(pretrained, output_mode='error', train=False,
     input_shape[0] = n_timesteps
     inputs = Input(shape=tuple(input_shape))
     if batch_size:
-        input_shape = (batch_size,) + input_shape
+        input_shape = (batch_size,) + tuple(input_shape)
         inputs = Input(batch_shape=input_shape)
     else:
         inputs = Input(shape=input_shape)
@@ -55,7 +55,6 @@ def prednet(input_channels, input_height, input_width, n_timesteps=10,
             train=False, output_mode='error', stateful=False, 
             batch_size=None, **config):
     
-    print(stateful)
     # Model parameters
     if K.image_data_format() == 'channels_first':
         input_shape = (input_channels, input_height, input_width) 

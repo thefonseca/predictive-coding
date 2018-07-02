@@ -19,10 +19,10 @@ base_config = {
     'max_seq_per_video': 5,
     'batch_size': 20,
     'max_missing_frames': 15,
-    #'input_shape': (128,160,3),
     'input_channels': 3, 
     'input_height': 128, 
     'input_width': 160,
+    'rescale': 1./255,
     #'N_seq': 5,
     'shuffle': False,
     'workers': 4,
@@ -82,7 +82,7 @@ add_config(configs, 'prednet_scratch_10v__moments_nano__R3',
              'output_mode': 'R3' }, base_config)
 
 add_config(configs, 'prednet_scratch_10v__moments_nano__representation', 
-           { 'description': 'Using PredNet trained on Moments in Time dataset to extract R3 features.',
+           { 'description': 'Using PredNet trained on Moments in Time dataset to extract features.',
              'model_weights_file': './results/prednet_scratch__moments_nano_10v__model/weights.hdf5',
              'model_json_file': './results/prednet_scratch__moments_nano_10v__model/model.json',
              'output_mode': 'representation' }, base_config)

@@ -212,7 +212,6 @@ class SequenceGenerator(Iterator):
         starty = y//2-(cropy//2)    
         return img[startx:startx+cropx,starty:starty+cropy]
 
-    # resize and crop image
     def preprocess(self, img):
         larger_dim = np.argsort(self.img_size)[-1]
         smaller_dim = np.argsort(self.img_size)[-2]
@@ -224,5 +223,7 @@ class SequenceGenerator(Iterator):
 
         # crop
         img = self.crop_center(img, self.img_size[0], self.img_size[1])
+        # rescale
+        img = img.astype(np.float32) / 255
         return img
 

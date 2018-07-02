@@ -159,18 +159,27 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
             y.append(category_source)
         
         if output_mode == 'representation':
-            rep_layers = model.get_layer('prednet_1').unflatten_features(X_.shape, rep)
+            rep_layers = model.layers[1].unflatten_features(X_.shape, rep)
             rep = []
+            
+            width_index = 3
+            channel_index = -1
+            block_size = [1, 1, 1, 1, 1]
+            if data_format == 'channels_first':
+                width_index = -1
+                channel_index = 2
             
             for i, rep_layer in enumerate(rep_layers): 
                 # Do avg spatial pooling to make all representation layers have 
-                # the same dimension as the highest representation layer.
-                ratio = rep_layer.shape[-1] / rep_layers[-1].shape[-1]
+                # the same dimension as the higher-level representation layer.
+                ratio = rep_layer.shape[width_index] / rep_layers[-1].shape[width_index]
                 if ratio > 1:
-                    rep_layer = block_reduce(rep_layer, block_size=(1, 1, 1, ratio, ratio), 
+                    block_size[width_index-1] = ratio
+                    block_size[width_index] = ratio
+                    rep_layer = block_reduce(rep_layer, block_size=tuple(block_size), 
                                              func=np.mean)
                 rep.append(rep_layer)
-            rep = np.concatenate(rep, axis=2)
+            rep = np.concatenate(rep, axis=channel_index)
             
         if data_format == 'channels_first':
             rep = np.transpose(rep, (0, 1, 3, 4, 2))
@@ -189,7 +198,8 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
 def evaluate(model, dataset, img_dir, img_sources, experiment_name,
              output_mode, n_timesteps=10, frame_step=3, seq_overlap=0, 
              max_seq_per_video=5, shuffle=False, batch_size=5, 
-             max_missing_frames=15, N_seq=None, seed=17, **config):
+             max_missing_frames=15, N_seq=None, seed=17,
+             input_width=160, input_height=128, **config):
     
     layer_config = model.layers[1].get_config()
     data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
@@ -197,7 +207,9 @@ def evaluate(model, dataset, img_dir, img_sources, experiment_name,
     print('Creating generator...')
     data_generator = SequenceGenerator(img_dir, img_sources, n_timesteps,
                                        output_mode=output_mode,
-                                       frame_step=frame_step, seq_overlap=seq_overlap, 
+                                       frame_step=frame_step, 
+                                       seq_overlap=seq_overlap, 
+                                       img_size=(input_height, input_width),
                                        max_seq_per_video=max_seq_per_video, 
                                        N_seq=N_seq, shuffle=shuffle, 
                                        batch_size=batch_size,
