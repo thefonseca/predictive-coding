@@ -24,7 +24,7 @@ VGG_FEATURES_PER_VIDEO = 30
 
 convnet_base_config = {
     'epochs': 100,
-    'stopping_patience': 30,
+    'stopping_patience': 20,
     'batch_size': 10,
     'shuffle': False,
     'dropout': 0.5,
@@ -235,38 +235,56 @@ add_config(configs, 'convlstm__moments_nano__prednet_moments_v50_R3_hard',
              'test_data_dir': '../prednet/results/prednet_kitti_50v__moments_nano__R3/training',
              'classes': ['running', 'walking']}, prednet_base_config)
 
-add_config(configs, 'lstm__moments_nano__prednet_kitti_R3_easy', 
+add_config(configs, 'lstm__moments_nano__prednet_kitti_rep_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
-(pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
+(pretrained on KITTI) features extracted from the Moments in Time dataset.',
              'model_type': 'lstm',
-             'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
-             'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
+             'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__representation/training',
              'classes': ['cooking', 'walking']}, prednet_base_config)
 
-add_config(configs, 'lstm__moments_nano__prednet_kitti_R3_hard', 
+add_config(configs, 'lstm__moments_nano__prednet_kitti_rep_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
-(pretrained on KITTI) R3 features extracted from the Moments in Time dataset.',
+(pretrained on KITTI) features extracted from the Moments in Time dataset.',
              'model_type': 'lstm',
-             'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
-             'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/validation',
-             'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__R3/training',
+             'training_data_dir': '../prednet/results/prednet_kitti__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_kitti__moments_nano__representation/training',
              'classes': ['running', 'walking']}, prednet_base_config)
 
-add_config(configs, 'lstm__moments_nano__prednet_random_R3_easy', 
+add_config(configs, 'lstm__moments_nano__prednet_random_rep_easy', 
            { 'description': 'A convnet classifier trained on the PredNet \
-(random weights) R3 features extracted from the Moments in Time dataset.',
+(random weights) features extracted from the Moments in Time dataset.',
              'model_type': 'lstm',
-             'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
-             'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
+             'training_data_dir': '../prednet/results/prednet_random__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_random__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_random__moments_nano__representation/training',
              'classes': ['cooking', 'walking']}, prednet_base_config)
 
-add_config(configs, 'lstm__moments_nano__prednet_random_R3_hard', 
+add_config(configs, 'lstm__moments_nano__prednet_random_rep_hard', 
            { 'description': 'A convnet classifier trained on the PredNet \
-(random weights) R3 features extracted from the Moments in Time dataset.',
+(random weights) features extracted from the Moments in Time dataset.',
              'model_type': 'lstm',
-             'training_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
-             'validation_data_dir': '../prednet/results/prednet_random__moments_nano__R3/validation',
-             'test_data_dir': '../prednet/results/prednet_random__moments_nano__R3/training',
+             'training_data_dir': '../prednet/results/prednet_random__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_random__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_random__moments_nano__representation/training',
+             'classes': ['running', 'walking']}, prednet_base_config)
+
+add_config(configs, 'lstm__moments_nano__prednet_kitti_moments_v500_rep_easy', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
+             'model_type': 'lstm',
+             'training_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
+             'classes': ['cooking', 'walking']}, prednet_base_config)
+
+add_config(configs, 'lstm__moments_nano__prednet_kitti_moments_v500_rep_hard', 
+           { 'description': 'A convnet classifier trained on the PredNet \
+(pretrained on Moments in Time) R3 features extracted from the Moments in Time dataset.',
+             'model_type': 'lstm',
+             'training_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/validation',
+             'test_data_dir': '../prednet/results/prednet_kitti_500v__moments_nano__representation/training',
              'classes': ['running', 'walking']}, prednet_base_config)
