@@ -10,19 +10,18 @@ This folder contains classification models that are trained on learned represent
 | ------------- | :--: | :--: | :--: | :--: | :--: | :--: |
 | VGG ImageNet | 0.287 | 0.661 | 0.878 | 0.600 | 0.853 | 0.489 |
 | PredNet random |  |  |  |  |  |  |
-| PredNet KITTI |  |  |  |  |  |  |
-| PredNet KITTI + Moments 500v |  |  |  |  |  |  |
-| PredNet scratch + Moments 500v |  |  |  |  |  |  |
+| PredNet KITTI | 0.656 | 0.693 | 0.621 | 0.521 | 0.689 | 0.521 |
+| PredNet KITTI + Moments 1500v | 0.5134 | 0.668 | 0.7684 | 0.595 | 0.716 | 0.589 |
 
 ### LSTM
 
 | Model  | Easy (loss) | Hard (loss) | Easy (acc) | Hard (acc) | Easy (test acc) | Hard (test acc) |
 | ------------- | :--: | :--: | :--: | :--: | :--: | :--: |
 | VGG ImageNet + LSTM | 0.222 | 0.704 | 0.922 | 0.544 | 0.879 | 0.526 |
-| PredNet random |  |  |  |  |  |  |
-| PredNet KITTI |  |  |  |  |  |  |
-| PredNet KITTI + Moments 500v |  |  |  |  |  |  |
-| PredNet scratch + Moments 500v |  |  |  |  |  |  |
+| PredNet random |  | 0.691 |  | 0.533 |  |  |
+| PredNet KITTI | 0.645 | 0.698 | 0.700 | 0.484 | 0.637 |  |
+| PredNet KITTI + Moments 1500v |  |  |  |  |  |  |
+| PredNet scratch + Moments 1500v |  |  |  |  |  |  |
 
 
 
