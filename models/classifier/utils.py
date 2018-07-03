@@ -42,11 +42,13 @@ def get_config(configs, FLAGS):
         suffix = '__' + config['task']
     else:
         suffix = '__' + FLAGS.task
+        config['task'] = FLAGS.task
         
     if not FLAGS.model:
         prefix = config['model_type'] + '__'
     else:
         prefix = FLAGS.model + '__'
+        config['model_type'] = FLAGS.model
     
     name = prefix + FLAGS.config + suffix
     return name, config

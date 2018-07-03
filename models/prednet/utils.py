@@ -153,11 +153,13 @@ def get_config(configs, FLAGS):
         suffix = '__' + config['task']
     else:
         suffix = '__' + FLAGS.task
+        config['task'] = FLAGS.task
     
     if FLAGS.stateful is None:
         stateful = config['stateful']
     else:
         stateful = FLAGS.stateful
+        config['stateful'] = FLAGS.stateful
     
     if stateful:
         suffix += '__' + 'stateful'
