@@ -68,7 +68,8 @@ def train(config_name, training_data_dir, validation_data_dir,
           n_timesteps=10, batch_size=4, stopping_patience=None, 
           input_channels=3, input_width=160, input_height=128, 
           max_queue_size=10, classes=None, training_max_per_class=None, 
-          frame_step=1, stateful=False, rescale=None, **config):
+          frame_step=1, stateful=False, rescale=None, 
+          seq_overlap=0, **config):
     
     model = utils.create_model(train=True, stateful=stateful,
                                input_channels=input_channels, 
@@ -130,12 +131,16 @@ def train(config_name, training_data_dir, validation_data_dir,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train PredNet model.')
     parser.add_argument('config', help='experiment config name defined in moments_settings.py')
+    parser.add_argument('--stateful', help='use stateful PredNet model', action='store_true')
+    parser.add_argument('--task', help='use stateful PredNet model', choices=['3c', '10c'])
     FLAGS, unparsed = parser.parse_known_args()
     
-    config = configs[FLAGS.config]
+    #config = configs[FLAGS.config]
+    config_name, config = utils.get_config(configs, FLAGS)
+    
     print('\n==> Starting experiment: {}\n'.format(config['description']))
     config_str = utils.get_config_str(config)
     print('==> Using configuration:\n{}'.format(config_str))
     
-    train(FLAGS.config, **config)
-    utils.save_experiment_config(FLAGS.config, config['base_results_dir'], config)
+    train(config_name, **config)
+    utils.save_experiment_config(config_name, config['base_results_dir'], config)

@@ -145,3 +145,27 @@ def resize_img(img, target_size):
     # crop
     img = crop_center(img, target_size[0], target_size[1])
     return img
+
+def get_config(configs, FLAGS):
+    config = configs[FLAGS.config]
+    
+    if not FLAGS.task:
+        suffix = '__' + config['task']
+    else:
+        suffix = '__' + FLAGS.task
+    
+    if FLAGS.stateful is None:
+        stateful = config['stateful']
+    else:
+        stateful = FLAGS.stateful
+    
+    if stateful:
+        suffix += '__' + 'stateful'
+    
+    if config['model_weights_file']:
+        config['model_weights_file'] = config['model_weights_file'].format(suffix)
+    if config['model_json_file']:
+        config['model_json_file'] = config['model_json_file'].format(suffix)
+        
+    name = FLAGS.config + suffix
+    return name, config

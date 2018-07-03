@@ -108,6 +108,6 @@ if __name__ == '__main__':
     extract_frames(FLAGS.source_dir, FLAGS.dest_dir, 
                    FLAGS.splits,  FLAGS.categories, FLAGS.max_per_category)
     
-    print('Generating frame list for images in directory {}'.format(FLAGS.dest_dir))
-    generate_frame_list(FLAGS.dest_dir, FLAGS.splits)
+    #print('Generating frame list for images in directory {}'.format(FLAGS.dest_dir))
+    #generate_frame_list(FLAGS.dest_dir, FLAGS.splits)
     

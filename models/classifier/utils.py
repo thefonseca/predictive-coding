@@ -33,3 +33,20 @@ def get_config_str(config):
         if k != 'description':
             config_str += '    {}: {}\n'.format(k, v)
     return config_str
+
+def get_config(configs, FLAGS):
+    print(configs.keys())
+    config = configs[FLAGS.config]
+    
+    if not FLAGS.task:
+        suffix = '__' + config['task']
+    else:
+        suffix = '__' + FLAGS.task
+        
+    if not FLAGS.model:
+        prefix = config['model_type'] + '__'
+    else:
+        prefix = FLAGS.model + '__'
+    
+    name = prefix + FLAGS.config + suffix
+    return name, config

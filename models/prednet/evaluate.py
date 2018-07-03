@@ -101,8 +101,10 @@ def evaluate_prediction(model, dataset, experiment_name,
     mse_model = 0
     mse_prev = 0
     
+    data_iterator = iter(data_generator)
+    
     for i in tqdm(range(n_batches)):
-        X_, y_, _ = next(data_generator)
+        X_, y_, _ = next(data_iterator)
         pred = model.predict(X_, data_generator.batch_size)
 
         mse_model += np.mean((X_[:, 1:] - pred[:, 1:]) ** 2)  # look at all timesteps except the first
@@ -198,7 +200,7 @@ def evaluate_representation(model, dataset, experiment_name, output_mode,
 def evaluate(config_name, dataset, data_dir, output_mode, 
              classes=None, n_timesteps=10, frame_step=3, 
              seq_overlap=0, input_width=160, input_height=128, 
-             shuffle=False, batch_size=5, 
+             shuffle=False, batch_size=5, max_per_class=None,
              stateful=False, rescale=None, **config):
     
     model = utils.create_model(train=False, 
@@ -226,6 +228,7 @@ def evaluate(config_name, dataset, data_dir, output_mode,
                                    batch_size=batch_size, 
                                    shuffle=shuffle,
                                    return_sources=True,
+                                   max_per_class=max_per_class,
                                    data_format=data_format)
     
     data_generator = data_generator.flow_from_directory(data_dir)
@@ -247,9 +250,12 @@ def evaluate(config_name, dataset, data_dir, output_mode,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Evaluate PredNet model.')
     parser.add_argument('config', help='experiment config name defined in moments_settings.py')
+    parser.add_argument('--stateful', help='use stateful PredNet model', action='store_true')
+    parser.add_argument('--task', help='use stateful PredNet model', choices=['3c', '10c'])
     FLAGS, unparsed = parser.parse_known_args()
     
-    config = configs[FLAGS.config]
+    #config = configs[FLAGS.config]
+    config_name, config = utils.get_config(configs, FLAGS)
     
     print('\n==> Starting experiment: {}\n'.format(config['description']))
     config_str = utils.get_config_str(config)
@@ -257,11 +263,11 @@ if __name__ == '__main__':
     
     for split in ['training', 'validation', 'test']:
         img_dir = config.get(split + '_data_dir', None)
-        img_sources = config.get(split + '_data_sources', None)
+        #img_sources = config.get(split + '_data_sources', None)
         
-        if img_dir and img_sources:
+        if img_dir:
             print('==> Dataset split: {}'.format(split))
-            evaluate(FLAGS.config, split, img_dir, **config)
-            utils.save_experiment_config(FLAGS.config, config['base_results_dir'], 
+            evaluate(config_name, split, img_dir, **config)
+            utils.save_experiment_config(config_name, config['base_results_dir'], 
                                          config, dataset=split)
     
