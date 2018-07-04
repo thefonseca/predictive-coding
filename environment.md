@@ -30,7 +30,7 @@ conda create --name tensorflow
 
 ## Install TensorFlow
 
-Follow the instructions in [Installing with Anaconda](https://www.tensorflow.org/install/install_linux#InstallingAnaconda)
+Follow the instructions in the [Installing with Anaconda section](https://www.tensorflow.org/install/install_linux#InstallingAnaconda) of TensorFlow docs.
 
 Make sure you have the environment activated:
 ```
