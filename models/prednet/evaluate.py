@@ -234,6 +234,10 @@ def evaluate(config_name, dataset, data_dir, output_mode,
                                    data_format=data_format)
     
     data_generator = data_generator.flow_from_directory(data_dir)
+    
+    if len(data_generator) == 0:
+        return
+    
     n_batches = len(data_generator)
     print('Number of batches: {}'.format(n_batches))
     

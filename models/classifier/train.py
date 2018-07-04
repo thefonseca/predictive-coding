@@ -63,6 +63,9 @@ def train(config_name, training_data_dir, validation_data_dir,
     train_generator = train_generator.flow_from_directory(training_data_dir)
     val_generator = val_generator.flow_from_directory(validation_data_dir)
     
+    if len(train_generator) == 0 or len(val_generator) == 0:
+        return
+    
     input_shape = train_generator.data_shape
     n_classes = train_generator.n_classes
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
