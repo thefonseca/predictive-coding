@@ -63,7 +63,9 @@ eval_base_config = {
     'training_data_dir': os.path.join(DATA_DIR, 'training'),
     'validation_data_dir': os.path.join(DATA_DIR, 'validation'),
     'task': '3c',
-    #'max_per_class': FRAMES_PER_VIDEO * 3,
+    # extract features only for the last 200 videos
+    'index_start': FRAMES_PER_VIDEO * 300,
+    'max_per_class': FRAMES_PER_VIDEO * 200,
     # RESULTS
     'base_results_dir': './results/',
     'n_plot': 20
@@ -102,10 +104,11 @@ train_base_config.update({
     'epochs': 150,
     'batch_size': SEQUENCES_PER_VIDEO,
     'shuffle': True,
-    'stopping_patience': 20,
+    'stopping_patience': 30,
     'training_index_start': 0,
-    'training_max_per_class': FRAMES_PER_VIDEO * 2,#400,
-    'stack_sizes': (32, 64, 128, 256)
+    # train on first 400 videos
+    'training_max_per_class': FRAMES_PER_VIDEO * 400,
+    #'stack_sizes': (32, 64, 128, 256)
 })
 
 add_config(configs, 'prednet_kitti__moments__model', 

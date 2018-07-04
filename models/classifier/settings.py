@@ -45,9 +45,9 @@ vgg_base_config = {
     #'workers': 4,
     #'use_multiprocessing': True,
     'task': '2c_easy',
-    'training_index_start': VGG_FEATURES_PER_VIDEO * 300,
+    #'training_index_start': VGG_FEATURES_PER_VIDEO * 300,
     'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-    'test_index_start': VGG_FEATURES_PER_VIDEO * 400,
+    'test_index_start': VGG_FEATURES_PER_VIDEO * 100,
     'test_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'base_results_dir': './results',
     'training_data_dir': './results/vgg_imagenet__moments_nano__features/training',
@@ -72,9 +72,9 @@ prednet_base_config = dict()
 prednet_base_config.update(vgg_base_config)
 prednet_base_config.update({
     'seq_length': PREDNET_FEATURES_PER_VIDEO,
-    'training_index_start': PREDNET_FEATURES_PER_VIDEO * 300,
+    #'training_index_start': PREDNET_FEATURES_PER_VIDEO * 300,
     'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class,
-    'test_index_start': PREDNET_FEATURES_PER_VIDEO * 400,
+    'test_index_start': PREDNET_FEATURES_PER_VIDEO * 100,
     'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'model_type': 'convlstm'
 })

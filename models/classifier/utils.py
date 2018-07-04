@@ -51,4 +51,5 @@ def get_config(configs, FLAGS):
         config['model_type'] = FLAGS.model
     
     name = prefix + FLAGS.config + suffix
+    config['config_name'] = name
     return name, config

@@ -169,4 +169,5 @@ def get_config(configs, FLAGS):
         config['model_json_file'] = config['model_json_file'].format(suffix)
         
     name = FLAGS.config + suffix
+    config['config_name'] = name
     return name, config

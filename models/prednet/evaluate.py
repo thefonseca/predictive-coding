@@ -201,7 +201,8 @@ def evaluate(config_name, dataset, data_dir, output_mode,
              classes=None, n_timesteps=10, frame_step=3, 
              seq_overlap=0, input_width=160, input_height=128, 
              shuffle=False, batch_size=5, max_per_class=None,
-             stateful=False, rescale=None, **config):
+             index_start=0, stateful=False, rescale=None, 
+             **config):
     
     model = utils.create_model(train=False, 
                                stateful=stateful, 
@@ -229,6 +230,7 @@ def evaluate(config_name, dataset, data_dir, output_mode,
                                    shuffle=shuffle,
                                    return_sources=True,
                                    max_per_class=max_per_class,
+                                   index_start=index_start,
                                    data_format=data_format)
     
     data_generator = data_generator.flow_from_directory(data_dir)
