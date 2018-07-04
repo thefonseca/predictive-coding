@@ -1,6 +1,7 @@
 from keras import backend as K
 from keras.models import Model, model_from_json
 from keras.layers import Input, TimeDistributed, Dense, Flatten
+from keras.utils.training_utils import multi_gpu_model
 import os
 import numpy as np
 from skimage.transform import resize
@@ -17,15 +18,15 @@ def load_model(model_json_file, model_weights_file, **extras):
     return train_model
 
 def create_model(model_json_file=None, model_weights_file=None, 
-                 train=False, **config):
+                 train=False, gpus=None, **config):
     if model_json_file and model_weights_file:
         pretrained_model = load_model(model_json_file, model_weights_file)
         model = pretrained_prednet(pretrained_model, train=train, **config)
     else:
         model = random_prednet(train=train, **config)
     
-    #if gpus:
-    #    model = multi_gpu_model(model, gpus=gpus)
+    if gpus:
+        model = multi_gpu_model(model, gpus=gpus)
     return model
 
 def pretrained_prednet(pretrained, output_mode='error', train=False, 

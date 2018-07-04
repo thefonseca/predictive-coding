@@ -58,6 +58,7 @@ eval_base_config = {
     'rescale': 1./255,
     'shuffle': False,
     'workers': 4,
+    'gpus': 2,
     #'use_multiprocessing': True,
     # DATA
     'training_data_dir': os.path.join(DATA_DIR, 'training'),
