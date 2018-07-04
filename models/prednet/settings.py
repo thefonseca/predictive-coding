@@ -104,7 +104,8 @@ train_base_config.update({
     'shuffle': True,
     'stopping_patience': 20,
     'training_index_start': 0,
-    'training_max_per_class': FRAMES_PER_VIDEO * 400,
+    'training_max_per_class': FRAMES_PER_VIDEO * 2,#400,
+    'stack_sizes': (32, 64, 128, 256)
 })
 
 add_config(configs, 'prednet_kitti__moments__model', 
