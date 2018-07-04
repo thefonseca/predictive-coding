@@ -114,6 +114,9 @@ def evaluate(config_name, test_data_dir, batch_size,
                               max_per_class=test_max_per_class)
     generator = generator.flow_from_directory(test_data_dir)
     
+    if len(generator) == 0:
+        return
+    
     # load best model
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')       

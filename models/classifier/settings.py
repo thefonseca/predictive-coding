@@ -38,7 +38,7 @@ VGG_FEATURES_PER_VIDEO = 30
 
 vgg_base_config = {
     'epochs': 100,
-    'stopping_patience': 20,
+    'stopping_patience': 50,
     'batch_size': 10,
     'shuffle': False,
     'dropout': 0.5,
