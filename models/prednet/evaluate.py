@@ -256,7 +256,6 @@ if __name__ == '__main__':
     parser.add_argument('--task', help='use stateful PredNet model', choices=['3c', '10c'])
     FLAGS, unparsed = parser.parse_known_args()
     
-    #config = configs[FLAGS.config]
     config_name, config = utils.get_config(configs, FLAGS)
     
     print('\n==> Starting experiment: {}\n'.format(config['description']))
@@ -265,11 +264,13 @@ if __name__ == '__main__':
     
     for split in ['training', 'validation', 'test']:
         img_dir = config.get(split + '_data_dir', None)
-        #img_sources = config.get(split + '_data_sources', None)
+        index_start = config.get(split + '_index_start', 0)
+        max_per_class = config.get(split + '_max_per_class', None)
         
         if img_dir:
             print('==> Dataset split: {}'.format(split))
-            evaluate(config_name, split, img_dir, **config)
+            evaluate(config_name, split, img_dir, index_start=index_start, 
+                     max_per_class=max_per_class, **config)
             utils.save_experiment_config(config_name, config['base_results_dir'], 
                                          config, dataset=split)
     

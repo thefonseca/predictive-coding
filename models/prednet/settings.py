@@ -37,7 +37,7 @@ models = {
     },
     'prednet_kitti_finetuned_moments': {
         'model_weights_file': './results/prednet_kitti__moments__model{}/weights.hdf5',
-        'model_json_file': './results/prednet_kitti__moments__model__{}/model.json',
+        'model_json_file': './results/prednet_kitti__moments__model{}/model.json',
     },
     'prednet_random_finetuned_moments': {
         'model_weights_file': './results/prednet_kitti__moments__model{}/weights.hdf5',
@@ -64,8 +64,8 @@ eval_base_config = {
     'validation_data_dir': os.path.join(DATA_DIR, 'validation'),
     'task': '3c',
     # extract features only for the last 200 videos
-    'index_start': FRAMES_PER_VIDEO * 300,
-    'max_per_class': FRAMES_PER_VIDEO * 200,
+    'training_index_start': FRAMES_PER_VIDEO * 300,
+    'training_max_per_class': FRAMES_PER_VIDEO * 200,
     # RESULTS
     'base_results_dir': './results/',
     'n_plot': 20
