@@ -51,7 +51,7 @@ class CustomModelCheckpoint(ModelCheckpoint):
         
     def on_epoch_end(self, epoch, logs=None):
         self.model = self.model_to_save
-        super(CustomModelCheckpoint, self).on_epoch_end(self, epoch, logs)
+        super(CustomModelCheckpoint, self).on_epoch_end(epoch, logs)
 
 def get_callbacks(model, results_dir, stopping_patience=None, stateful=False):
     # start with lr of 0.001 and then drop to 0.0001 after 75 epochs
@@ -93,14 +93,20 @@ def train(config_name, training_data_dir, validation_data_dir,
                                input_width=input_width, 
                                batch_size=batch_size,
                                input_height=input_height, **config)
-    model.summary()
-    model.compile(loss='mean_absolute_error', optimizer='adam')
     
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     callbacks = get_callbacks(model, results_dir, stopping_patience, stateful)
     
     if gpus:
         model = multi_gpu_model(model, gpus=gpus)
+    
+    model.summary()
+    model.compile(loss='mean_absolute_error', optimizer='adam')
+    
+    json_file = os.path.join(results_dir, 'model.json')
+    json_string = model.to_json()
+    with open(json_file, "w") as f:
+        f.write(json_string)
     
     layer_config = model.layers[1].get_config()
     data_format = layer_config['data_format'] if 'data_format' in layer_config else 'channels_first' #layer_config['dim_ordering']
@@ -148,10 +154,6 @@ def train(config_name, training_data_dir, validation_data_dir,
                                   max_queue_size=max_queue_size, 
                                   workers=workers)
     
-    json_file = os.path.join(results_dir, 'model.json')
-    json_string = model.to_json()
-    with open(json_file, "w") as f:
-        f.write(json_string)
         
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train PredNet model.')
