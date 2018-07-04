@@ -22,7 +22,34 @@ if [ -f ~/.bashrc ]; then
 fi
 ```
 
+## Create an Anaconda environment
+More details [here](https://conda.io/docs/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands).
+```
+conda create --name tensorflow
+```
+
+## Install TensorFlow
+
+Follow the instructions in [Installing with Anaconda](https://www.tensorflow.org/install/install_linux#InstallingAnaconda)
+
+Make sure you have the environment activated:
+```
+source activate tensorflow
+```
+
+Install TensorFlow via pip:
+```
+(tensorflow)$ pip install --ignore-installed --upgrade tfBinaryURL
+```
+
+You have to choose the tfBinaryURL to match the TensorFlow version required for your experiments. For example, to install version 1.8.0 with GPU support use this command:
+```
+(tensorflow)$ pip install --ignore-installed --upgrade https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.8.0-cp34-cp34m-linux_x86_64.whl
+```
+
 ## Configuring CUDA and CuDNN
+Each TensorFlow version requires specific of CUDA and CuDNN versions (see a complete list [here](https://www.tensorflow.org/install/install_sources)).
+
 To choose specific versions of CUDA and CuDNN you need to configure the environment variables `LD_LIBRARY_PATH` (CUDA) and `DYLD_LIBRARY_PATH` (CuDNN). An easy way to set these variables is using Anaconda's activation/deactivation scripts (more details [here](https://blog.kovalevskyi.com/multiple-version-of-cuda-libraries-on-the-same-machine-b9502d50ae77)). To create an activation script execute the following commands:
 ```
 mkdir -p ~/<ANACONDA_HOME>/envs/<tensorflow_env>/etc/conda/activate.d
