@@ -11,6 +11,7 @@ from keras import backend as K
 from keras.models import Model
 from keras.callbacks import Callback, LearningRateScheduler, ModelCheckpoint
 from keras.callbacks import CSVLogger, EarlyStopping, LambdaCallback
+from keras.utils.training_utils import multi_gpu_model
 from keras.optimizers import Adam
 
 # Getting reproducible results:
@@ -38,17 +39,32 @@ from data import DataGenerator
 class StateResetter(Callback):
     def on_batch_end(self, batch, logs={}):
         self.model.reset_states()
+        
+class CustomModelCheckpoint(ModelCheckpoint):
+    '''
+    Trick to use multi_gpu_model. We save the original model instead.
+    See: https://github.com/keras-team/keras/issues/8649
+    '''
+    def __init__(self, model_to_save, *args, **kwargs):
+        super(CustomModelCheckpoint, self).__init__(*args, **kwargs)
+        self.model_to_save = model_to_save
+        
+    def on_epoch_end(self, epoch, logs=None):
+        self.model = self.model_to_save
+        super(CustomModelCheckpoint, self).on_epoch_end(self, epoch, logs)
 
-def get_callbacks(results_dir, stopping_patience=None, stateful=False):
+def get_callbacks(model, results_dir, stopping_patience=None, stateful=False):
     # start with lr of 0.001 and then drop to 0.0001 after 75 epochs
     lr_schedule = lambda epoch: 0.001 if epoch < 75 else 0.0001    
     callbacks = [LearningRateScheduler(lr_schedule)]
     
     checkpoint_path = os.path.join(results_dir, 'weights.hdf5')
     csv_path = os.path.join(results_dir, 'train.log')
-    checkpointer = ModelCheckpoint(filepath=checkpoint_path,
-                                   monitor='val_loss',
-                                   verbose=1, save_best_only=True)
+    checkpointer = CustomModelCheckpoint(filepath=checkpoint_path,
+                                         monitor='val_loss',
+                                         model_to_save=model,
+                                         verbose=1, save_best_only=True)
+    
     csv_logger = CSVLogger(csv_path)
     callbacks.append(checkpointer)
     callbacks.append(csv_logger)
@@ -68,8 +84,9 @@ def train(config_name, training_data_dir, validation_data_dir,
           n_timesteps=10, batch_size=4, stopping_patience=None, 
           input_channels=3, input_width=160, input_height=128, 
           max_queue_size=10, classes=None, training_max_per_class=None, 
-          frame_step=1, stateful=False, rescale=None, 
-          seq_overlap=0, **config):
+          frame_step=1, stateful=False, rescale=None, gpus=None,
+          validation_max_per_class=None, data_format=None, seq_overlap=0, 
+          **config):
     
     model = utils.create_model(train=True, stateful=stateful,
                                input_channels=input_channels, 
@@ -79,8 +96,14 @@ def train(config_name, training_data_dir, validation_data_dir,
     model.summary()
     model.compile(loss='mean_absolute_error', optimizer='adam')
     
+    results_dir = utils.get_create_results_dir(config_name, base_results_dir)
+    callbacks = get_callbacks(model, results_dir, stopping_patience, stateful)
+    
+    if gpus:
+        model = multi_gpu_model(model, gpus=gpus)
+    
     layer_config = model.layers[1].get_config()
-    data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
+    data_format = layer_config['data_format'] if 'data_format' in layer_config else 'channels_first' #layer_config['dim_ordering']
     
     resize = lambda img: utils.resize_img(img, target_size=(input_height, 
                                                             input_width))
@@ -89,10 +112,11 @@ def train(config_name, training_data_dir, validation_data_dir,
                                     seq_length=n_timesteps,
                                     seq_overlap=seq_overlap,
                                     sample_step=frame_step,
-                                    target_size=None, #input_shape,
+                                    target_size=None,
                                     rescale=rescale,
                                     fn_preprocess=resize,
-                                    batch_size=batch_size, shuffle=shuffle,
+                                    batch_size=batch_size, 
+                                    shuffle=shuffle,
                                     data_format=data_format,
                                     output_mode='error',
                                     max_per_class=training_max_per_class)
@@ -101,21 +125,19 @@ def train(config_name, training_data_dir, validation_data_dir,
                                   seq_length=n_timesteps,
                                   seq_overlap=seq_overlap,
                                   sample_step=frame_step,
-                                  target_size=None, #input_shape,
-                                  rescale= 1./255,
+                                  target_size=None,
+                                  rescale=rescale,
                                   fn_preprocess=resize,
                                   batch_size=batch_size,
                                   data_format=data_format,
-                                  output_mode='error')
+                                  output_mode='error', 
+                                  max_per_class=validation_max_per_class)
     
     train_generator = train_generator.flow_from_directory(training_data_dir)
     val_generator = val_generator.flow_from_directory(validation_data_dir)
     
     if len(train_generator) == 0 or len(val_generator) == 0:
         return
-    
-    results_dir = utils.get_create_results_dir(config_name, base_results_dir)
-    callbacks = get_callbacks(results_dir, stopping_patience, stateful)
     
     history = model.fit_generator(train_generator, 
                                   len(train_generator), 
