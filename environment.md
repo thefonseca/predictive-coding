@@ -58,7 +58,7 @@ chmod +x ~/<ANACONDA_HOME>/envs/<tensorflow_env>/etc/conda/activate.d/activate.s
 vim ~/<ANACONDA_HOME>/envs/<tensorflow_env>/etc/conda/activate.d/activate.sh
 ```
 
-Add the following contents:
+Add the following contents (on the Cohort machines, `CUDA_HOME` and `CUDNN_HOME` will probably be in the `/opt` folder):
 ```
 #!/bin/sh
 ORIGINAL_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
