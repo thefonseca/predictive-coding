@@ -14,7 +14,7 @@ import math
 from keras import backend as K
 
 from prednet import PredNet
-from settings import configs
+from settings import configs, tasks
 import utils
 import sys
 sys.path.append("../classifier")
@@ -260,7 +260,7 @@ if __name__ == '__main__':
     parser.add_argument('--task', help='use stateful PredNet model', choices=['3c', '10c'])
     FLAGS, unparsed = parser.parse_known_args()
     
-    config_name, config = utils.get_config(configs, FLAGS)
+    config_name, config = utils.get_config(configs, tasks, FLAGS)
     
     print('\n==> Starting experiment: {}\n'.format(config['description']))
     config_str = utils.get_config_str(config)

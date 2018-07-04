@@ -27,7 +27,7 @@ tf.set_random_seed(1234)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
 K.set_session(sess)
 
-from settings import *
+from settings import configs, tasks
 import utils
 import argparse
 import sys
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     FLAGS, unparsed = parser.parse_known_args()
     
     #config = configs[FLAGS.config]
-    config_name, config = utils.get_config(configs, FLAGS)
+    config_name, config = utils.get_config(configs, tasks, FLAGS)
     
     print('\n==> Starting experiment: {}\n'.format(config['description']))
     config_str = utils.get_config_str(config)

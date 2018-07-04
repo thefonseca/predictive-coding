@@ -34,7 +34,7 @@ def get_config_str(config):
             config_str += '    {}: {}\n'.format(k, v)
     return config_str
 
-def get_config(configs, FLAGS):
+def get_config(configs, tasks, FLAGS):
     config = configs[FLAGS.config]
     
     if not FLAGS.task:
@@ -48,6 +48,8 @@ def get_config(configs, FLAGS):
     else:
         prefix = FLAGS.model + '__'
         config['model_type'] = FLAGS.model
+        
+    config.update(tasks[config['task']])
     
     name = prefix + FLAGS.config + suffix
     config['_config_name'] = name

@@ -93,14 +93,14 @@ add_config(configs, 'prednet_random_moments',
              'validation_data_dir': '../prednet/results/prednet_random__moments__representation/validation',
              'test_data_dir': '../prednet/results/prednet_random__moments__representation/training'}, prednet_base_config)
 
-add_config(configs, 'prednet_kitti_finetuned_moments__3c', 
+add_config(configs, 'prednet_kitti_finetuned_moments_3c', 
            { 'description': 'A convnet classifier trained on PredNet \
 (pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
              'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__3c/training',
              'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__3c/validation',
-             'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation/training'}, prednet_base_config)
+             'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__3c/training'}, prednet_base_config)
 
-add_config(configs, 'prednet_random_finetuned_moments__3c',
+add_config(configs, 'prednet_random_finetuned_moments_3c',
            { 'description': 'A convnet classifier trained on PredNet \
 (pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
              'training_data_dir': '../prednet/results/prednet_random_finetuned_moments__representation__3c/training',

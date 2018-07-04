@@ -144,7 +144,7 @@ def resize_img(img, target_size):
     img = crop_center(img, target_size[0], target_size[1])
     return img
 
-def get_config(configs, FLAGS):
+def get_config(configs, tasks, FLAGS):
     config = configs[FLAGS.config]
     
     if not FLAGS.task:
@@ -166,6 +166,8 @@ def get_config(configs, FLAGS):
         config['model_weights_file'] = config['model_weights_file'].format(suffix)
     if config['model_json_file']:
         config['model_json_file'] = config['model_json_file'].format(suffix)
+        
+    config.update(tasks[config['task']])
         
     name = FLAGS.config + suffix
     config['_config_name'] = name

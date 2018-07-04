@@ -6,7 +6,7 @@ from keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
 from keras.models import load_model
 
 from data import DataGenerator
-from settings import configs
+from settings import configs, tasks
 import models
 import utils
 
@@ -146,7 +146,7 @@ if __name__ == '__main__':
     FLAGS, unparsed = parser.parse_known_args()
     
     #config = configs[FLAGS.config]
-    config_name, config = utils.get_config(configs, FLAGS)
+    config_name, config = utils.get_config(configs, tasks, FLAGS)
     
     print('\n==> Starting experiment: {}'.format(config['description']))
     config_str = utils.get_config_str(config)
