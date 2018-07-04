@@ -35,7 +35,6 @@ def get_config_str(config):
     return config_str
 
 def get_config(configs, FLAGS):
-    print(configs.keys())
     config = configs[FLAGS.config]
     
     if not FLAGS.task:
@@ -51,5 +50,5 @@ def get_config(configs, FLAGS):
         config['model_type'] = FLAGS.model
     
     name = prefix + FLAGS.config + suffix
-    config['config_name'] = name
+    config['_config_name'] = name
     return name, config

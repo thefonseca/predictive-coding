@@ -57,7 +57,6 @@ def random_prednet(input_channels, input_height, input_width,
     A_filt_sizes = (3,) * (len(stack_sizes) - 1)
     Ahat_filt_sizes = (3,) * len(stack_sizes)
     R_filt_sizes = (3,) * len(stack_sizes)
-    print(stack_sizes)
     prednet = PredNet(stack_sizes, R_stack_sizes,
                       A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
                       output_mode=output_mode, return_sequences=True, 
@@ -169,5 +168,5 @@ def get_config(configs, FLAGS):
         config['model_json_file'] = config['model_json_file'].format(suffix)
         
     name = FLAGS.config + suffix
-    config['config_name'] = name
+    config['_config_name'] = name
     return name, config
