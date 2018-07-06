@@ -102,10 +102,10 @@ train_base_config = dict()
 train_base_config.update(eval_base_config)
 train_base_config.update({
     'output_mode': 'error',
-    'epochs': 150,
+    'epochs': 100,
     'batch_size': SEQUENCES_PER_VIDEO,
     'shuffle': True,
-    'stopping_patience': 30,
+    #'stopping_patience': 100,
     'training_index_start': 0,
     # train on first 400 videos
     'training_max_per_class': FRAMES_PER_VIDEO * 400,
