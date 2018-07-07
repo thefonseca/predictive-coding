@@ -157,12 +157,13 @@ def get_config(configs, tasks, FLAGS):
         config['stateful'] = FLAGS.stateful
     
     if stateful:
-        suffix += '__' + 'stateful'
+        suffix += '_' + 'stateful'
     
+    model_suffix = '__' + config['pretrained']
     if config['model_weights_file']:
-        config['model_weights_file'] = config['model_weights_file'].format(suffix)
+        config['model_weights_file'] = config['model_weights_file'].format(model_suffix)
     if config['model_json_file']:
-        config['model_json_file'] = config['model_json_file'].format(suffix)
+        config['model_json_file'] = config['model_json_file'].format(model_suffix)
         
     config.update(tasks[config['task']])
         
