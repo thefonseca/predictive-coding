@@ -25,14 +25,14 @@ def create_model(model_json_file=None, model_weights_file=None,
         model = random_prednet(train=train, **config)
     return model
 
-def pretrained_prednet(pretrained, output_mode='error', train=False, 
+def pretrained_prednet(pretrained_model, output_mode='error', train=False, 
                        n_timesteps=10, stateful=False, batch_size=None, 
                        **config):
-    layer_config = pretrained.layers[1].get_config()
+    layer_config = pretrained_model.layers[1].get_config()
     layer_config['output_mode'] = output_mode
     layer_config['stateful'] = stateful
-    prednet = PredNet(weights=pretrained.layers[1].get_weights(), **layer_config)
-    input_shape = list(pretrained.layers[0].batch_input_shape[1:])
+    prednet = PredNet(weights=pretrained_model.layers[1].get_weights(), **layer_config)
+    input_shape = list(pretrained_model.layers[0].batch_input_shape[1:])
     input_shape[0] = n_timesteps
     inputs = get_input_layer(batch_size, tuple(input_shape))
     outputs = get_output_layer(prednet, inputs, n_timesteps, train, output_mode)
