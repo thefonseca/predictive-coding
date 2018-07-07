@@ -42,7 +42,8 @@ def train(config_name, training_data_dir, validation_data_dir,
           seq_length=None, sample_step=1, batch_size=10, 
           stopping_patience=3, classes=None, input_shape=None, 
           max_queue_size=10, model_type='convnet', shuffle=False,
-          training_index_start=0, training_max_per_class=None, **config):
+          training_index_start=0, training_max_per_class=None, 
+          validation_index_start=0, validation_max_per_class=None, **config):
     
     train_generator = DataGenerator(batch_size=batch_size,
                                     shuffle=shuffle,
@@ -58,7 +59,9 @@ def train(config_name, training_data_dir, validation_data_dir,
                                   classes=classes,
                                   seq_length=seq_length,
                                   target_size=input_shape,
-                                  sample_step=sample_step)
+                                  sample_step=sample_step,
+                                  index_start=validation_index_start,
+                                  max_per_class=validation_max_per_class)
     
     train_generator = train_generator.flow_from_directory(training_data_dir)
     val_generator = val_generator.flow_from_directory(validation_data_dir)

@@ -31,6 +31,9 @@ tasks = {
     '10c': {
         'classes': ['barking', 'cooking', 'driving', 'juggling', 'photographing', 
                     'biting', 'climbing', 'running', 'sleeping', 'walking']
+    },
+    'full': {
+        'classes': None
     }
 }
 
@@ -113,3 +116,15 @@ add_config(configs, 'prednet_kitti_finetuned_moments_10c',
              'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__10c/training',
              'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__10c/validation',
              'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__10c/training'}, prednet_base_config)
+
+add_config(configs, 'prednet_kitti_finetuned_moments_10c__ucf', 
+           { 'description': 'A convnet classifier trained on PredNet \
+(pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
+             'task': 'full',
+             'model_type': 'convnet',
+             'training_max_per_class': 90000, # features_per_video * max_videos_per_class,
+             'training_index_start': 0,
+             'validation_index_start': 90000,
+             'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf__representation__full/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf__representation__full/training',
+             'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf__representation__full/validation'}, prednet_base_config)
