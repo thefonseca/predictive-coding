@@ -100,30 +100,49 @@ def train(config_name, training_data_dir, validation_data_dir,
                         workers=workers)
     
 
-def evaluate(config_name, test_data_dir, batch_size, 
-             base_results_dir, classes=None,
-             workers=1, use_multiprocessing=False,
-             seq_length=None, input_shape=None, 
-             test_max_per_class=None, test_index_start=0,
-             model_type='convnet', **config):
+def evaluate(config_name, batch_size, 
+             #test_data_dir, 
+             #base_results_dir, classes=None,
+             #workers=1, use_multiprocessing=False,
+             #seq_length=None, input_shape=None, 
+             #test_max_per_class=None, test_index_start=0,
+             model_type='convnet', ensemble=None, **config):
     
     print('\nEvaluating model on test set...')
-    # we use the remaining part of training set as test set
-    generator = DataGenerator(classes=classes,
-                              batch_size=batch_size,
-                              seq_length=seq_length,
-                              target_size=input_shape,
-                              index_start=test_index_start,
-                              max_per_class=test_max_per_class)
-    generator = generator.flow_from_directory(test_data_dir)
     
+    if not ensemble:
+        ensemble = [config['_config_name_original']]
+        
+    generators = []
+    model_list = []
+    for ensemble_name in ensemble:
+        FLAGS = configs[ensemble_name]
+        FLAGS['config'] = ensemble_name
+        e_config_name, e_config = utils.get_config(configs, tasks, FLAGS)
+    
+        generator = DataGenerator(classes=e_config['classes'],
+                                  batch_size=e_config['batch_size'],
+                                  seq_length=e_config['seq_length'],
+                                  target_size=e_config.get('input_shape', None),
+                                  index_start=e_config['test_index_start'],
+                                  max_per_class=e_config['test_max_per_class'])
+        generators.append(generator.flow_from_directory(e_config['test_data_dir']))
+        
+        # load best model
+        results_dir = utils.get_create_results_dir(e_config_name, e_config['base_results_dir'])
+        checkpoint_path = os.path.join(results_dir, e_config['model_type'] + '.hdf5')       
+        model_list.append(load_model(checkpoint_path))
+    
+    if len(model_list) == 1:
+        model = model_list[0]
+        generator = generators[0]       
+    else:
+        model = models.ensemble(model_list)
+        generator = zip(generators)
+        
     if len(generator) == 0:
         return
-    
-    # load best model
-    results_dir = utils.get_create_results_dir(config_name, base_results_dir)
-    checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')       
-    model = load_model(checkpoint_path)
+        
     metrics = model.evaluate_generator(generator, len(generator),
                                        use_multiprocessing=use_multiprocessing, 
                                        workers=workers)
@@ -140,7 +159,7 @@ def evaluate(config_name, test_data_dir, batch_size,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train a classifier.')
     parser.add_argument('config', help='experiment config name defined in settings.py')
-    parser.add_argument('-m', '--model', type=str, choices=['convlstm', 'lstm'],
+    parser.add_argument('-m', '--model_type', type=str, choices=['convlstm', 'lstm'],
                     help='model architecture of classifier')
     parser.add_argument('-t', '--task', type=str, choices=['2c_easy', '2c_hard', '10c'],
                     help='classification task')
@@ -148,8 +167,7 @@ if __name__ == '__main__':
                         action='store_true')
     FLAGS, unparsed = parser.parse_known_args()
     
-    #config = configs[FLAGS.config]
-    config_name, config = utils.get_config(configs, tasks, FLAGS)
+    config_name, config = utils.get_config(configs, tasks, vars(FLAGS))
     
     print('\n==> Starting experiment: {}'.format(config['description']))
     config_str = utils.get_config_str(config)
@@ -159,7 +177,7 @@ if __name__ == '__main__':
         train(config_name, **config)
         save_experiment_config(config_name, config['base_results_dir'], config)
     
-    if config['test_data_dir']:
+    if config.get('test_data_dir', None) or config.get('ensemble', None):
         evaluate(config_name, **config)
 
     

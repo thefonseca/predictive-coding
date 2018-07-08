@@ -35,22 +35,23 @@ def get_config_str(config):
     return config_str
 
 def get_config(configs, tasks, FLAGS):
-    config = configs[FLAGS.config]
+    config = configs[FLAGS['config']]
     
-    if not FLAGS.task:
+    if not FLAGS['task']:
         suffix = '__' + config['task']
     else:
-        suffix = '__' + FLAGS.task
-        config['task'] = FLAGS.task
+        suffix = '__' + FLAGS['task']
+        config['task'] = FLAGS['task']
         
-    if not FLAGS.model:
+    if not FLAGS['model_type']:
         prefix = config['model_type'] + '__'
     else:
-        prefix = FLAGS.model + '__'
-        config['model_type'] = FLAGS.model
+        prefix = FLAGS['model_type'] + '__'
+        config['model_type'] = FLAGS['model_type']
         
     config.update(tasks[config['task']])
     
-    name = prefix + FLAGS.config + suffix
+    name = prefix + FLAGS['config'] + suffix
     config['_config_name'] = name
+    config['_config_name_original'] = FLAGS['config']
     return name, config

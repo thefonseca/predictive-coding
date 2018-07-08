@@ -242,7 +242,7 @@ class DataGenerator(Sequence):
         source_seqs = []
         
         i = 0
-        while i <= len(sources) - self.seq_overlap:
+        while i < len(sources) - self.seq_overlap - 1:
             seq = []
             source_seq = []
             prev_source = None
@@ -279,6 +279,7 @@ class DataGenerator(Sequence):
                     break
                     
                 prev_source = source
+                #print(len(sources), self.seq_overlap)
                 if j == len(sources) - 1:
                     #print('last item', i, j)
                     #self.__fix_incomplete_sequence(seq, source_seq, seqs, 

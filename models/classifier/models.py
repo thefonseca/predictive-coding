@@ -1,6 +1,6 @@
-from keras.models import Sequential
+from keras.models import Sequential, Model
 from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D, LSTM, TimeDistributed
-from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
+from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization, Average
 from keras import backend as K
 
 
@@ -60,3 +60,13 @@ def lstm(input_shape, n_classes, drop_rate=0.5):
     model.add(Dense(n_classes))
     model.add(Activation('softmax'))
     return model
+
+def ensemble(models):
+    if models and len(models) < 2:
+        raise ValueError('To get an ensemble you need at least two models')
+    
+    inputs = [inp for model in models for inp in model.inputs]
+    outputs = [inp for model in models for inp in model.outputs]
+    avg = Average()(outputs)
+    ensemble = Model(inputs=inputs, outputs=avg)
+    return emsemble

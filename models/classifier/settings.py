@@ -43,7 +43,7 @@ vgg_base_config = {
     'epochs': 100,
     'stopping_patience': 50,
     'batch_size': 10,
-    'shuffle': False,
+    'shuffle': True,
     'dropout': 0.5,
     #'workers': 4,
     #'use_multiprocessing': True,
@@ -58,12 +58,12 @@ vgg_base_config = {
     'test_data_dir': './results/vgg_imagenet__moments_nano__features/training',
 }
 
-add_config(configs, 'convlstm__moments_nano__vgg_imagenet', 
+add_config(configs, 'moments_nano__vgg_imagenet', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
              'model_type': 'convlstm' }, vgg_base_config)
 
-add_config(configs, 'lstm__moments_nano__vgg_imagenet', 
+add_config(configs, 'moments_nano__vgg_imagenet', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
              'model_type': 'lstm' }, vgg_base_config)
@@ -117,12 +117,23 @@ add_config(configs, 'prednet_kitti_finetuned_moments_10c',
              'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__10c/validation',
              'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__10c/training'}, prednet_base_config)
 
+add_config(configs, 'vgg_prednet_ensemble', 
+           { 'description': 'An ensemble classifier trained on features extracted from the Moments in Time dataset.',
+             'task': '2c_easy',
+             'model_type': 'convlstm',
+             'batch_size': 10,
+             'shuffle': False,
+             'base_results_dir': './results',
+             'ensemble': ['moments_nano__vgg_imagenet', 
+                          'prednet_kitti_finetuned_moments_10c']}, dict())
+
 add_config(configs, 'prednet_kitti_finetuned_moments_10c__ucf', 
            { 'description': 'A convnet classifier trained on PredNet \
 (pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
              'task': 'full',
              'model_type': 'convnet',
-             'seq_legth': None,
+             'seq_length': None,
+             'batch_size': 50,
              'training_max_per_class': .9,
              'training_index_start': 0,
              'validation_index_start': .9,
