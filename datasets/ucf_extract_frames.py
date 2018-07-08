@@ -57,7 +57,7 @@ def extract_files():
 
                 print("Generated %d frames for %s" % (nb_frames, filename_no_ext))
 
-    with open('data_file.csv', 'w') as fout:
+    with open('./data_file.csv', 'w') as fout:
         writer = csv.writer(fout)
         writer.writerows(data_file)
 
@@ -97,4 +97,5 @@ def main():
     extract_files()
 
 if __name__ == '__main__':
+    os.chdir('./ucf_data')
     main()
