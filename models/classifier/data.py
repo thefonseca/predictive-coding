@@ -26,7 +26,8 @@ class DataGenerator(Sequence):
                  index_start=0, max_per_class=None, seq_length=None, 
                  sample_step=1, seq_overlap=0, target_size=None, 
                  classes=None, data_format=K.image_data_format(), 
-                 output_mode=None, rescale=None, return_sources=False):
+                 output_mode=None, rescale=None, max_seq_per_source=None, 
+                 return_sources=False):
         
         'Initialization'
         self.batch_size = batch_size
@@ -45,6 +46,8 @@ class DataGenerator(Sequence):
         self.output_mode = output_mode
         self.seq_overlap = seq_overlap
         self.rescale = rescale
+        self.max_seq_per_source = max_seq_per_source
+        self.source_count = {}
         
     def flow_from_directory(self, data_dir):
         self.data_dir = data_dir
@@ -88,17 +91,30 @@ class DataGenerator(Sequence):
         self.on_epoch_end()
         
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
-        if self.max_per_class is None or \
-        (self.index_start < 0 and self.index_start + self.max_per_class >= 0):
-            class_samples = class_samples[self.index_start::self.sample_step]
-            class_sources = class_sources[self.index_start::self.sample_step]
+        if self.index_start > 0 and self.index_start < 1:
+            index_start = int(self.index_start * len(class_samples))
         else:
-            index_end = self.index_start + self.max_per_class
-            class_samples = class_samples[self.index_start:index_end:self.sample_step]
-            class_sources = class_sources[self.index_start:index_end:self.sample_step]
-
+            index_start = self.index_start
+        
+        if self.max_per_class is None or \
+        (index_start < 0 and index_start + self.max_per_class >= 0):
+            class_samples = class_samples[index_start::self.sample_step]
+            class_sources = class_sources[index_start::self.sample_step]
+        else:
+            if self.max_per_class > 0 and self.max_per_class < 1:
+                index_end = index_start + int(self.max_per_class * len(class_samples))
+            else:
+                index_end = index_start + self.max_per_class
+            class_samples = class_samples[index_start:index_end:self.sample_step]
+            class_sources = class_sources[index_start:index_end:self.sample_step]
+            
         if self.seq_length:
             class_samples = self.__to_sequence(class_samples, class_sources)
+            # Check sequence counts consistency
+            if self.max_seq_per_source:
+                for k, c in self.source_count.items():
+                    if c > self.max_seq_per_source:
+                        raise ValueError('A sequence exceeds the maximum length')
         
         self.y.extend([class_index] * len(class_samples))
         self.X.extend(class_samples)
@@ -195,30 +211,79 @@ class DataGenerator(Sequence):
             
         return data
     
-    def __to_sequence(self, samples, sources):
+    '''def __fix_incomplete_sequence(self, seq, source_seq, seqs, 
+                                  source_seqs, source):
         
-        prev_source = None
+        count = self.source_count.get(source, 0)
+        if self.max_seq_per_source and count >= self.max_seq_per_source:
+            return
+        # Check if current sequence is incomplete
+        is_incomplete = len(seq) < self.seq_length
+        has_min_length = len(seq) > max(self.seq_length - self.seq_overlap, self.seq_overlap) 
+        if is_incomplete and has_min_length and len(source_seqs) > 0:
+            prev_seq_source = source_seqs[-1][-1]
+            # If previous sequence has samples from the same source,
+            # use samples from previous sequence to complete current sequence.
+            # This is necessary because videos have variable number of frames.
+            if prev_seq_source == source:
+                previous_samples = max(self.seq_length - len(seq), self.seq_overlap) + 1
+                new_seq = seqs[-1][-previous_samples:]
+                current_samples = self.seq_length - previous_samples
+                new_seq.extend(seq[-current_samples:])
+                new_source_seq = source_seqs[-1][-previous_samples:]
+                new_source_seq.extend(source_seq[-current_samples:])
+                seqs.append(new_seq)
+                source_seqs.append(new_source_seq)
+                self.source_count[source] = count + 1'''
+        
+    
+    def __to_sequence(self, samples, sources):
         seqs = []
+        source_seqs = []
         
         i = 0
-        while i < len(sources) - self.seq_length:
+        while i <= len(sources) - self.seq_overlap:
             seq = []
+            source_seq = []
             prev_source = None
+            
+            # Try to get one sequence of length self.seq_length
             for j in range(i, i + self.seq_length):
                 # NAME_OF__SOURCE__frame_001.pkl => NAME_OF__SOURCE
                 source = '__'.join(sources[j].split('__')[:-1]) 
+                #print(i, j, source)
+                
+                count = self.source_count.get(source, 0)
+                
+                if self.max_seq_per_source and count >= self.max_seq_per_source:
+                    #print('count:', count, samples[j])
+                    i = j + 1
+                    break
                 
                 if prev_source is None or prev_source == source:
                     seq.append(samples[j])
+                    source_seq.append(source)
+                    
+                    #print('prev_source == source:', i, j)
                     if len(seq) == self.seq_length:
+                        #print('added:', i, j, source)
                         seqs.append(seq)
-                        i = (j - self.seq_overlap + 1)
+                        source_seqs.append(source_seq)
+                        i = j - self.seq_overlap + 1
+                        self.source_count[source] = count + 1
                 else:
+                    #print('prev_source != source:', i, j)
+                    #self.__fix_incomplete_sequence(seq, source_seq, seqs, 
+                    #                               source_seqs, source)
                     i = j
                     break
                     
                 prev_source = source
-                if j == len(sources):
+                if j == len(sources) - 1:
+                    #print('last item', i, j)
+                    #self.__fix_incomplete_sequence(seq, source_seq, seqs, 
+                    #                               source_seqs, source)
                     i = j
+                    break
             
         return seqs

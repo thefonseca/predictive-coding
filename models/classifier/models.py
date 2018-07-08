@@ -13,11 +13,11 @@ def convnet(input_shape, n_classes, drop_rate=0.5):
               input_shape=input_shape, 
               activation='relu'))
     #model.add(BatchNormalization())
-    model.add(Activation('relu'))
+    #model.add(Activation('relu'))
     #model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(drop_rate))
     model.add(Flatten())
-    model.add(Dense(32))
+    model.add(Dense(512))
     #model.add(BatchNormalization())
     model.add(Activation('relu'))
     model.add(Dropout(drop_rate))
