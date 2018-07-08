@@ -11,9 +11,9 @@ This folder contains classification models that are trained on learned represent
 | VGG ImageNet | 0.287 | 0.661 | 0.878 | 0.600 | 0.853 | 0.489 |
 | PredNet random | 0.690 | 0.6903 | 0.544 | 0.544 | 0.521 | 0.500 |
 | PredNet KITTI | 0.656 | 0.693 | 0.621 | 0.521 | 0.689 | 0.521 |
-| PredNet KITTI + Moments 1200v | 0.541 | 0.674 | 0.744 | 0.5444 | 0.653 | 0.521 |
-| PredNet KITTI + Moments 1500v* | 0.5134 | 0.668 | 0.7684 | 0.595 | 0.716 | 0.589 |
-| PredNet KITTI + Moments 4000v | 0.626 | 0.674 | 0.689 | 0.622 | 0.663 | 0.563 |
+| PredNet KITTI + Moments 1200v | 0.470 | 0.649 | 0.778 | 0.611 | 0.705 | 0.589 |
+| PredNet KITTI + Moments 1500v* | 0.513 | 0.668 | 0.768 | 0.595 | 0.716 | 0.589 |
+| PredNet KITTI + Moments 4000v | 0.583 | 0.676 | 0.778 | 0.500 | 0.658 | 0.621 |
 | PredNet KITTI + Moments 4000v (stateful) |  |  |  |  |  |  |
 
 
