@@ -58,16 +58,10 @@ vgg_base_config = {
     'test_data_dir': './results/vgg_imagenet__moments_nano__features/training',
 }
 
-add_config(configs, 'moments_nano__vgg_imagenet', 
+add_config(configs, 'moments__vgg_imagenet', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
              'model_type': 'convlstm' }, vgg_base_config)
-
-add_config(configs, 'moments_nano__vgg_imagenet', 
-           { 'description': 'A ConvLSTM classifier using VGG features',
-             'seq_length': VGG_FEATURES_PER_VIDEO,
-             'model_type': 'lstm' }, vgg_base_config)
-
 
 PREDNET_FEATURES_PER_VIDEO = 5
 
