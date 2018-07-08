@@ -39,14 +39,14 @@ def move_files(file_groups):
     """
     # Do each of our groups.
     for group, videos in file_groups.items():
-
+        #group = os.path.join('ucf_data', group)
         # Do each of our videos.
         for video in videos:
 
             # Get the parts.
             parts = video.split('/')
             classname = parts[0]
-            filename = parts[1]
+            filename = parts[1].replace('HandStandPushups', 'HandstandPushups')
             file_path = os.path.join('UCF101', filename)
 
             # Check if this class exists.
@@ -79,4 +79,5 @@ def main():
     move_files(group_lists)
 
 if __name__ == '__main__':
+    os.chdir('./ucf_data')
     main()
