@@ -98,12 +98,18 @@ def train(config_name, training_data_dir, validation_data_dir,
                         use_multiprocessing=use_multiprocessing,
                         max_queue_size=max_queue_size, 
                         workers=workers)
+
     
+def gen_multiple(generators):
+    while True:
+        X_list = [gen.next()[0] for gen in generators]
+        y = generators[0].next()[1]
+        yield X_list, y
 
 def evaluate(config_name, batch_size, 
              #test_data_dir, 
              #base_results_dir, classes=None,
-             #workers=1, use_multiprocessing=False,
+             workers=1, use_multiprocessing=False,
              #seq_length=None, input_shape=None, 
              #test_max_per_class=None, test_index_start=0,
              model_type='convnet', ensemble=None, **config):
@@ -114,6 +120,7 @@ def evaluate(config_name, batch_size,
         ensemble = [config['_config_name_original']]
         
     generators = []
+    data_generators = []
     model_list = []
     for ensemble_name in ensemble:
         FLAGS = configs[ensemble_name]
@@ -121,12 +128,14 @@ def evaluate(config_name, batch_size,
         e_config_name, e_config = utils.get_config(configs, tasks, FLAGS)
     
         generator = DataGenerator(classes=e_config['classes'],
+                                  shuffle=False,
                                   batch_size=e_config['batch_size'],
                                   seq_length=e_config['seq_length'],
                                   target_size=e_config.get('input_shape', None),
                                   index_start=e_config['test_index_start'],
                                   max_per_class=e_config['test_max_per_class'])
-        generators.append(generator.flow_from_directory(e_config['test_data_dir']))
+        data_generators.append(generator)
+        generators.append(iter(generator.flow_from_directory(e_config['test_data_dir'])))
         
         # load best model
         results_dir = utils.get_create_results_dir(e_config_name, e_config['base_results_dir'])
@@ -135,15 +144,18 @@ def evaluate(config_name, batch_size,
     
     if len(model_list) == 1:
         model = model_list[0]
-        generator = generators[0]       
+        generator = generators[0]     
     else:
-        model = models.ensemble(model_list)
-        generator = zip(generators)
+        model = models.ensemble(model_list, data_generators[0].data_shape)
+        model.compile(loss='categorical_crossentropy',
+                  optimizer='adam', metrics=['accuracy'])
+        model.summary()
+        generator = gen_multiple(generators)
         
-    if len(generator) == 0:
+    if len(data_generators[0]) == 0:
         return
         
-    metrics = model.evaluate_generator(generator, len(generator),
+    metrics = model.evaluate_generator(generator, len(data_generators[0]),
                                        use_multiprocessing=use_multiprocessing, 
                                        workers=workers)
 

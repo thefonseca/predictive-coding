@@ -118,8 +118,9 @@ add_config(configs, 'vgg_prednet_ensemble',
              'batch_size': 10,
              'shuffle': False,
              'base_results_dir': './results',
-             'ensemble': ['moments_nano__vgg_imagenet', 
-                          'prednet_kitti_finetuned_moments_10c']}, dict())
+             'ensemble': ['moments__vgg_imagenet', # 'moments__vgg_imagenet'] 
+                          'prednet_kitti_finetuned_moments_10c']
+           }, dict())
 
 add_config(configs, 'prednet_kitti_finetuned_moments_10c__ucf', 
            { 'description': 'A convnet classifier trained on PredNet \
