@@ -41,7 +41,7 @@ def train(config_name, training_data_dir, validation_data_dir,
           use_multiprocessing=False, workers=1, dropout=0.5, 
           seq_length=None, sample_step=1, batch_size=10, 
           stopping_patience=3, classes=None, input_shape=None, 
-          max_queue_size=10, model_type='convnet', shuffle=False,
+          max_queue_size=10, model_type='convnet', shuffle=True,
           training_index_start=0, training_max_per_class=None, 
           validation_index_start=0, validation_max_per_class=None, **config):
     
@@ -122,9 +122,9 @@ def evaluate(config_name, batch_size,
     generators = []
     data_generators = []
     model_list = []
-    for ensemble_name in ensemble:
-        FLAGS = configs[ensemble_name]
-        FLAGS['config'] = ensemble_name
+    for model_config in ensemble:
+        FLAGS = configs[model_config]
+        FLAGS['config'] = model_config
         e_config_name, e_config = utils.get_config(configs, tasks, FLAGS)
     
         generator = DataGenerator(classes=e_config['classes'],

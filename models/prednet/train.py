@@ -159,7 +159,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train PredNet model.')
     parser.add_argument('config', help='experiment config name defined in moments_settings.py')
     parser.add_argument('--stateful', help='use stateful PredNet model', action='store_true')
-    parser.add_argument('--task', help='use stateful PredNet model', choices=['3c', '10c'])
+    parser.add_argument('--task', help='use stateful PredNet model', choices=['3c', '10c', 'full'])
     FLAGS, unparsed = parser.parse_known_args()
     
     #config = configs[FLAGS.config]
