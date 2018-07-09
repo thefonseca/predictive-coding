@@ -8,7 +8,7 @@ This folder contains classification models that are trained on learned represent
 
 | Model      | Easy (test acc) | Hard (test acc) |
 | -------------                  | :--:  | :--:  |
-| VGG ImageNet                   | 0.853 | 0.489 |
+| VGG ImageNet                   | 0.884 | 0.463 |
 | PredNet random                 | 0.521 | 0.505 |
 | PredNet KITTI                  | 0.700 | 0.511 |
 | PredNet KITTI + Moments 1200v  | 0.705 | 0.589 |
@@ -17,7 +17,7 @@ This folder contains classification models that are trained on learned represent
 
 | Model    | Easy (loss) | Hard (loss) | Easy (acc) | Hard (acc) |    
 | -------------                  | :---: | :---: | :---: | :---: |
-| VGG ImageNet                   | 0.287 | 0.661 | 0.878 | 0.600 |
+| VGG ImageNet                   | 0.274 | 0.688 | 0.867 | 0.578 |
 | PredNet random                 | 0.690 | 0.694 | 0.544 | 0.556 |
 | PredNet KITTI                  | 0.582 | 0.685 | 0.722 | 0.622 |
 | PredNet KITTI + Moments 1200v  | 0.470 | 0.649 | 0.778 | 0.611 |
