@@ -7,6 +7,10 @@ Objectives:
 * Investigate the limitations of Convnet representations on video understanding tasks
 * Test the influence of the amount of unsupervised training data on the supervised task performance
 
+Tasks:
+* Easy: "cooking" x "walking"
+* Hard: "running" x "walking"
+
 #### Test set
 
 | Model      | Easy (test acc) | Hard (test acc) |
