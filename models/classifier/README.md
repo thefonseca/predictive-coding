@@ -30,7 +30,7 @@ Objectives:
 | PredNet KITTI + Moments 1.25h* | 0.513 | 0.668 | 0.768 | 0.595 |
 | PredNet KITTI + Moments 3.33h  | 0.583 | 0.676 | 0.778 | 0.500 |
 
-\* _In this run we let the model "see" the held-out data_
+\* _In this run we let the model "see" the held-out labelled data_
 
 ## Out-of-domain action recognition: UCF-101
 Objectives:
@@ -38,12 +38,12 @@ Objectives:
 * Compare with baselines from the literature (focus on unsupervised approaches)
 
 | Model                       | UCF-101 RGB (%) | Pre-training dataset | Pre-training size (frames) |
-| -------------               | :---: | :---: |
+| -------------               | :--: | :---:           | :---: |
 | CNN tuple verification [1]  | 50.2 | UCF-101         | 2.7M  |
 | Random LSTM [2]             | 74.5 | Sports-1M       | 0     |
 | Composite LSTM [2]          | 75.8 | Sports-1M       | 32.4M |
-| PredNet                     |      | Moments in Time | 2.4M  |
-| PredNet finetuned           |      | Moments in Time | 2.4M  |
+| PredNet                     | _coming soon_     | Moments in Time | 2.4M  |
+| PredNet finetuned           | _coming soon_     | Moments in Time | 2.4M  |
 
 [1] Misra, I., Zitnick, C. L., & Hebert, M. (2016, October). [Shuffle and learn: unsupervised learning using temporal order verification](https://link.springer.com/chapter/10.1007/978-3-319-46448-0_32). In European Conference on Computer Vision (pp. 527-544). Springer, Cham.
 
