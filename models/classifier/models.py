@@ -1,8 +1,9 @@
 from keras.models import Sequential, Model
 from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D, LSTM, TimeDistributed
 from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
-from keras.layers import Input, Average
+from keras.layers import Input, Average, Masking
 from keras import backend as K
+
 
 
 def convnet(input_shape, n_classes, drop_rate=0.5):
@@ -30,6 +31,7 @@ def convlstm(input_shape, n_classes, drop_rate=0.5):
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
     inputs = Input(shape=input_shape)
+    #x = Masking(mask_value=0.0)(inputs)
     x = ConvLSTM2D(filters=200, kernel_size=(3, 3), dropout=drop_rate,
                    padding='same', return_sequences=True)(inputs)
     x = Conv3D(filters=1, kernel_size=(3, 3, 3), activation='sigmoid',
@@ -38,39 +40,21 @@ def convlstm(input_shape, n_classes, drop_rate=0.5):
     x = Dense(32, activation='relu')(x)
     x = Dropout(drop_rate)(x)
     predictions = Dense(n_classes, activation='softmax')(x)
-    
-    '''model = Sequential()
-    model.add(ConvLSTM2D(filters=200, kernel_size=(3, 3),
-                       input_shape=input_shape, dropout=drop_rate,
-                       padding='same', return_sequences=True))
-    #model.add(BatchNormalization())
-    model.add(Conv3D(filters=1, kernel_size=(3, 3, 3),
-                     activation='sigmoid',
-                     padding='same', data_format='channels_last'))
-    model.add(Flatten())
-    model.add(Dense(32))
-    #model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(Dropout(drop_rate))
-    model.add(Dense(n_classes))
-    model.add(Activation('softmax'))'''
     return Model(inputs=inputs, outputs=predictions)
-
 
 def lstm(input_shape, n_classes, drop_rate=0.5):
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
-    model = Sequential()
-    model.add(TimeDistributed(Flatten(), input_shape=input_shape))
-    model.add(LSTM(512, return_sequences=False, dropout=drop_rate))
-    model.add(Dense(32))
-    model.add(Activation('relu'))
-    model.add(Dropout(drop_rate))
-    model.add(Dense(n_classes))
-    model.add(Activation('softmax'))
-    return model
-
+    inputs = Input(shape=input_shape)
+    x = TimeDistributed(Flatten())(inputs)
+    x = Masking(mask_value=0.0)(x)
+    x = LSTM(50, return_sequences=False, dropout=drop_rate)(x)
+    x = Dense(32, activation='relu')(x)
+    x = Dropout(drop_rate)(x)
+    predictions = Dense(n_classes, activation='softmax')(x)
+    return Model(inputs=inputs, outputs=predictions)
+    
 def ensemble(models, input_shape):
     if models and len(models) < 2:
         raise ValueError('To get an ensemble you need at least two models')

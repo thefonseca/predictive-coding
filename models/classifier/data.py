@@ -27,7 +27,7 @@ class DataGenerator(Sequence):
                  sample_step=1, seq_overlap=0, target_size=None, 
                  classes=None, data_format=K.image_data_format(), 
                  output_mode=None, rescale=None, max_seq_per_source=None, 
-                 return_sources=False):
+                 min_seq_length=0, pad_sequences=False, return_sources=False):
         
         'Initialization'
         self.batch_size = batch_size
@@ -37,6 +37,7 @@ class DataGenerator(Sequence):
         self.index_start = index_start
         self.max_per_class = max_per_class
         self.seq_length = seq_length
+        self.min_seq_length = min_seq_length
         self.sample_step = sample_step
         self.target_size = target_size
         self.fn_preprocess = fn_preprocess
@@ -48,6 +49,7 @@ class DataGenerator(Sequence):
         self.rescale = rescale
         self.max_seq_per_source = max_seq_per_source
         self.source_count = {}
+        self.pad_sequences = pad_sequences
         
     def flow_from_directory(self, data_dir):
         self.data_dir = data_dir
@@ -79,17 +81,6 @@ class DataGenerator(Sequence):
         self.__postprocess()
         return self
     
-    def __postprocess(self):
-        self.n_classes = len(self.classes)
-        if len(self.X) == 0:
-            print('No data found in {}!'.format(self.data_dir))
-        else:
-            self.data_shape = self.__load_data(0).shape
-            msg = 'Found {} samples belonging to {} classes in {}'
-            print(msg.format(len(self.X), self.n_classes, self.data_dir))
-            print('Data shape: {}'.format(self.data_shape))
-        self.on_epoch_end()
-        
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
         if self.index_start > 0 and self.index_start < 1:
             index_start = int(self.index_start * len(class_samples))
@@ -107,17 +98,41 @@ class DataGenerator(Sequence):
                 index_end = index_start + self.max_per_class
             class_samples = class_samples[index_start:index_end:self.sample_step]
             class_sources = class_sources[index_start:index_end:self.sample_step]
-            
+        
         if self.seq_length:
             class_samples = self.__to_sequence(class_samples, class_sources)
-            # Check sequence counts consistency
-            if self.max_seq_per_source:
-                for k, c in self.source_count.items():
-                    if c > self.max_seq_per_source:
-                        raise ValueError('A sequence exceeds the maximum length')
         
         self.y.extend([class_index] * len(class_samples))
         self.X.extend(class_samples)
+        
+    def __postprocess(self):
+        self.n_classes = len(self.classes)
+        if len(self.X) == 0:
+            print('No data found in {}!'.format(self.data_dir))
+        else:
+            self.data_shape = self.__load_data(0).shape
+            msg = 'Found {} samples belonging to {} classes in {}'
+            print(msg.format(len(self.X), self.n_classes, self.data_dir))
+            
+            if self.seq_length:
+                # Check sequence counts consistency
+                for k, c in self.source_count.items():
+                    if self.max_seq_per_source and c > self.max_seq_per_source:
+                        raise ValueError('A sequence exceeds the maximum length')
+                
+                # Get sequence length distribution
+                seq_length_dist = {}
+                for seq in self.X:
+                    count_per_length = seq_length_dist.get(len(seq), 0)
+                    seq_length_dist[len(seq)] = count_per_length + 1
+                    
+                print('Sequence distribution:')
+                for length, count in sorted(seq_length_dist.items()):
+                    print('- {} sequences of length {}'.format(count, length))
+            
+            print('Data shape: {}'.format(self.data_shape))
+        self.on_epoch_end()
+    
         
     def __len__(self):
         'Denotes the number of batches per epoch'
@@ -142,7 +157,7 @@ class DataGenerator(Sequence):
         # Initialization
         X = np.empty((self.batch_size,) + self.data_shape)
         y = np.empty((self.batch_size), dtype=int)
-        sources = [] 
+        sources = []
         
         # Generate data
         for i, index in enumerate(indexes):
@@ -189,6 +204,10 @@ class DataGenerator(Sequence):
             sample = self.__load_pickle(filename)
         elif filename.lower().endswith(('.png', '.jpg', '.jpeg')):
             sample = self.__load_image(filename)
+        elif filename == 'padding':
+            sample = np.zeros(self.data_shape[1:])
+        else:
+            raise ValueError('{} format is not supported'.format(filename))
         return sample
     
     def __load_seq_data(self, index):
@@ -197,7 +216,7 @@ class DataGenerator(Sequence):
         
         for sample in seq:
             seq_data.append(self.__load_sample(sample))
-                        
+        
         return np.array(seq_data)
     
     def __load_data(self, index):
@@ -236,6 +255,13 @@ class DataGenerator(Sequence):
                 source_seqs.append(new_source_seq)
                 self.source_count[source] = count + 1'''
         
+    def __add_incomplete_sequence(self, seq, source_seq, seqs, source_seqs):
+        if self.pad_sequences:
+            padding_item = 'padding' #np.zeros_like(seq[-1])
+            seq.extend([padding_item] * (self.seq_length - len(seq)))
+            source_seq.extend([padding_item] * (self.seq_length - len(seq)))
+        seqs.append(seq)
+        source_seqs.append(source_seq)
     
     def __to_sequence(self, samples, sources):
         seqs = []
@@ -271,10 +297,15 @@ class DataGenerator(Sequence):
                         source_seqs.append(source_seq)
                         i = j - self.seq_overlap + 1
                         self.source_count[source] = count + 1
+                        break
                 else:
                     #print('prev_source != source:', i, j)
                     #self.__fix_incomplete_sequence(seq, source_seq, seqs, 
                     #                               source_seqs, source)
+                    
+                    if self.min_seq_length <= len(seq):
+                        self.__add_incomplete_sequence(seq, source_seq, 
+                                                       seqs, source_seqs)
                     i = j
                     break
                     
@@ -284,6 +315,9 @@ class DataGenerator(Sequence):
                     #print('last item', i, j)
                     #self.__fix_incomplete_sequence(seq, source_seq, seqs, 
                     #                               source_seqs, source)
+                    if self.min_seq_length <= len(seq):
+                        self.__add_incomplete_sequence(seq, source_seq, 
+                                                       seqs, source_seqs)
                     i = j
                     break
             
