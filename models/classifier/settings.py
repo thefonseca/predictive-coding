@@ -63,6 +63,23 @@ add_config(configs, 'moments__vgg_imagenet',
              'seq_length': VGG_FEATURES_PER_VIDEO,
              'model_type': 'convlstm' }, vgg_base_config)
 
+add_config(configs, 'moments__images', 
+           { 'description': 'A ConvLSTM classifier using raw images',
+             'seq_length': 10,
+             'sample_step': 3,
+             'batch_size': 5,
+             'input_channels': 3, 
+             'input_height': 128, 
+             'input_width': 160,
+             'rescale': 1./255,
+             'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100,
+             #'validation_max_per_class': VGG_FEATURES_PER_VIDEO * 10,
+             'pad_sequences': True,
+             'training_data_dir': '../../datasets/moments_video_frames/training',
+             'validation_data_dir': '../../datasets/moments_video_frames/validation',
+             'test_data_dir': '../../datasets/moments_video_frames/training',
+             'model_type': 'lstm' }, vgg_base_config)
+
 PREDNET_FEATURES_PER_VIDEO = 5
 
 prednet_base_config = dict()

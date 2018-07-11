@@ -34,7 +34,13 @@ def save_experiment_config(config_name, base_results_dir, config):
     for key in sorted(config):
         f.write('{}: {}\n'.format(key, config[key]))
     f.close()
-
+    
+def resize_fn(input_height, input_width):
+    resize = None
+    if input_width and input_height:
+        resize = lambda img: utils.resize_img(img, target_size=(input_height, 
+                                                                input_width))
+    return resize
     
 def train(config_name, training_data_dir, validation_data_dir, 
           base_results_dir, test_data_dir=None, epochs=10, 
@@ -43,14 +49,20 @@ def train(config_name, training_data_dir, validation_data_dir,
           stopping_patience=3, classes=None, input_shape=None, 
           max_queue_size=10, model_type='convnet', shuffle=True,
           training_index_start=0, training_max_per_class=None, 
-          validation_index_start=0, validation_max_per_class=None, **config):
+          validation_index_start=0, validation_max_per_class=None, 
+          input_width=None, input_height=None, rescale=None,
+          pad_sequences=False, **config):
     
     train_generator = DataGenerator(batch_size=batch_size,
                                     shuffle=shuffle,
                                     classes=classes,
                                     seq_length=seq_length,
+                                    pad_sequences=pad_sequences,
                                     target_size=input_shape,
                                     sample_step=sample_step,
+                                    rescale=rescale,
+                                    fn_preprocess=resize_fn(input_height, 
+                                                            input_width),
                                     index_start=training_index_start,
                                     max_per_class=training_max_per_class)
     
@@ -58,8 +70,12 @@ def train(config_name, training_data_dir, validation_data_dir,
                                   shuffle=shuffle,
                                   classes=classes,
                                   seq_length=seq_length,
+                                  pad_sequences=pad_sequences,
                                   target_size=input_shape,
                                   sample_step=sample_step,
+                                  rescale=rescale,
+                                  fn_preprocess=resize_fn(input_height, 
+                                                          input_width),
                                   index_start=validation_index_start,
                                   max_per_class=validation_max_per_class)
     
@@ -98,7 +114,6 @@ def train(config_name, training_data_dir, validation_data_dir,
                         use_multiprocessing=use_multiprocessing,
                         max_queue_size=max_queue_size, 
                         workers=workers)
-
     
 def gen_multiple(generators):
     while True:
@@ -112,6 +127,7 @@ def evaluate(config_name, batch_size,
              workers=1, use_multiprocessing=False,
              #seq_length=None, input_shape=None, 
              #test_max_per_class=None, test_index_start=0,
+             #input_width=None, input_height=None, rescale=None,
              model_type='convnet', ensemble=None, **config):
     
     print('\nEvaluating model on test set...')
@@ -126,9 +142,15 @@ def evaluate(config_name, batch_size,
         FLAGS = configs[model_config]
         FLAGS['config'] = model_config
         e_config_name, e_config = utils.get_config(configs, tasks, FLAGS)
-    
+        
+        input_width = e_config.get('input_width', None)
+        input_height = e_config.get('input_height', None)
+        
         generator = DataGenerator(classes=e_config['classes'],
                                   shuffle=False,
+                                  fn_preprocess=resize_fn(input_height, 
+                                                          input_width),
+                                  rescale=e_config.get('rescale', None),
                                   batch_size=e_config['batch_size'],
                                   seq_length=e_config['seq_length'],
                                   target_size=e_config.get('input_shape', None),
