@@ -37,14 +37,14 @@ This folder contains classification models that are trained on learned represent
 \* _In this run we let the model "see" the held-out labelled data_
 
 ## Out-of-domain action recognition: UCF-101
-Objectives:
+#### Objectives:
 * Assess the performance of model variants on an out-of-domain task
 * Compare with baselines from the literature (focus on unsupervised approaches)
 
 | Model                       | UCF-101 RGB (%) | Pre-training dataset | Pre-training size (frames) |
 | -------------               | :--: | :---:           | :---: |
 | CNN tuple verification [1]  | 50.2 | UCF-101         | 2.7M  |
-| Random LSTM [2]             | 74.5 | Sports-1M       | 0     |
+| Random LSTM [2]             | 74.5 | -       | 0     |
 | Composite LSTM [2]          | 75.8 | Sports-1M       | 32.4M |
 | PredNet                     | _coming soon_     | Moments in Time | 2.4M  |
 | PredNet finetuned           | _coming soon_     | Moments in Time | 2.4M  |
@@ -55,7 +55,7 @@ Objectives:
 
 
 ## Exploring the audio modality
-Objectives:
+#### Objectives:
 * Check if our unsupervised learning approach can learn useful representations from audio
 * Check if the audio modality provides complementary information 
 
