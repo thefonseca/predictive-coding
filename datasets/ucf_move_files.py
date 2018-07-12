@@ -6,6 +6,7 @@ Should only run this file once!
 """
 import os
 import os.path
+from shutil import copyfile
 
 def get_train_test_lists(version='01'):
     """
@@ -60,10 +61,11 @@ def move_files(file_groups):
                 print("Can't find %s to move. Skipping." % (filename))
                 continue
 
-            # Move it.
+            # Copy it.
             dest = group + '/' + classname + '/' + filename
-            print("Moving %s to %s" % (file_path, dest))
-            os.rename(file_path, dest)
+            print("Copying %s to %s" % (file_path, dest))
+            copyfile(file_path, dest)
+            #os.rename(file_path, dest)
 
     print("Done.")
 
