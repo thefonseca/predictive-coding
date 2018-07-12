@@ -199,9 +199,14 @@ if __name__ == '__main__':
                     help='classification task')
     parser.add_argument('--eval', help='perform only evaluation using pretrained model',
                         action='store_true')
+    parser.add_argument('--gpu', help='choose a specific gpu to run', type=int)
+    
     FLAGS, unparsed = parser.parse_known_args()
     
     config_name, config = utils.get_config(configs, tasks, vars(FLAGS))
+    
+    if FLAGS.gpu:
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(FLAGS.gpu)
     
     print('\n==> Starting experiment: {}'.format(config['description']))
     config_str = utils.get_config_str(config)
