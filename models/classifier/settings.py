@@ -86,6 +86,7 @@ prednet_base_config = dict()
 prednet_base_config.update(vgg_base_config)
 prednet_base_config.update({
     'seq_length': PREDNET_FEATURES_PER_VIDEO,
+    'min_seq_length': PREDNET_FEATURES_PER_VIDEO,
     #'training_index_start': PREDNET_FEATURES_PER_VIDEO * 300,
     'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class,
     'test_index_start': PREDNET_FEATURES_PER_VIDEO * 100,
