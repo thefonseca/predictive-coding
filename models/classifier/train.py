@@ -92,7 +92,9 @@ def train(config_name, training_data_dir, validation_data_dir,
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     
     model_fn = getattr(models, model_type)
-    model = model_fn(input_shape, n_classes, drop_rate=dropout)
+    mask_value = 0. if pad_sequences else None
+    model = model_fn(input_shape, n_classes, drop_rate=dropout, 
+                     mask_value=mask_value)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')
     csv_path = os.path.join(results_dir, model_type + '.log')
 

@@ -78,7 +78,7 @@ add_config(configs, 'moments__images',
              'training_data_dir': '../../datasets/moments_video_frames/training',
              'validation_data_dir': '../../datasets/moments_video_frames/validation',
              'test_data_dir': '../../datasets/moments_video_frames/training',
-             'model_type': 'lstm' }, vgg_base_config)
+             'model_type': 'convlstm' }, vgg_base_config)
 
 PREDNET_FEATURES_PER_VIDEO = 5
 

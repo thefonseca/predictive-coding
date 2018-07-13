@@ -1,7 +1,7 @@
 from keras.models import Sequential, Model
 from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D, LSTM, TimeDistributed
 from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
-from keras.layers import Input, Average, Masking
+from keras.layers import Input, Average, Masking, Reshape
 from keras import backend as K
 
 
@@ -26,29 +26,37 @@ def convnet(input_shape, n_classes, drop_rate=0.5):
     model.add(Activation('softmax'))
     return model
 
-def convlstm(input_shape, n_classes, drop_rate=0.5):
+def convlstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
     inputs = Input(shape=input_shape)
-    #x = Masking(mask_value=0.0)(inputs)
-    x = ConvLSTM2D(filters=200, kernel_size=(3, 3), dropout=drop_rate,
-                   padding='same', return_sequences=True)(inputs)
+    if mask_value is not None:
+        x = TimeDistributed(Flatten())(inputs)
+        x = TimeDistributed(Masking(mask_value=mask_value))(x)
+        x = TimeDistributed(Reshape(input_shape[1:]))(x)
+    else:
+        x = inputs
+    x = ConvLSTM2D(filters=10, kernel_size=(3, 3), dropout=drop_rate,
+                   padding='same', return_sequences=True)(x)
     x = Conv3D(filters=1, kernel_size=(3, 3, 3), activation='sigmoid',
                padding='same', data_format='channels_last')(x)
     x = Flatten()(x)
     x = Dense(32, activation='relu')(x)
     x = Dropout(drop_rate)(x)
     predictions = Dense(n_classes, activation='softmax')(x)
-    return Model(inputs=inputs, outputs=predictions)
+    return Model(inputs=inputs, outputs=[predictions])
 
-def lstm(input_shape, n_classes, drop_rate=0.5):
+def lstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
     inputs = Input(shape=input_shape)
-    x = TimeDistributed(Flatten())(inputs)
-    x = Masking(mask_value=0.0)(x)
+    if mask_value is not None:
+        x = TimeDistributed(Flatten())(inputs)
+        x = Masking(mask_value=0.0)(x)
+    else:
+        x = inputs
     x = LSTM(50, return_sequences=False, dropout=drop_rate)(x)
     x = Dense(32, activation='relu')(x)
     x = Dropout(drop_rate)(x)
