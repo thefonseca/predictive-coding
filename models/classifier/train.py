@@ -4,12 +4,15 @@ import argparse
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
 from keras.models import load_model
+from keras.metrics import categorical_accuracy, top_k_categorical_accuracy
+from keras.losses import categorical_crossentropy
 
 from data import DataGenerator
 from settings import configs, tasks
 import models
 import utils
 
+from tqdm import tqdm
 import numpy as np
 import tensorflow as tf
 import random as rn
@@ -124,14 +127,48 @@ def gen_multiple(generators):
         X_list = [gen.next()[0] for gen in generators]
         y = generators[0].next()[1]
         yield X_list, y
+        
+def evaluate_average(model, data_iterator, n_batches):
+    predictions = {}
+    source_counts = {}
+    labels = {}
 
-def evaluate(config_name, batch_size, 
-             #test_data_dir, 
-             #base_results_dir, classes=None,
+    for i in tqdm(range(n_batches)):
+        X, y, sources_ = next(data_iterator)
+        sources = []
+        for s in sources_:
+            path, source = os.path.split(s[0])
+            path, category = os.path.split(path)
+            source = source.split('__')
+            source = '__'.join(source[:-1])
+            sources.append(os.path.join(category, source))
+
+        preds = model.predict(X)
+
+        for j in range(len(sources)):
+            s_count = source_counts.get(sources[j], 0)
+            source_counts[sources[j]] = s_count + 1
+            acc_pred = predictions.get(sources[j], np.zeros_like(y[j]))
+            predictions[sources[j]] = acc_pred + preds[j]
+            labels[sources[j]] = y[j]
+
+    metrics = {}
+    y_true = K.variable(np.array([y for source, y in sorted(labels.items())]))
+    y_pred = K.variable(np.array([predictions[s] / source_counts[s] for s in sorted(predictions.keys())]))
+
+    loss = categorical_crossentropy(y_true, y_pred)
+    metrics['loss'] = K.eval(K.mean(loss))
+    acc = categorical_accuracy(y_true, y_pred)
+    metrics['acc'] = K.eval(K.mean(acc))
+
+    if y_true.shape[-1] >= 10:
+        top_k_acc = top_k_categorical_accuracy(y_true, y_pred, k=5)
+        metrics['top_k_acc'] = K.eval(top_k_acc)
+        
+    return metrics
+
+def evaluate(config_name, batch_size, average_predictions=False,
              workers=1, use_multiprocessing=False,
-             #seq_length=None, input_shape=None, 
-             #test_max_per_class=None, test_index_start=0,
-             #input_width=None, input_height=None, rescale=None,
              model_type='convnet', ensemble=None, **config):
     
     print('\nEvaluating model on test set...')
@@ -152,12 +189,14 @@ def evaluate(config_name, batch_size,
         
         generator = DataGenerator(classes=e_config['classes'],
                                   shuffle=False,
+                                  return_sources=average_predictions,
                                   fn_preprocess=resize_fn(input_height, 
                                                           input_width),
                                   rescale=e_config.get('rescale', None),
                                   batch_size=e_config['batch_size'],
                                   seq_length=e_config['seq_length'],
                                   min_seq_length=e_config.get('min_seq_length', 0),
+                                  pad_sequences=e_config.get('pad_sequences', False),
                                   target_size=e_config.get('input_shape', None),
                                   index_start=e_config['test_index_start'],
                                   max_per_class=e_config['test_max_per_class'])
@@ -176,18 +215,27 @@ def evaluate(config_name, batch_size,
         model = models.ensemble(model_list, data_generators[0].data_shape)
         model.compile(loss='categorical_crossentropy',
                   optimizer='adam', metrics=['accuracy'])
-        model.summary()
         generator = gen_multiple(generators)
-        
+    
+    model.summary()
+    
     if len(data_generators[0]) == 0:
         return
+    
+    if average_predictions:
+        # Average predictions for sequences coming from the 
+        # same source video
+        n_batches = len(data_generators[0])
+        metrics = evaluate_average(model, iter(generator), n_batches)
+        metric_str = ['{}: {}'.format(m, v) for m, v in metrics.items()]
+        metric_str = ' - '.join(metric_str)
+    else:
+        metrics = model.evaluate_generator(generator, len(data_generators[0]),
+                                           use_multiprocessing=use_multiprocessing, 
+                                           workers=workers)
+        metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
+        metric_str = ' - '.join(metric_str)
         
-    metrics = model.evaluate_generator(generator, len(data_generators[0]),
-                                       use_multiprocessing=use_multiprocessing, 
-                                       workers=workers)
-
-    metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
-    metric_str = ' - '.join(metric_str)
     print('Test {}'.format(metric_str))
     f = open(os.path.join(results_dir, 'test.txt'), 'w')
     f.write('Test results:\n')
