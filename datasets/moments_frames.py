@@ -3,49 +3,14 @@ import glob
 from tqdm import tqdm
 import pickle as pkl
 import argparse
+import subprocess
 
 FLAGS = None
 
 
-def generate_frame_list(source_dir, splits):
-    
-    ''' Generate list of frames to be used by the original PredNet generator. '''
-    
-    image_pattern = os.path.join(source_dir, '{}/*/*.jpg')
-    image_pattern2 = os.path.join(source_dir, '{}/*.jpg')
-
-    for split in splits:
-
-        source_list = []
-        print('Searching for image files in "{}/{}/<category>" (this may take a while)...'.format(source_dir, 
-                                                                                                  split))
-        frames = sorted(glob.glob(image_pattern.format(split)))
-
-        if len(frames) == 0:
-            print('Searching for image files in "{}/{}" (this may take a while)...'.format(source_dir, 
-                                                                                           split))
-            frames = sorted(glob.glob(image_pattern2.format(split)))
-
-        if len(frames) == 0:
-            continue
-
-        for frame in tqdm(frames, desc='Processing {} set'.format(split)):
-
-            folder, filename = os.path.split(frame)
-            category = os.path.split(folder)[1]
-            source_video_name = filename.split('__frame_')[0]
-
-            if split != category:
-                source_list.append('{}__{}'.format(category, source_video_name))
-            else:
-                source_list.append(source_video_name)
-
-        filename = os.path.join(source_dir, 'sources_' + split + '.pkl')
-        pkl.dump(source_list, open(filename, "wb"))
-        
-
 def extract_frames(source_dir, dest_dir, splits, categories=None, 
-                   max_per_category=None, video_pattern='{}/**/*.mp4'):
+                   max_per_category=None, audio=False, size='160x128',
+                   video_pattern='{}/**/*.mp4'):
     
     pattern_all_categories = os.path.join(source_dir, video_pattern)
     pattern_no_categories = pattern_all_categories.replace('/**', '') # '{}/*.mp4'
@@ -77,19 +42,43 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
             if split != category:
                 frame_folder = os.path.join(frame_folder, category)
                 
-            frame_pattern = os.path.splitext(filename)[0] + '__frame_%03d.jpg'
-
             if not os.path.exists(frame_folder): 
                 os.makedirs(frame_folder)
                 current_folder = frame_folder
             elif current_folder != frame_folder:
                 # if directory was not created in this run, skip to
-                # avoid overwritting 
+                # avoid overwritting
                 continue
 
+            if audio:
+                # create spectrogram video
+                audio_pattern = os.path.splitext(filename)[0] + '__audio.mp4'
+                audio_path = os.path.join(frame_folder, audio_pattern)
+                ffmpeg_cmd = 'ffmpeg -hide_banner -loglevel panic -i {} -filter_complex '
+                ffmpeg_cmd += '"[0:a]showspectrum=s={}:mode=combined:slide=fullframe:'
+                # overlap=0.895 results in 10 fps videos
+                ffmpeg_cmd += 'scale=log:color=intensity:overlap=0.895[v]" -map "[v]" -map 0:a {}'
+                os.system(ffmpeg_cmd.format(video, size, audio_path))
+                
+                if not os.path.exists(audio_path):
+                    # If original video does not have audio, we create "silence" frames
+                    duration_cmd = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {}'
+                    duration = float(subprocess.check_output(duration_cmd.format(video), shell=True))
+                    #print('Creating "silence" video with {} seconds'.format(duration))
+                    fps = 10
+                    create_cmd = 'ffmpeg -hide_banner -loglevel panic -t {} -s {} -f rawvideo -pix_fmt rgb24 -r {} -i /dev/zero {}'
+                    os.system(create_cmd.format(duration, size, fps, audio_path))
+                    
+                video = audio_path
+            
+            frame_pattern = os.path.splitext(filename)[0] + '__frame_%03d.jpg'
             frame_path = os.path.join(frame_folder, frame_pattern)
             #print('Extracting {} frames to {} ...'.format(video, frame_path))
             os.system('ffmpeg -hide_banner -loglevel panic -i "{}" "{}"'.format(video, frame_path))
+            
+            if audio:
+                os.remove(video)
+            
         
 
 if __name__ == '__main__':
@@ -103,11 +92,9 @@ if __name__ == '__main__':
                         help='a subset of categories to be processed. Default is all categories.')
     parser.add_argument('--max_per_category', type=int,
                         help='maximum number of videos per category. Default is all videos.')
+    parser.add_argument('--audio', help='extract audio spectrograms.',
+                        action='store_true')
     FLAGS, unparsed = parser.parse_known_args()
     
-    extract_frames(FLAGS.source_dir, FLAGS.dest_dir, 
-                   FLAGS.splits,  FLAGS.categories, FLAGS.max_per_category)
-    
-    #print('Generating frame list for images in directory {}'.format(FLAGS.dest_dir))
-    #generate_frame_list(FLAGS.dest_dir, FLAGS.splits)
-    
+    extract_frames(FLAGS.source_dir, FLAGS.dest_dir, FLAGS.splits, 
+                   FLAGS.categories, FLAGS.max_per_category, FLAGS.audio)
