@@ -1,6 +1,7 @@
 import os
 
 DATA_DIR = '../../datasets/moments_video_frames/'
+AUDIO_DIR = '../../datasets/moments_audio_frames/'
 UCF_DATA_DIR = '../../datasets/ucf_data/'
 FRAMES_PER_VIDEO = 90
 SEQUENCES_PER_VIDEO = 5
@@ -62,7 +63,7 @@ eval_base_config = {
     'rescale': 1./255,
     'shuffle': False,
     'workers': 4,
-    'gpus': 2,
+    #'gpus': 2,
     #'use_multiprocessing': True,
     # DATA
     'training_data_dir': os.path.join(DATA_DIR, 'training'),
@@ -133,4 +134,13 @@ add_config(configs, 'prednet_kitti__moments__model',
 
 add_config(configs, 'prednet_random__moments__model', 
            { 'description': 'Training PredNet from scratch on Moments in Time dataset.',
-             'model_name': 'prednet_random' }, train_base_config)    
+             'model_name': 'prednet_random' }, train_base_config)
+
+add_config(configs, 'prednet_random__moments_audio__model', 
+           { 'description': 'Training PredNet from scratch on Moments in Time dataset audio spectrograms.',
+             'frame_step': 1,
+             'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
+             'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
+             'training_max_per_class': FRAMES_PER_VIDEO * 10,
+             'validation_max_per_class': FRAMES_PER_VIDEO * 10,
+             'model_name': 'prednet_random' }, train_base_config)
