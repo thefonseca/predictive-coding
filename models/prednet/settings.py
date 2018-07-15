@@ -83,6 +83,15 @@ add_config(configs, 'prednet_kitti__moments__prediction',
              'model_name': 'prednet_kitti',
              'output_mode': 'prediction' }, eval_base_config)
 
+add_config(configs, 'prednet_random__moments_audio__prediction', 
+           { 'description': 'Training PredNet from scratch on Moments in Time dataset audio spectrograms.',
+             'frame_step': 1,
+             'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
+             'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
+             #'training_max_per_class': FRAMES_PER_VIDEO * 10,
+             #'validation_max_per_class': FRAMES_PER_VIDEO * 10,
+             'model_name': 'prednet_random' }, train_base_config)
+
 add_config(configs, 'prednet_random__moments__representation', 
            { 'description': 'Using PredNet with random weights to extract features.',
              'model_name': 'prednet_random',
@@ -141,6 +150,6 @@ add_config(configs, 'prednet_random__moments_audio__model',
              'frame_step': 1,
              'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
              'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
-             'training_max_per_class': FRAMES_PER_VIDEO * 10,
-             'validation_max_per_class': FRAMES_PER_VIDEO * 10,
+             #'training_max_per_class': FRAMES_PER_VIDEO * 10,
+             #'validation_max_per_class': FRAMES_PER_VIDEO * 10,
              'model_name': 'prednet_random' }, train_base_config)

@@ -58,9 +58,13 @@ class DataGenerator(Sequence):
             self.classes = sorted(os.walk(data_dir).next()[1])
         data_pattern = '{}/*'
         
+        total_samples = 0
         for i, c in enumerate(self.classes):
             class_samples = sorted(glob.glob(os.path.join(data_dir, data_pattern.format(c))))
-            self.__process_class_samples(i, class_samples, class_samples)
+            total_samples += self.__process_class_samples(i, class_samples, class_samples)
+            
+        msg = 'Found {} samples belonging to {} classes in {}'
+        print(msg.format(total_samples, len(self.classes), self.data_dir))
             
         self.__postprocess()
         return self
@@ -70,13 +74,17 @@ class DataGenerator(Sequence):
             self.classes = sorted(list(set(y)))
         self.sources = sources
         
+        total_samples = 0
         for i, c in enumerate(self.classes):
             sample_indices = [k for k, y_ in enumerate(y) if y_ == c]
             class_samples = X[sample_indices]
             class_sources = None
             if sources:
                 class_sources = sources[sample_indices]
-            self.__process_class_samples(i, class_samples, class_sources)
+            total_samples += self.__process_class_samples(i, class_samples, class_sources)
+            
+        msg = 'Found {} samples belonging to {} classes'
+        print(msg.format(total_samples, len(self.classes)))
             
         self.__postprocess()
         return self
@@ -99,20 +107,19 @@ class DataGenerator(Sequence):
             class_samples = class_samples[index_start:index_end:self.sample_step]
             class_sources = class_sources[index_start:index_end:self.sample_step]
         
+        total_class_samples = len(class_samples)
         if self.seq_length:
             class_samples = self.__to_sequence(class_samples, class_sources)
         
         self.y.extend([class_index] * len(class_samples))
         self.X.extend(class_samples)
+        return total_class_samples
         
     def __postprocess(self):
         self.n_classes = len(self.classes)
         if len(self.X) == 0:
             print('No data found in {}!'.format(self.data_dir))
         else:
-            self.data_shape = self.__load_data(0).shape
-            msg = 'Found {} samples belonging to {} classes in {}'
-            print(msg.format(len(self.X), self.n_classes, self.data_dir))
             
             if self.seq_length:
                 # Check sequence counts consistency
@@ -125,11 +132,20 @@ class DataGenerator(Sequence):
                 for seq in self.X:
                     count_per_length = seq_length_dist.get(len(seq), 0)
                     seq_length_dist[len(seq)] = count_per_length + 1
-                    
+                
+                msg = 'Found {} sequences belonging to {} classes'
+                print(msg.format(len(self.X), self.n_classes))
+                
                 print('Sequence distribution:')
+                total = 0
                 for length, count in sorted(seq_length_dist.items()):
                     print('- {} sequences of length {}'.format(count, length))
+                    total += count * length
+                all_samples = [s for seq in self.X for s in seq]
+                unique_samples = len(set(all_samples))
+                print('Total samples used: {}'.format(unique_samples)) 
             
+            self.data_shape = self.__load_data(0).shape
             print('Data shape: {}'.format(self.data_shape))
         self.on_epoch_end()
     
