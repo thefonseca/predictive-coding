@@ -28,7 +28,7 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
                 all_categories = os.walk(os.path.join(source_dir, split)).next()[1]
                 categories = all_categories
                     
-            for c in categories:
+            for c in sorted(categories):
                 cat_videos = sorted(glob.glob(pattern_category.format(split, c)))[:max_per_category]
                 videos.extend(cat_videos)
 
@@ -50,9 +50,10 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
                 # avoid overwritting
                 continue
 
+            max_filename_length = 200
             if audio:
                 # create spectrogram video
-                audio_pattern = os.path.splitext(filename)[0] + '__audio.mp4'
+                audio_pattern = os.path.splitext(filename)[0][:max_filename_length] + '__audio.mp4'
                 audio_path = os.path.join(frame_folder, audio_pattern)
                 ffmpeg_cmd = 'ffmpeg -hide_banner -loglevel panic -i {} -filter_complex '
                 ffmpeg_cmd += '"[0:a]showspectrum=s={}:mode=combined:slide=fullframe:'
@@ -71,7 +72,7 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
                     
                 video = audio_path
             
-            frame_pattern = os.path.splitext(filename)[0] + '__frame_%03d.jpg'
+            frame_pattern = os.path.splitext(filename)[0][:max_filename_length] + '__frame_%03d.jpg'
             frame_path = os.path.join(frame_folder, frame_pattern)
             #print('Extracting {} frames to {} ...'.format(video, frame_path))
             os.system('ffmpeg -hide_banner -loglevel panic -i "{}" "{}"'.format(video, frame_path))
