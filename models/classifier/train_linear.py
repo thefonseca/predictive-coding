@@ -12,10 +12,6 @@ from sklearn.svm import LinearSVC
 #from sklearn.linear_model import LogisticRegression
 from sklearn.externals import joblib
 
-#from keras import backend as K
-#from keras.metrics import categorical_accuracy, top_k_categorical_accuracy
-#from keras.losses import categorical_crossentropy
-
 # Getting reproducible results:
 # https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
 os.environ['PYTHONHASHSEED'] = '0'

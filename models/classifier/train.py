@@ -133,7 +133,7 @@ def evaluate_average(model, data_iterator, n_batches):
     source_counts = {}
     labels = {}
 
-    for i in tqdm(range(n_batches)):
+    for i in tqdm(range(n_batches), desc='Evaluating on test set'):
         X, y, sources_ = next(data_iterator)
         sources = []
         for s in sources_:
