@@ -161,7 +161,7 @@ def evaluate_average(model, data_iterator, n_batches):
     acc = categorical_accuracy(y_true, y_pred)
     metrics['acc'] = K.eval(K.mean(acc))
 
-    if y_true.shape[-1] >= 10:
+    if y_true.shape[-1] > 10:
         top_k_acc = top_k_categorical_accuracy(y_true, y_pred, k=5)
         metrics['top_k_acc'] = K.eval(top_k_acc)
         
@@ -182,7 +182,7 @@ def evaluate(config_name, batch_size, average_predictions=False,
     for model_config in ensemble:
         FLAGS = configs[model_config]
         FLAGS['config'] = model_config
-        e_config_name, e_config = utils.get_config(configs, tasks, FLAGS)
+        e_config_name, e_config = utils.get_config(FLAGS)
         
         input_width = e_config.get('input_width', None)
         input_height = e_config.get('input_height', None)
@@ -256,7 +256,7 @@ if __name__ == '__main__':
     
     FLAGS, unparsed = parser.parse_known_args()
     
-    config_name, config = utils.get_config(configs, tasks, vars(FLAGS))
+    config_name, config = utils.get_config(vars(FLAGS))
     
     if FLAGS.gpu:
         os.environ["CUDA_VISIBLE_DEVICES"] = str(FLAGS.gpu)

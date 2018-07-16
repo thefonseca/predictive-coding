@@ -2,6 +2,8 @@ import numpy as np
 from skimage.transform import resize
 import os
 
+from settings import configs, tasks
+
 
 def crop_center(img, cropx, cropy):
     x,y,c = img.shape
@@ -34,7 +36,7 @@ def get_config_str(config):
             config_str += '    {}: {}\n'.format(k, v)
     return config_str
 
-def get_config(configs, tasks, FLAGS):
+def get_config(FLAGS):
     config = dict()
     config.update(configs[FLAGS['config']])
     
@@ -44,7 +46,7 @@ def get_config(configs, tasks, FLAGS):
         suffix = '__' + FLAGS['task']
         config['task'] = FLAGS['task']
         
-    if not FLAGS['model_type']:
+    if FLAGS.get('model_type', None) is None:
         prefix = config['model_type'] + '__'
     else:
         prefix = FLAGS['model_type'] + '__'
