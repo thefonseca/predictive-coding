@@ -13,15 +13,14 @@ This folder contains classification models that are trained on learned represent
 
 #### Results: Test set
 
-| Model      | Easy (test acc) | Hard (test acc) |
-| -------------                  | :--:  | :--:  |
-| VGG ImageNet                   | 0.884 | 0.463 |
-| PredNet random                 | 0.521 | 0.505 |
-| PredNet KITTI                  | 0.700 | 0.511 |
-| PredNet KITTI + Moments 1h     | 0.705 | 0.589 |
-| PredNet KITTI + Moments 1.25h* | 0.716 | 0.589 |
-| PredNet KITTI + Moments 3.33h  | 0.658 | 0.621 |
-| PredNet KITTI + Moments 66.6h  | _now running_ |
+| Model      | Easy (ConvLSTM) | Hard (ConvLSTM) | Easy (SVM) | Hard (SVM) |
+| -------------                  | :--:  | :--:  | :--:  | :--:  |
+| VGG ImageNet                   | 88.4 | 46.3 | 80.4 | 52.0 |
+| PredNet random                 | 52.1 | 50.5 | 60.1 | 56.5 |
+| PredNet KITTI                  | 70.0 | 51.1 | 63.6 | 63.6 |
+| PredNet KITTI + Moments 1h     | 70.5 | 58.9 | 64.8 | 62.7 |
+| PredNet KITTI + Moments 3.33h  | 65.8 | 62.1 | 62.6 | 63.1 |
+| PredNet KITTI + Moments 66.6h  | _now running_ |  |  |
 
 #### Results: Validation set
 
@@ -46,8 +45,8 @@ This folder contains classification models that are trained on learned represent
 | CNN tuple verification [1]  | 50.2 | UCF-101         | 2.7M  |
 | Random LSTM [2]             | 74.5 | -       | 0     |
 | Composite LSTM [2]          | 75.8 | Sports-1M       | 32.4M |
-| PredNet                     | _coming soon_     | Moments in Time | 2.4M  |
-| PredNet finetuned           | _coming soon_     | Moments in Time | 2.4M  |
+| PredNet                     | _coming soon_ | Moments in Time | 2.4M  |
+| PredNet finetuned           | _coming soon_ | Moments in Time | 2.4M  |
 
 [1] Misra, I., Zitnick, C. L., & Hebert, M. (2016, October). [Shuffle and learn: unsupervised learning using temporal order verification](https://link.springer.com/chapter/10.1007/978-3-319-46448-0_32). In European Conference on Computer Vision (pp. 527-544). Springer, Cham.
 
