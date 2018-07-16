@@ -6,6 +6,7 @@ import numpy as np
 from skimage.transform import resize
 
 from prednet import PredNet
+from settings import configs, tasks
 
 def load_model(model_json_file, model_weights_file, **extras):
     # Load trained model
@@ -18,6 +19,7 @@ def load_model(model_json_file, model_weights_file, **extras):
 
 def create_model(model_json_file=None, model_weights_file=None, 
                  train=False, **config):
+    print(model_weights_file)
     if model_json_file and model_weights_file:
         pretrained_model = load_model(model_json_file, model_weights_file)
         model = pretrained_prednet(pretrained_model, train=train, **config)
@@ -141,25 +143,31 @@ def resize_img(img, target_size):
     img = crop_center(img, target_size[0], target_size[1])
     return img
 
-def get_config(configs, tasks, FLAGS):
-    config = configs[FLAGS.config]
+def get_config(FLAGS):
+    config = dict()
+    config.update(configs[FLAGS['config']])
     
-    if not FLAGS.task:
+    if FLAGS.get('task', None) is None:
         suffix = '__' + config['task']
     else:
-        suffix = '__' + FLAGS.task
-        config['task'] = FLAGS.task
+        suffix = '__' + FLAGS['task']
+        config['task'] = FLAGS['task']
     
-    if FLAGS.stateful is None:
+    if FLAGS.get('stateful', None) is None:
         stateful = config['stateful']
     else:
-        stateful = FLAGS.stateful
-        config['stateful'] = FLAGS.stateful
+        stateful = FLAGS['stateful']
+        config['stateful'] = FLAGS['stateful']
     
     if stateful:
         suffix += '_' + 'stateful'
-    
-    model_suffix = '__' + config['pretrained']
+        
+    if FLAGS.get('pretrained', None) is None:
+        model_suffix = '__' + config['pretrained']
+    else:
+        model_suffix = '__' + FLAGS['pretrained']
+        config['pretrained'] = FLAGS['pretrained']
+        
     if config['model_weights_file']:
         config['model_weights_file'] = config['model_weights_file'].format(model_suffix)
     if config['model_json_file']:
@@ -167,6 +175,6 @@ def get_config(configs, tasks, FLAGS):
         
     config.update(tasks[config['task']])
         
-    name = FLAGS.config + suffix
+    name = FLAGS['config'] + suffix
     config['_config_name'] = name
     return name, config

@@ -78,6 +78,11 @@ eval_base_config = {
     'n_plot': 20
 }
 
+add_config(configs, 'prednet_random__moments__prediction', 
+           { 'description': 'Using PredNet with random weights to evaluate predictions.',
+             'model_name': 'prednet_random',
+             'output_mode': 'prediction' }, eval_base_config)
+
 add_config(configs, 'prednet_kitti__moments__prediction', 
            { 'description': 'Using PredNet pre-trained on KITTI dataset to evaluate predictions.',
              'model_name': 'prednet_kitti',
@@ -90,7 +95,7 @@ add_config(configs, 'prednet_random__moments_audio__prediction',
              'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
              #'training_max_per_class': FRAMES_PER_VIDEO * 10,
              #'validation_max_per_class': FRAMES_PER_VIDEO * 10,
-             'model_name': 'prednet_random' }, train_base_config)
+             'model_name': 'prednet_random' }, eval_base_config)
 
 add_config(configs, 'prednet_random__moments__representation', 
            { 'description': 'Using PredNet with random weights to extract features.',
@@ -107,6 +112,11 @@ add_config(configs, 'prednet_kitti_finetuned_moments__representation',
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
              'model_name': 'prednet_kitti_finetuned_moments',
              'output_mode': 'representation' }, eval_base_config)
+
+add_config(configs, 'prednet_kitti_finetuned_moments__prediction', 
+           { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
+             'model_name': 'prednet_kitti_finetuned_moments',
+             'output_mode': 'prediction' }, eval_base_config)
 
 add_config(configs, 'prednet_random_finetuned_moments__representation', 
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',

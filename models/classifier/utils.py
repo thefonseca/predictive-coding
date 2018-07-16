@@ -35,7 +35,8 @@ def get_config_str(config):
     return config_str
 
 def get_config(configs, tasks, FLAGS):
-    config = configs[FLAGS['config']]
+    config = dict()
+    config.update(configs[FLAGS['config']])
     
     if not FLAGS['task']:
         suffix = '__' + config['task']
