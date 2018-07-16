@@ -46,7 +46,7 @@ def train(config_name, training_data_dir, base_results_dir, classes=None,
     for i in tqdm(range(len(train_generator)), desc='Loading training set'):
         X, y = next(train_iterator)
         train_X.append(X.flatten())
-        train_y.append(y[0][0])
+        train_y.append(np.argmax(y[0]))
     
     print('Training linear model...')
     clf = LinearSVC()
@@ -75,7 +75,7 @@ def evaluate_average(model, data_iterator, n_batches):
             sources.append(os.path.join(category, source))
             
         preds = model.predict([X_.flatten() for X_ in X])
-        y_pred.extend(preds)
+        y_pred.extend([int(p) for p in preds])
         y_true.extend([np.argmax(y_) for y_ in y])
         
         for j in range(len(sources)):
@@ -85,12 +85,14 @@ def evaluate_average(model, data_iterator, n_batches):
             predictions[sources[j]] = acc_pred + preds[j]
             labels[sources[j]] = np.argmax(y[j])
 
-    y_avg_true = np.array([y for source, y in sorted(labels.items())])
-    y_avg_pred = np.array([1 if predictions[s] / source_counts[s] >= 0.5 else 0 for s in sorted(predictions.keys())])
+    y_avg_true = [y for source, y in sorted(labels.items())]
+    y_avg_pred = [1 if predictions[s] / source_counts[s] >= 0.5 else 0 for s in sorted(predictions.keys())]
     
     metrics = {}
+    #print(y_true, y_pred)
     acc = accuracy_score(y_true, y_pred)
     metrics['acc'] = acc
+    #print(y_avg_true, y_avg_pred)
     acc = accuracy_score(y_avg_true, y_avg_pred)
     metrics['avg_acc'] = acc
     return metrics

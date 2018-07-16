@@ -131,6 +131,13 @@ add_config(configs, 'prednet_kitti_finetuned_moments_10c',
              'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__10c/validation',
              'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__10c/training'}, prednet_base_config)
 
+add_config(configs, 'prednet_kitti_finetuned_moments_full', 
+           { 'description': 'A convnet classifier trained on PredNet \
+(pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
+             'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__full/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__full/validation',
+             'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__full/training'}, prednet_base_config)
+
 add_config(configs, 'vgg_prednet_ensemble', 
            { 'description': 'An ensemble classifier trained on features extracted from the Moments in Time dataset.',
              'task': '2c_easy',
