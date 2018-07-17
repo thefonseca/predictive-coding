@@ -20,7 +20,7 @@ This folder contains classification models that are trained on learned represent
 | PredNet KITTI                  | 70.0 | 51.1 | 63.6 | 63.6 |
 | PredNet KITTI + Moments 1h     | 70.5 | 58.9 | 64.8 | 62.7 |
 | PredNet KITTI + Moments 3.33h  | 65.8 | 62.1 | 62.6 | 63.1 |
-| PredNet KITTI + Moments 66.6h  | _now running_ |  |  |
+| PredNet KITTI + Moments 66.6h  | _now running_ |  | 62.4 | 62.9 |
 
 #### Results: Validation set
 
