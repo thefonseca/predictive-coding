@@ -179,5 +179,6 @@ def get_config(FLAGS):
         name += '__' + 'stateful'
     
     config['_config_name'] = name
+    config['_config_name_original'] = FLAGS['config']
     config.update(tasks[config['task']])
     return name, config

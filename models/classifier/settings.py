@@ -9,16 +9,20 @@ def add_config(configs, name, config, base_config=None):
 
 configs = {}
 
-configs['vgg_imagenet__moments_nano__features'] = {
+FRAMES_PER_VIDEO = 90
+
+configs['imagenet__moments__features'] = {
     'description': 'Extract features from Moments in Time dataset',
     'input_shape': (160, 160, 3),
     'batch_size': 10,
-    'frames_per_video': 90,
-    'max_videos_per_class': 200,
+    'index_start': FRAMES_PER_VIDEO * 300,
+    'max_per_class': FRAMES_PER_VIDEO * 200,
     'sample_step': 3,
+    'task': '10c',
+    'model_type': 'vgg',
     'base_results_dir': './results',
-    'training_data_dir': '../../datasets/moments_nano_frames/training',
-    'validation_data_dir': '../../datasets/moments_nano_frames/validation'
+    'training_data_dir': '../../datasets/moments_video_frames/training',
+    'validation_data_dir': '../../datasets/moments_video_frames/validation'
 }
 
 tasks = {

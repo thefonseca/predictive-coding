@@ -82,7 +82,7 @@ def evaluate_average(model, data_iterator, n_batches):
             labels[sources[j]] = np.argmax(y[j])
 
     y_avg_true = [y for source, y in sorted(labels.items())]
-    y_avg_pred = [int(round(predictions[s] / source_counts[s])) for s in sorted(predictions.keys())]
+    y_avg_pred = [int(round(1. * predictions[s] / source_counts[s])) for s in sorted(predictions.keys())]
     
     metrics = {}
     #print(y_true, y_pred)

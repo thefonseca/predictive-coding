@@ -154,7 +154,7 @@ def evaluate_average(model, data_iterator, n_batches):
 
     metrics = {}
     y_true = K.variable(np.array([y for source, y in sorted(labels.items())]))
-    y_pred = K.variable(np.array([predictions[s] / source_counts[s] for s in sorted(predictions.keys())]))
+    y_pred = K.variable(np.array([1. * predictions[s] / source_counts[s] for s in sorted(predictions.keys())]))
 
     loss = categorical_crossentropy(y_true, y_pred)
     metrics['loss'] = K.eval(K.mean(loss))

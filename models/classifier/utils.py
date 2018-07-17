@@ -40,10 +40,10 @@ def get_config(FLAGS):
     config = dict()
     config.update(configs[FLAGS['config']])
     
-    if not FLAGS['task']:
-        suffix = '__' + config['task']
+    if FLAGS.get('task', None) is None:
+        task_suffix = '__' + config['task']
     else:
-        suffix = '__' + FLAGS['task']
+        task_suffix = '__' + FLAGS['task']
         config['task'] = FLAGS['task']
         
     if FLAGS.get('model_type', None) is None:
@@ -54,7 +54,7 @@ def get_config(FLAGS):
         
     config.update(tasks[config['task']])
     
-    name = prefix + FLAGS['config'] + suffix
+    name = prefix + FLAGS['config'] + task_suffix
     config['_config_name'] = name
     config['_config_name_original'] = FLAGS['config']
     return name, config

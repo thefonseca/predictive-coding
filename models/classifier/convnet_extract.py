@@ -13,11 +13,11 @@ from keras.applications.vgg16 import preprocess_input
 from keras.utils import to_categorical
 
 from data import DataGenerator
-from settings import configs
+import utils
+
 import argparse
 import cPickle as pkl
 from tqdm import tqdm
-
 
 def get_create_results_dir(config_name, base_results_dir):
     results_dir = os.path.join(base_results_dir, config_name)
@@ -44,17 +44,18 @@ def save_representation(features, labels, results_dir, config):
             
 
 def save_bottleneck_features(config_name, data_dir, base_results_dir, 
-                             batch_size, input_shape, frames_per_video, 
-                             max_videos_per_class, sample_step, 
+                             batch_size, input_shape, sample_step, 
+                             max_per_class, index_start=0, 
                              classes=None, **config):
     
-    max_frames_per_class = frames_per_video * max_videos_per_class
-    
-    generator = DataGenerator(batch_size=batch_size, return_sources=True,
+    generator = DataGenerator(batch_size=batch_size, 
+                              return_sources=True,
                               fn_preprocess=preprocess_input,
                               shuffle=False, sample_step=sample_step, 
-                              target_size=input_shape[:2], classes=classes,
-                              max_per_class=max_frames_per_class)
+                              target_size=input_shape[:2], 
+                              classes=classes,
+                              index_start=index_start,
+                              max_per_class=max_per_class)
     generator = generator.flow_from_directory(data_dir)
     output_generator = iter(generator)
     
@@ -89,8 +90,11 @@ if __name__ == '__main__':
     parser.add_argument('config', help='experiment config name defined in settings.py')
     FLAGS, unparsed = parser.parse_known_args()
     
-    config = configs[FLAGS.config]
+    #config = configs[FLAGS.config]
+    config_name, config = utils.get_config(vars(FLAGS))
     print('\n==> Starting feature extraction: {}'.format(config['description']))
+    config_str = utils.get_config_str(config)
+    print('\n==> Using configuration:\n{}'.format(config_str))
     
-    save_bottleneck_features(FLAGS.config, config['training_data_dir'], **config)
-    save_bottleneck_features(FLAGS.config, config['validation_data_dir'], **config)
+    save_bottleneck_features(config_name, config['training_data_dir'], **config)
+    save_bottleneck_features(config_name, config['validation_data_dir'], **config)
