@@ -124,12 +124,35 @@ add_config(configs, 'prednet_random_finetuned_moments__representation',
              'model_name': 'prednet_random_finetuned_moments',
              'output_mode': 'representation' }, eval_base_config)
 
-add_config(configs, 'prednet_kitti_finetuned_moments__ucf__representation', 
+add_config(configs, 'prednet_kitti_finetuned_moments__ucf_01__representation', 
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
              'model_name': 'prednet_kitti_finetuned_moments',
-             'training_data_dir': os.path.join(UCF_DATA_DIR, 'train'),
-             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test'),
+             'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
+             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test_01'),
              'task': 'full',
+             'pretrained': 'full',
+             'training_index_start': 0,
+             'training_max_per_class': None,
+             'output_mode': 'representation' }, eval_base_config)
+
+add_config(configs, 'prednet_kitti_finetuned_moments__ucf_02__representation', 
+           { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
+             'model_name': 'prednet_kitti_finetuned_moments',
+             'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_02'),
+             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test_02'),
+             'task': 'full',
+             'pretrained': 'full',
+             'training_index_start': 0,
+             'training_max_per_class': None,
+             'output_mode': 'representation' }, eval_base_config)
+
+add_config(configs, 'prednet_kitti_finetuned_moments__ucf_03__representation', 
+           { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
+             'model_name': 'prednet_kitti_finetuned_moments',
+             'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_03'),
+             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test_03'),
+             'task': 'full',
+             'pretrained': 'full',
              'training_index_start': 0,
              'training_max_per_class': None,
              'output_mode': 'representation' }, eval_base_config)
