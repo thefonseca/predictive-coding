@@ -168,7 +168,7 @@ if __name__ == '__main__':
     FLAGS, unparsed = parser.parse_known_args()
     
     if FLAGS.gpus:
-        os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(FLAGS.gpus))
+        os.environ["CUDA_VISIBLE_DEVICES"] = ','.join([str(g) for g in FLAGS.gpus])
     
     config_name, config = utils.get_config(vars(FLAGS))
     

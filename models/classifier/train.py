@@ -260,7 +260,7 @@ if __name__ == '__main__':
     config_name, config = utils.get_config(vars(FLAGS))
     
     if FLAGS.gpus:
-        os.environ["CUDA_VISIBLE_DEVICES"] = ','.join(str(FLAGS.gpus))
+        os.environ["CUDA_VISIBLE_DEVICES"] = ','.join([str(g) for g in FLAGS.gpus])
     
     print('\n==> Starting experiment: {}'.format(config['description']))
     config_str = utils.get_config_str(config)
