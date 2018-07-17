@@ -57,9 +57,9 @@ vgg_base_config = {
     'test_index_start': VGG_FEATURES_PER_VIDEO * 100,
     'test_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'base_results_dir': './results',
-    'training_data_dir': './results/vgg__imagenet__moments__features/training',
-    'validation_data_dir': './results/vgg__imagenet__moments__features/validation',
-    'test_data_dir': './results/vgg__imagenet__moments__features/training',
+    'training_data_dir': './results/vgg__imagenet__moments__features__10c/training',
+    'validation_data_dir': './results/vgg__imagenet__moments__features__10c/validation',
+    'test_data_dir': './results/vgg__imagenet__moments__features__10c/training',
 }
 
 add_config(configs, 'moments__vgg_imagenet', 
@@ -111,9 +111,9 @@ add_config(configs, 'prednet_kitti_moments',
 add_config(configs, 'prednet_random_moments', 
            { 'description': 'A convnet classifier trained on PredNet \
 (random weights) features extracted from the Moments in Time dataset.',
-             'training_data_dir': '../prednet/results/prednet_random__moments__representation__10c/training',
-             'validation_data_dir': '../prednet/results/prednet_random__moments__representation__10c/validation',
-             'test_data_dir': '../prednet/results/prednet_random__moments__representation__10c/training'}, prednet_base_config)
+             'training_data_dir': '../prednet/results/prednet_random__moments__representation__3c/training',
+             'validation_data_dir': '../prednet/results/prednet_random__moments__representation__3c/validation',
+             'test_data_dir': '../prednet/results/prednet_random__moments__representation__3c/training'}, prednet_base_config)
 
 add_config(configs, 'prednet_kitti_finetuned_moments_3c', 
            { 'description': 'A convnet classifier trained on PredNet \
