@@ -37,7 +37,7 @@ def convlstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
         x = TimeDistributed(Reshape(input_shape[1:]))(x)
     else:
         x = inputs
-    x = ConvLSTM2D(filters=10, kernel_size=(3, 3), dropout=drop_rate,
+    x = ConvLSTM2D(filters=200, kernel_size=(3, 3), dropout=drop_rate,
                    padding='same', return_sequences=True)(x)
     x = Conv3D(filters=1, kernel_size=(3, 3, 3), activation='sigmoid',
                padding='same', data_format='channels_last')(x)
