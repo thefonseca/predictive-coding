@@ -13,14 +13,14 @@ This folder contains classification models that are trained on learned represent
 
 #### Results: Test set
 
-| Model      | Easy (ConvLSTM) | Hard (ConvLSTM) | Easy (SVM) | Hard (SVM) |
-| -------------                  | :--:  | :--:  | :--:  | :--:  |
-| VGG ImageNet                   | 88.4 | 46.3 | 80.4 | 52.0 |
-| PredNet random                 | 52.1 | 50.5 | 60.1 | 56.5 |
-| PredNet KITTI                  | 70.0 | 51.1 | 63.6 | 63.6 |
-| PredNet KITTI + Moments 1h     | 70.5 | 58.9 | 64.8 | 62.7 |
-| PredNet KITTI + Moments 3.33h  | 65.8 | 62.1 | 62.6 | 63.1 |
-| PredNet KITTI + Moments 66.6h  | _now running_ |  | 62.4 | 62.9 |
+| Model      | Easy (ConvLSTM) | Hard (ConvLSTM) | Easy (SVM) | Hard (SVM) | 10-class (ConvLSTM) | 10-class (SVM) |
+| -------------                  | :--:  | :--:  | :--:  | :--:  | :--:  | :--:  |
+| VGG ImageNet                   | 88.4 | 46.3 | 80.4 | 52.0 | | 42.0 |
+| PredNet random                 | 52.1 | 50.5 | 60.1 | 56.5 | | |
+| PredNet KITTI                  | 70.0 | 51.1 | 63.6 | 63.6 | | |
+| PredNet KITTI + Moments 1h     | 70.5 | 58.9 | 64.8 | 62.7 | | |
+| PredNet KITTI + Moments 3.33h  | 65.8 | 62.1 | 62.6 | 63.1 | | |
+| PredNet KITTI + Moments 66.6h  | 72.6 | 72.6 | 62.4 | 62.9 | | 28.9 |
 
 #### Results: Validation set
 
@@ -32,6 +32,7 @@ This folder contains classification models that are trained on learned represent
 | PredNet KITTI + Moments 1h     | 0.470 | 0.649 | 0.778 | 0.611 |
 | PredNet KITTI + Moments 1.25h* | 0.513 | 0.668 | 0.768 | 0.595 |
 | PredNet KITTI + Moments 3.33h  | 0.583 | 0.676 | 0.778 | 0.500 |
+| PredNet KITTI + Moments 66.6h  | 0.592 | 0.666 | 0.744 | 0.533 |
 
 \* _In this run we let the model "see" the held-out labelled data_
 
