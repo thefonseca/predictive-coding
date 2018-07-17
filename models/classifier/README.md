@@ -15,7 +15,7 @@ This folder contains classification models that are trained on learned represent
 
 | Model      | Easy (ConvLSTM) | Hard (ConvLSTM) | Easy (SVM) | Hard (SVM) | 10-class (ConvLSTM) | 10-class (SVM) |
 | -------------                  | :--:  | :--:  | :--:  | :--:  | :--:  | :--:  |
-| VGG ImageNet                   | 88.4 | 46.3 | 85.0 | 66.8 | | 42.0 |
+| VGG ImageNet                   | 88.4 | 46.3 | 85.0 | 66.8 | | 36.8 |
 | PredNet random                 | 52.1 | 50.5 | 66.8 | 62.2 | | |
 | PredNet KITTI                  | 70.0 | 51.1 | 73.3 | 70.3 | | |
 | PredNet KITTI + Moments 1h     | 70.5 | 58.9 | 72.0 | 65.3 | | |
