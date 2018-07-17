@@ -111,9 +111,9 @@ add_config(configs, 'prednet_kitti_moments',
 add_config(configs, 'prednet_random_moments', 
            { 'description': 'A convnet classifier trained on PredNet \
 (random weights) features extracted from the Moments in Time dataset.',
-             'training_data_dir': '../prednet/results/prednet_random__moments__representation__3c/training',
-             'validation_data_dir': '../prednet/results/prednet_random__moments__representation__3c/validation',
-             'test_data_dir': '../prednet/results/prednet_random__moments__representation__3c/training'}, prednet_base_config)
+             'training_data_dir': '../prednet/results/prednet_random__moments__representation__10c/training',
+             'validation_data_dir': '../prednet/results/prednet_random__moments__representation__10c/validation',
+             'test_data_dir': '../prednet/results/prednet_random__moments__representation__10c/training'}, prednet_base_config)
 
 add_config(configs, 'prednet_kitti_finetuned_moments_3c', 
            { 'description': 'A convnet classifier trained on PredNet \
