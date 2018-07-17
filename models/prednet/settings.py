@@ -52,6 +52,7 @@ models = {
 
 eval_base_config = {
     'n_timesteps': 10,
+    'min_seq_length': 10,
     'frame_step': 3,
     'seq_overlap': 5,
     'timestep_start': -1,
@@ -68,7 +69,7 @@ eval_base_config = {
     # DATA
     'training_data_dir': os.path.join(DATA_DIR, 'training'),
     'validation_data_dir': os.path.join(DATA_DIR, 'validation'),
-    'task': '3c',
+    'task': '10c',
     'pretrained': '10c',
     # extract features only for the last 200 videos
     'training_index_start': FRAMES_PER_VIDEO * 300,
@@ -140,6 +141,7 @@ train_base_config.update({
     'epochs': 30,
     'batch_size': SEQUENCES_PER_VIDEO,
     'shuffle': True,
+    'task': '3c',
     #'stopping_patience': 100,
     'training_index_start': 0,
     # train on first 400 videos

@@ -9,7 +9,8 @@ from prednet import PredNet
 from settings import configs, tasks
 
 def load_model(model_json_file, model_weights_file, **extras):
-    # Load trained model
+    
+    print('Loading model: {}'.format(model_weights_file))
     f = open(model_json_file, 'r')
     json_string = f.read()
     f.close()
@@ -19,7 +20,6 @@ def load_model(model_json_file, model_weights_file, **extras):
 
 def create_model(model_json_file=None, model_weights_file=None, 
                  train=False, **config):
-    print(model_weights_file)
     if model_json_file and model_weights_file:
         pretrained_model = load_model(model_json_file, model_weights_file)
         model = pretrained_prednet(pretrained_model, train=train, **config)
@@ -148,9 +148,9 @@ def get_config(FLAGS):
     config.update(configs[FLAGS['config']])
     
     if FLAGS.get('task', None) is None:
-        suffix = '__' + config['task']
+        task_suffix = '__' + config['task']
     else:
-        suffix = '__' + FLAGS['task']
+        task_suffix = '__' + FLAGS['task']
         config['task'] = FLAGS['task']
     
     if FLAGS.get('stateful', None) is None:
@@ -159,9 +159,6 @@ def get_config(FLAGS):
         stateful = FLAGS['stateful']
         config['stateful'] = FLAGS['stateful']
     
-    if stateful:
-        suffix += '_' + 'stateful'
-        
     if FLAGS.get('pretrained', None) is None:
         model_suffix = '__' + config['pretrained']
     else:
@@ -173,8 +170,14 @@ def get_config(FLAGS):
     if config['model_json_file']:
         config['model_json_file'] = config['model_json_file'].format(model_suffix)
         
-    config.update(tasks[config['task']])
+    if config['output_mode'] in ['prediction', 'representation']:
+        name = FLAGS['config'] + model_suffix
+    else:
+        name = FLAGS['config'] + task_suffix
         
-    name = FLAGS['config'] + suffix
+    if stateful:
+        name += '__' + 'stateful'
+    
     config['_config_name'] = name
+    config.update(tasks[config['task']])
     return name, config
