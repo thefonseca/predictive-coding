@@ -57,9 +57,9 @@ vgg_base_config = {
     'test_index_start': VGG_FEATURES_PER_VIDEO * 100,
     'test_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'base_results_dir': './results',
-    'training_data_dir': './results/vgg_imagenet__moments_nano__features/training',
-    'validation_data_dir': './results/vgg_imagenet__moments_nano__features/validation',
-    'test_data_dir': './results/vgg_imagenet__moments_nano__features/training',
+    'training_data_dir': './results/vgg__imagenet__moments__features/training',
+    'validation_data_dir': './results/vgg__imagenet__moments__features/validation',
+    'test_data_dir': './results/vgg__imagenet__moments__features/training',
 }
 
 add_config(configs, 'moments__vgg_imagenet', 
