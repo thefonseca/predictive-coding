@@ -49,7 +49,7 @@ def train(config_name, training_data_dir, validation_data_dir,
           base_results_dir, test_data_dir=None, epochs=10, 
           use_multiprocessing=False, workers=1, dropout=0.5, 
           seq_length=None, sample_step=1, batch_size=10, 
-          stopping_patience=3, classes=None, input_shape=None, 
+          stopping_patience=3, classes=None, #input_shape=None, 
           max_queue_size=10, model_type='convnet', shuffle=True,
           training_index_start=0, training_max_per_class=None, 
           validation_index_start=0, validation_max_per_class=None, 
@@ -62,7 +62,7 @@ def train(config_name, training_data_dir, validation_data_dir,
                                     seq_length=seq_length,
                                     min_seq_length=min_seq_length,
                                     pad_sequences=pad_sequences,
-                                    target_size=input_shape,
+                                    #target_size=input_shape,
                                     sample_step=sample_step,
                                     rescale=rescale,
                                     fn_preprocess=resize_fn(input_height, 
@@ -76,7 +76,7 @@ def train(config_name, training_data_dir, validation_data_dir,
                                   seq_length=seq_length,
                                   min_seq_length=min_seq_length,
                                   pad_sequences=pad_sequences,
-                                  target_size=input_shape,
+                                  #target_size=input_shape,
                                   sample_step=sample_step,
                                   rescale=rescale,
                                   fn_preprocess=resize_fn(input_height, 
@@ -167,80 +167,62 @@ def evaluate_average(model, data_iterator, n_batches):
         
     return metrics
 
-def evaluate(config_name, batch_size, average_predictions=False,
+
+def evaluate(config_name, test_data_dir, batch_size, 
+             base_results_dir, classes=None,
              workers=1, use_multiprocessing=False,
-             model_type='convnet', ensemble=None, **config):
+             seq_length=None, min_seq_length=0, pad_sequences=False,
+             test_max_per_class=None, test_index_start=0,
+             model_type='convnet', average_predictions=False, 
+             input_height=None, input_width=None, **config):
     
     print('\nEvaluating model on test set...')
+    # we use the remaining part of training set as test set
+    print('Classes: {}'.format(classes))
+    generator = DataGenerator(classes=classes,
+                              batch_size=batch_size,
+                              seq_length=seq_length,
+                              min_seq_length=min_seq_length,
+                              pad_sequences=pad_sequences,
+                              return_sources=average_predictions,
+                              fn_preprocess=resize_fn(input_height, 
+                                                      input_width),
+                              index_start=test_index_start,
+                              max_per_class=test_max_per_class)
+    generator = generator.flow_from_directory(test_data_dir)
     
-    if not ensemble:
-        ensemble = [config['_config_name_original']]
-        
-    generators = []
-    data_generators = []
-    model_list = []
-    for model_config in ensemble:
-        FLAGS = configs[model_config]
-        FLAGS['config'] = model_config
-        e_config_name, e_config = utils.get_config(FLAGS)
-        
-        input_width = e_config.get('input_width', None)
-        input_height = e_config.get('input_height', None)
-        
-        generator = DataGenerator(classes=e_config['classes'],
-                                  shuffle=False,
-                                  return_sources=average_predictions,
-                                  fn_preprocess=resize_fn(input_height, 
-                                                          input_width),
-                                  rescale=e_config.get('rescale', None),
-                                  batch_size=e_config['batch_size'],
-                                  seq_length=e_config['seq_length'],
-                                  min_seq_length=e_config.get('min_seq_length', 0),
-                                  pad_sequences=e_config.get('pad_sequences', False),
-                                  target_size=e_config.get('input_shape', None),
-                                  index_start=e_config['test_index_start'],
-                                  max_per_class=e_config['test_max_per_class'])
-        data_generators.append(generator)
-        generators.append(iter(generator.flow_from_directory(e_config['test_data_dir'])))
-        
-        # load best model
-        results_dir = utils.get_create_results_dir(e_config_name, e_config['base_results_dir'])
-        checkpoint_path = os.path.join(results_dir, e_config['model_type'] + '.hdf5')       
-        model_list.append(load_model(checkpoint_path))
-    
-    if len(model_list) == 1:
-        model = model_list[0]
-        generator = generators[0]     
-    else:
-        model = models.ensemble(model_list, data_generators[0].data_shape)
-        model.compile(loss='categorical_crossentropy',
-                  optimizer='adam', metrics=['accuracy'])
-        generator = gen_multiple(generators)
-    
-    model.summary()
-    
-    if len(data_generators[0]) == 0:
+    if len(generator) == 0:
         return
+    
+    # load best model
+    results_dir = utils.get_create_results_dir(config_name, base_results_dir)
+    checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')       
+    model = load_model(checkpoint_path)
+    model.summary()
     
     if average_predictions:
         # Average predictions for sequences coming from the 
         # same source video
-        n_batches = len(data_generators[0])
+        n_batches = len(generator)
         metrics = evaluate_average(model, iter(generator), n_batches)
         metric_str = ['{}: {}'.format(m, v) for m, v in metrics.items()]
         metric_str = ' - '.join(metric_str)
     else:
-        metrics = model.evaluate_generator(generator, len(data_generators[0]),
+        metrics = model.evaluate_generator(generator, len(generator),
                                            use_multiprocessing=use_multiprocessing, 
                                            workers=workers)
         metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
         metric_str = ' - '.join(metric_str)
-        
+    
+
+    metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
+    metric_str = ' - '.join(metric_str)
     print('Test {}'.format(metric_str))
     f = open(os.path.join(results_dir, 'test.txt'), 'w')
     f.write('Test results:\n')
     f.write(metric_str)
     f.close()
+
 
 
 if __name__ == '__main__':

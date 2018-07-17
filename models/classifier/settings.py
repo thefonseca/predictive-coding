@@ -61,6 +61,7 @@ vgg_base_config = {
 add_config(configs, 'moments__vgg_imagenet', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
+             'min_seq_length': VGG_FEATURES_PER_VIDEO,
              'model_type': 'convlstm' }, vgg_base_config)
 
 add_config(configs, 'moments__images', 
@@ -138,7 +139,7 @@ add_config(configs, 'prednet_kitti_finetuned_moments_full',
              'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__full/validation',
              'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__full/training'}, prednet_base_config)
 
-add_config(configs, 'vgg_prednet_ensemble', 
+'''add_config(configs, 'vgg_prednet_ensemble', 
            { 'description': 'An ensemble classifier trained on features extracted from the Moments in Time dataset.',
              'task': '2c_easy',
              'model_type': 'convlstm',
@@ -147,7 +148,7 @@ add_config(configs, 'vgg_prednet_ensemble',
              'base_results_dir': './results',
              'ensemble': ['moments__vgg_imagenet', # 'moments__vgg_imagenet'] 
                           'prednet_kitti_finetuned_moments_10c']
-           }, dict())
+           }, dict())'''
 
 add_config(configs, 'prednet_kitti_finetuned_moments_10c__ucf', 
            { 'description': 'A convnet classifier trained on PredNet \
