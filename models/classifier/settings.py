@@ -66,8 +66,8 @@ VGG_SAMPLE_STEP = 2
 
 add_config(configs, 'moments__vgg_imagenet', 
            { 'description': 'A ConvLSTM classifier using VGG features',
-             'seq_length': (1.*VGG_FEATURES_PER_VIDEO)/VGG_SAMPLE_STEP,
-             'min_seq_length': (1.*VGG_FEATURES_PER_VIDEO)/VGG_SAMPLE_STEP,
+             'seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
+             'min_seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'sample_step': VGG_SAMPLE_STEP,
              'dropout': 0.9,
              'model_type': 'lstm' }, vgg_base_config)
