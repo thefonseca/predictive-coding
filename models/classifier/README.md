@@ -17,7 +17,7 @@ This folder contains classification models that are trained on learned represent
 | -------------                  | :--:  | :--:  | :--:  | :--:  | :--:  | :--:  |
 | VGG ImageNet                   | 88.4 | 46.3 | 85.0 | 66.8 | | 36.8 |
 | PredNet random                 | 52.1 | 50.5 | 66.8 | 62.2 | | 23.0 |
-| PredNet KITTI                  | 70.0 | 51.1 | 73.3 | 70.3 | | |
+| PredNet KITTI                  | 70.0 | 51.1 | 73.3 | 70.3 | | 24.6 |
 | PredNet KITTI + Moments 1h     | 70.5 | 58.9 | 72.0 | 65.3 | | |
 | PredNet KITTI + Moments 3.33h  | 65.8 | 62.1 | 72.8 | 65.6 | | 27.3 |
 | PredNet KITTI + Moments 66.6h  | 72.6 | 55.8 | 73.7 | 64.4 | 26.9 | 29.8 |
