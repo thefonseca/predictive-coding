@@ -235,8 +235,7 @@ if __name__ == '__main__':
                     help='classification task')
     parser.add_argument('--eval', help='perform only evaluation using pretrained model',
                         action='store_true')
-    #parser.add_argument('--gpu', help='choose a specific gpu to run', type=int)
-    parser.add_argument('--gpus', type=int, nargs='+', default=[1], help='list of gpus to use')
+    parser.add_argument('--gpus', type=int, nargs='+', help='list of gpus to use')
     
     FLAGS, unparsed = parser.parse_known_args()
     

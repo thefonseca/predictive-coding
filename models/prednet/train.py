@@ -103,8 +103,6 @@ def train(config_name, training_data_dir, validation_data_dir,
         f.write(json_string)
     
     if gpus:
-        if isinstance(gpus, str):
-            gpus = len(gpus.split(','))
         model = multi_gpu_model(model, gpus=gpus)
     
     model.summary()
@@ -164,11 +162,8 @@ if __name__ == '__main__':
     parser.add_argument('config', help='experiment config name defined in moments_settings.py')
     parser.add_argument('--stateful', help='use stateful PredNet model', action='store_true')
     parser.add_argument('--task', help='use stateful PredNet model', choices=['3c', '10c', 'full'])
-    parser.add_argument('--gpus', type=int, nargs='+', default=[0], help='list of gpus to use')
+    parser.add_argument('--gpus', type=int, help='number of gpus')
     FLAGS, unparsed = parser.parse_known_args()
-    
-    if FLAGS.gpus:
-        os.environ["CUDA_VISIBLE_DEVICES"] = ','.join([str(g) for g in FLAGS.gpus])
     
     config_name, config = utils.get_config(vars(FLAGS))
     

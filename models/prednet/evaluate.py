@@ -260,13 +260,8 @@ if __name__ == '__main__':
     parser.add_argument('--stateful', help='use stateful PredNet model', action='store_true')
     parser.add_argument('--task', help='choose dataset to evaluate', choices=['3c', '10c', 'full'])
     parser.add_argument('--pretrained', help='choose pre-trained model dataset', choices=['3c', '10c', 'full'])
-    #parser.add_argument('--gpus', help='list of gpus to use', type=str)
-    parser.add_argument('--gpus', type=int, nargs='+', default=[0], help='list of gpus to use')
     FLAGS, unparsed = parser.parse_known_args()
     config_name, config = utils.get_config(vars(FLAGS))
-    
-    if FLAGS.gpus:
-        os.environ["CUDA_VISIBLE_DEVICES"] = ','.join([str(g) for g in FLAGS.gpus])
     
     print('\n==> Starting experiment: {}\n'.format(config['description']))
     config_str = utils.get_config_str(config)
