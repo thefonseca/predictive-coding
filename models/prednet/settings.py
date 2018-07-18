@@ -4,6 +4,7 @@ DATA_DIR = '../../datasets/moments_video_frames/'
 AUDIO_DIR = '../../datasets/moments_audio_frames/'
 UCF_DATA_DIR = '../../datasets/ucf_data/'
 FRAMES_PER_VIDEO = 90
+AUDIO_FRAMES_PER_VIDEO = 30
 SEQUENCES_PER_VIDEO = 5
 
 def add_config(configs, name, config, base_config=None):
@@ -164,11 +165,11 @@ train_base_config.update({
     'epochs': 30,
     'batch_size': SEQUENCES_PER_VIDEO,
     'shuffle': True,
-    'task': '3c',
+    'task': '10c',
     #'stopping_patience': 100,
     'training_index_start': 0,
     # train on first 400 videos
-    'training_max_per_class': FRAMES_PER_VIDEO * 400,
+    'training_max_per_class': AUDIO_FRAMES_PER_VIDEO * 400,
     #'stack_sizes': (32, 64, 128, 256)
 })
 

@@ -52,11 +52,9 @@ def lstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
     inputs = Input(shape=input_shape)
+    x = TimeDistributed(Flatten())(inputs)
     if mask_value is not None:
-        x = TimeDistributed(Flatten())(inputs)
-        x = Masking(mask_value=0.0)(x)
-    else:
-        x = inputs
+        x = Masking(mask_value=mask_value)(x)
     x = LSTM(512, return_sequences=False, dropout=drop_rate)(x)
     #x = Dense(32, activation='relu')(x)
     #x = Dropout(drop_rate)(x)
