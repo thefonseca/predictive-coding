@@ -57,9 +57,9 @@ def lstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
         x = Masking(mask_value=0.0)(x)
     else:
         x = inputs
-    x = LSTM(50, return_sequences=False, dropout=drop_rate)(x)
-    x = Dense(32, activation='relu')(x)
-    x = Dropout(drop_rate)(x)
+    x = LSTM(512, return_sequences=False, dropout=drop_rate)(x)
+    #x = Dense(32, activation='relu')(x)
+    #x = Dropout(drop_rate)(x)
     predictions = Dense(n_classes, activation='softmax')(x)
     return Model(inputs=inputs, outputs=predictions)
     

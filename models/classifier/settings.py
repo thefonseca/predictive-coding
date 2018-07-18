@@ -62,11 +62,15 @@ vgg_base_config = {
     'test_data_dir': './results/vgg__imagenet__moments__features__10c/training',
 }
 
+VGG_SAMPLE_STEP = 2
+
 add_config(configs, 'moments__vgg_imagenet', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO,
              'min_seq_length': VGG_FEATURES_PER_VIDEO,
-             'model_type': 'convlstm' }, vgg_base_config)
+             'sample_step': VGG_SAMPLE_STEP,
+             'dropout': 0.9,
+             'model_type': 'lstm' }, vgg_base_config)
 
 add_config(configs, 'moments__images', 
            { 'description': 'A ConvLSTM classifier using raw images',

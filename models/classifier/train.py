@@ -169,7 +169,7 @@ def evaluate_average(model, data_iterator, n_batches):
 
 
 def evaluate(config_name, test_data_dir, batch_size, 
-             base_results_dir, classes=None,
+             base_results_dir, classes=None, sample_step=1,
              workers=1, use_multiprocessing=False,
              seq_length=None, min_seq_length=0, pad_sequences=False,
              test_max_per_class=None, test_index_start=0,
@@ -181,6 +181,7 @@ def evaluate(config_name, test_data_dir, batch_size,
     print('Classes: {}'.format(classes))
     generator = DataGenerator(classes=classes,
                               batch_size=batch_size,
+                              sample_step=sample_step,
                               seq_length=seq_length,
                               min_seq_length=min_seq_length,
                               pad_sequences=pad_sequences,
