@@ -13,10 +13,10 @@ This folder contains classification models that are trained on learned represent
 
 #### Results: Test set
 
-| Model      | 2-class easy | 2-class hard | 10-class |
+| Features + Classifier          | 2-class easy | 2-class hard | 10-class |
 | -------------                  | :--: | :--: | :--: |
 | VGG ImageNet + SVM             | 85.0 | 66.8 | 36.8 |
-| VGG ImageNet + LSTM            | 87.4 | 45.8 |  |
+| VGG ImageNet + LSTM            | 87.4 | 45.8 | 42.1 |
 | PredNet random + SVM           | 66.8 | 62.2 | 23.0 |
 | PredNet KITTI + SVM            | 73.3 | 70.3 | 24.6 |
 | PredNet Moments 3.33h + SVM    | 72.8 | 65.6 | 27.3 |
