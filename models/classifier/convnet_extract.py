@@ -45,7 +45,7 @@ def save_representation(features, labels, results_dir, config):
 
 def save_bottleneck_features(config_name, data_dir, base_results_dir, 
                              batch_size, input_shape, sample_step, 
-                             max_per_class, index_start=0, 
+                             max_per_class=None, index_start=0, 
                              classes=None, **config):
     
     generator = DataGenerator(batch_size=batch_size, 

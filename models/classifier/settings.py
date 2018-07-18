@@ -15,8 +15,8 @@ configs['imagenet__moments__features'] = {
     'description': 'Extract features from Moments in Time dataset',
     'input_shape': (160, 160, 3),
     'batch_size': 10,
-    'index_start': FRAMES_PER_VIDEO * 300,
-    'max_per_class': FRAMES_PER_VIDEO * 200,
+    #'index_start': FRAMES_PER_VIDEO * 300,
+    #'max_per_class': FRAMES_PER_VIDEO * 200,
     'sample_step': 3,
     'task': '10c',
     'model_type': 'vgg',
@@ -52,7 +52,7 @@ vgg_base_config = {
     #'workers': 4,
     #'use_multiprocessing': True,
     'task': '2c_easy',
-    #'training_index_start': VGG_FEATURES_PER_VIDEO * 300,
+    'training_index_start': VGG_FEATURES_PER_VIDEO * 300,
     'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'test_index_start': VGG_FEATURES_PER_VIDEO * 100,
     'test_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
