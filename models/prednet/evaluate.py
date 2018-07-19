@@ -202,7 +202,7 @@ def evaluate(config_name, dataset, data_dir, output_mode,
              seq_overlap=0, input_width=160, input_height=128, 
              shuffle=False, batch_size=5, max_per_class=None,
              index_start=0, stateful=False, rescale=None, 
-             min_seq_length=0, **config):
+             min_seq_length=0, pad_sequences=False, **config):
     
     model = utils.create_model(train=False, 
                                stateful=stateful, 
@@ -223,6 +223,7 @@ def evaluate(config_name, dataset, data_dir, output_mode,
                                    seq_length=n_timesteps,
                                    seq_overlap=seq_overlap,
                                    min_seq_length=min_seq_length,
+                                   pad_sequences=pad_sequences,
                                    sample_step=frame_step,
                                    target_size=None,
                                    rescale=rescale,
