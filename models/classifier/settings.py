@@ -48,7 +48,7 @@ vgg_base_config = {
     'stopping_patience': 50,
     'batch_size': 10,
     'shuffle': True,
-    'dropout': 0.5,
+    'dropout': 0.9,
     #'workers': 4,
     #'use_multiprocessing': True,
     'task': '2c_easy',
@@ -69,7 +69,6 @@ add_config(configs, 'moments__vgg_imagenet',
              'seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'min_seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'sample_step': VGG_SAMPLE_STEP,
-             'dropout': 0.9,
              'model_type': 'lstm' }, vgg_base_config)
 
 add_config(configs, 'moments__images', 
@@ -98,7 +97,7 @@ prednet_base_config.update(vgg_base_config)
 prednet_base_config.update({
     'seq_length': PREDNET_FEATURES_PER_VIDEO,
     'min_seq_length': PREDNET_FEATURES_PER_VIDEO,
-    #'training_index_start': PREDNET_FEATURES_PER_VIDEO * 300,
+    'training_index_start': 0, #PREDNET_FEATURES_PER_VIDEO * 300,
     'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class,
     'test_index_start': PREDNET_FEATURES_PER_VIDEO * 100,
     'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
@@ -146,6 +145,13 @@ add_config(configs, 'prednet_kitti_finetuned_moments_full',
              'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__full/training',
              'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__full/validation',
              'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__representation__full/training'}, prednet_base_config)
+
+add_config(configs, 'prednet_random_finetuned_moments_audio_10c',
+           { 'description': 'A classifier trained on PredNet \
+(pretrained on Moments in Time audio) features extracted from the Moments in Time dataset.',
+             'training_data_dir': '../prednet/results/prednet_random_finetuned_moments_audio__representation__10c/training',
+             'validation_data_dir': '../prednet/results/prednet_random_finetuned_moments_audio__representation__10c/validation',
+             'test_data_dir': '../prednet/results/prednet_random_finetuned_moments_audio__representation__10c/training'}, prednet_base_config)
 
 '''add_config(configs, 'vgg_prednet_ensemble', 
            { 'description': 'An ensemble classifier trained on features extracted from the Moments in Time dataset.',
