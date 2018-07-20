@@ -85,8 +85,8 @@ def train(config_name, training_data_dir, validation_data_dir,
           input_channels=3, input_width=160, input_height=128, 
           max_queue_size=10, classes=None, training_max_per_class=None, 
           frame_step=1, stateful=False, rescale=None, gpus=None,
-          validation_max_per_class=None, data_format=None, seq_overlap=0, 
-          **config):
+          validation_max_per_class=None, data_format=K.image_data_format(), 
+          seq_overlap=0, **config):
     
     model = utils.create_model(train=True, stateful=stateful,
                                input_channels=input_channels, 
@@ -109,7 +109,7 @@ def train(config_name, training_data_dir, validation_data_dir,
     model.compile(loss='mean_absolute_error', optimizer='adam')
     
     layer_config = model.layers[1].get_config()
-    data_format = layer_config['data_format'] if 'data_format' in layer_config else 'channels_first' #layer_config['dim_ordering']
+    data_format = layer_config['data_format'] if 'data_format' in layer_config else data_format #layer_config['dim_ordering']
     
     resize = lambda img: utils.resize_img(img, target_size=(input_height, 
                                                             input_width))
