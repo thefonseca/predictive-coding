@@ -48,6 +48,10 @@ models = {
     'prednet_random_finetuned_moments': {
         'model_weights_file': './results/prednet_kitti__moments__model{}/weights.hdf5',
         'model_json_file': './results/prednet_kitti__moments__model{}/model.json',
+    },
+    'prednet_random_finetuned_moments_audio': {
+        'model_weights_file': './results/prednet_kitti__moments_audio__model{}/weights.hdf5',
+        'model_json_file': './results/prednet_kitti__moments_audio__model{}/model.json',
     }
 }
 
@@ -123,6 +127,16 @@ add_config(configs, 'prednet_kitti_finetuned_moments__prediction',
 add_config(configs, 'prednet_random_finetuned_moments__representation', 
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
              'model_name': 'prednet_random_finetuned_moments',
+             'output_mode': 'representation' }, eval_base_config)
+
+add_config(configs, 'prednet_random_finetuned_moments_audio__representation', 
+           { 'description': 'Using PredNet pre-trained on Moments in Time audio dataset to extract features.',
+             'model_name': 'prednet_random_finetuned_moments_audio',
+             'frame_step': 1,
+             'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
+             'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
+             'training_index_start': AUDIO_FRAMES_PER_VIDEO * 300,
+             'training_max_per_class': AUDIO_FRAMES_PER_VIDEO * 200,
              'output_mode': 'representation' }, eval_base_config)
 
 add_config(configs, 'prednet_kitti_finetuned_moments__ucf_01__representation', 
