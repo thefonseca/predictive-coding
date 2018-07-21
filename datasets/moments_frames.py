@@ -56,19 +56,30 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
                 audio_pattern = os.path.splitext(filename)[0][:max_filename_length] + '__audio.mp4'
                 audio_path = os.path.join(frame_folder, audio_pattern)
                 ffmpeg_cmd = 'ffmpeg -hide_banner -loglevel panic -i {} -filter_complex '
-                ffmpeg_cmd += '"[0:a]showspectrum=s={}:mode=combined:slide=fullframe:'
+                #ffmpeg_cmd += '"[0:a]showspectrum=s={}:mode=combined:slide=fullframe:'
+                ffmpeg_cmd += '"[0:a]showspectrum=s={}:mode=combined:slide=scroll:'
                 # overlap=0.895 results in 10 fps videos
-                ffmpeg_cmd += 'scale=log:color=intensity:overlap=0.895[v]" -map "[v]" -map 0:a {}'
+                #ffmpeg_cmd += 'scale=log:color=intensity:overlap=0.895[v]" -map "[v]" -map 0:a {}'
+                ffmpeg_cmd += 'scale=log:color=intensity:overlap=0[v]" -map "[v]" -map 0:a {}'
                 os.system(ffmpeg_cmd.format(video, size, audio_path))
                 
-                if not os.path.exists(audio_path):
+                if os.path.exists(audio_path):
+                    # force 10fps video
+                    audio_pattern_10fps = os.path.splitext(filename)[0][:max_filename_length] + '__10fps.mp4'
+                    audio_path_10fps = os.path.join(frame_folder, audio_pattern_10fps)
+                    ffmpeg_cmd = 'ffmpeg -hide_banner -loglevel panic -y -i {} -r 10 {}'
+                    os.system(ffmpeg_cmd.format(audio_path, audio_path_10fps))
+                    os.remove(audio_path)
+                    audio_path = audio_path_10fps
+                    
+                '''if not os.path.exists(audio_path):
                     # If original video does not have audio, we create "silence" frames
                     duration_cmd = 'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {}'
                     duration = float(subprocess.check_output(duration_cmd.format(video), shell=True))
                     #print('Creating "silence" video with {} seconds'.format(duration))
                     fps = 10
                     create_cmd = 'ffmpeg -hide_banner -loglevel panic -t {} -s {} -f rawvideo -pix_fmt rgb24 -r {} -i /dev/zero {}'
-                    os.system(create_cmd.format(duration, size, fps, audio_path))
+                    os.system(create_cmd.format(duration, size, fps, audio_path))'''
                     
                 video = audio_path
             
@@ -77,7 +88,7 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
             #print('Extracting {} frames to {} ...'.format(video, frame_path))
             os.system('ffmpeg -hide_banner -loglevel panic -i "{}" "{}"'.format(video, frame_path))
             
-            if audio:
+            if audio and os.path.exists(video):
                 os.remove(video)
             
         
@@ -87,7 +98,7 @@ if __name__ == '__main__':
     parser.add_argument('source_dir', help='directory storing raw videos')
     parser.add_argument('dest_dir', help='directory for storing extracted frames')
     parser.add_argument('--splits', type=str, nargs='+', 
-                        default=['training', 'validation', 'test'],
+                        default=['training', 'validation'],
                         help='subdirs of "source_dir" containing videos for each dataset split')
     parser.add_argument('--categories', type=str, nargs='+', 
                         help='a subset of categories to be processed. Default is all categories.')
