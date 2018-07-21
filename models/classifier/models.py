@@ -6,7 +6,7 @@ from keras import backend as K
 
 
 
-def convnet(input_shape, n_classes, drop_rate=0.5):
+def convnet(input_shape, n_classes, hidden_dims, drop_rate=0.5):
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[2], input_shape[0], input_shape[1])
     
@@ -18,15 +18,15 @@ def convnet(input_shape, n_classes, drop_rate=0.5):
     model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(drop_rate))
     model.add(Flatten())
-    model.add(Dense(100))
-    #model.add(BatchNormalization())
-    model.add(Activation('relu'))
-    model.add(Dropout(drop_rate))
+    for dim in hidden_dims:
+        model.add(Dense(dim, activation='relu'))
+        #model.add(BatchNormalization())
+        model.add(Dropout(drop_rate))
     model.add(Dense(n_classes))
     model.add(Activation('softmax'))
     return model
 
-def convlstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
+def convlstm(input_shape, n_classes, hidden_dims, drop_rate=0.5, mask_value=None):
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
@@ -42,12 +42,13 @@ def convlstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
     x = Conv3D(filters=1, kernel_size=(3, 3, 3), activation='sigmoid',
                padding='same', data_format='channels_last')(x)
     x = Flatten()(x)
-    x = Dense(32, activation='relu')(x)
-    x = Dropout(drop_rate)(x)
+    for dim in hidden_dims:
+        x = Dense(dim, activation='relu')(x)
+        x = Dropout(drop_rate)(x)
     predictions = Dense(n_classes, activation='softmax')(x)
     return Model(inputs=inputs, outputs=[predictions])
 
-def lstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
+def lstm(input_shape, n_classes, hidden_dims, drop_rate=0.5, mask_value=None):
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
@@ -55,9 +56,8 @@ def lstm(input_shape, n_classes, drop_rate=0.5, mask_value=None):
     x = TimeDistributed(Flatten())(inputs)
     if mask_value is not None:
         x = Masking(mask_value=mask_value)(x)
-    x = LSTM(64, return_sequences=False, dropout=drop_rate)(x)
-    #x = Dense(32, activation='relu')(x)
-    #x = Dropout(drop_rate)(x)
+    for dim in hidden_dims:
+        x = LSTM(dim, return_sequences=False, dropout=drop_rate)(x)
     predictions = Dense(n_classes, activation='softmax')(x)
     return Model(inputs=inputs, outputs=predictions)
     

@@ -27,7 +27,7 @@ class DataGenerator(Sequence):
                  sample_step=1, seq_overlap=0, target_size=None, 
                  classes=None, data_format=K.image_data_format(), 
                  output_mode=None, rescale=None, max_seq_per_source=None, 
-                 min_seq_length=0, pad_sequences=False, return_sources=False):
+                 min_seq_length=1, pad_sequences=False, return_sources=False):
         
         'Initialization'
         self.batch_size = batch_size
@@ -141,7 +141,7 @@ class DataGenerator(Sequence):
                 for length, count in sorted(seq_length_dist.items()):
                     print('- {} sequences of length {}'.format(count, length))
                     total += count * length
-                all_samples = [s for seq in self.X for s in seq]
+                all_samples = [s for seq in self.X for s in seq if s != 'padding']
                 unique_samples = len(set(all_samples))
                 print('Total samples used: {}'.format(unique_samples)) 
             
@@ -221,9 +221,11 @@ class DataGenerator(Sequence):
         elif filename.lower().endswith(('.png', '.jpg', '.jpeg')):
             sample = self.__load_image(filename)
         elif filename == 'padding':
-            sample = np.zeros(self.data_shape[1:])
+            sample = np.zeros(self.sample_shape)
         else:
             raise ValueError('{} format is not supported'.format(filename))
+            
+        self.sample_shape = sample.shape
         return sample
     
     def __load_seq_data(self, index):
@@ -246,31 +248,6 @@ class DataGenerator(Sequence):
             
         return data
     
-    '''def __fix_incomplete_sequence(self, seq, source_seq, seqs, 
-                                  source_seqs, source):
-        
-        count = self.source_count.get(source, 0)
-        if self.max_seq_per_source and count >= self.max_seq_per_source:
-            return
-        # Check if current sequence is incomplete
-        is_incomplete = len(seq) < self.seq_length
-        has_min_length = len(seq) > max(self.seq_length - self.seq_overlap, self.seq_overlap) 
-        if is_incomplete and has_min_length and len(source_seqs) > 0:
-            prev_seq_source = source_seqs[-1][-1]
-            # If previous sequence has samples from the same source,
-            # use samples from previous sequence to complete current sequence.
-            # This is necessary because videos have variable number of frames.
-            if prev_seq_source == source:
-                previous_samples = max(self.seq_length - len(seq), self.seq_overlap) + 1
-                new_seq = seqs[-1][-previous_samples:]
-                current_samples = self.seq_length - previous_samples
-                new_seq.extend(seq[-current_samples:])
-                new_source_seq = source_seqs[-1][-previous_samples:]
-                new_source_seq.extend(source_seq[-current_samples:])
-                seqs.append(new_seq)
-                source_seqs.append(new_source_seq)
-                self.source_count[source] = count + 1'''
-        
     def __add_incomplete_sequence(self, seq, source_seq, seqs, source_seqs):
         if self.pad_sequences:
             padding_item = 'padding' #np.zeros_like(seq[-1])
@@ -315,10 +292,6 @@ class DataGenerator(Sequence):
                         self.source_count[source] = count + 1
                         break
                 else:
-                    #print('prev_source != source:', i, j)
-                    #self.__fix_incomplete_sequence(seq, source_seq, seqs, 
-                    #                               source_seqs, source)
-                    
                     if self.min_seq_length <= len(seq):
                         self.__add_incomplete_sequence(seq, source_seq, 
                                                        seqs, source_seqs)
@@ -328,9 +301,6 @@ class DataGenerator(Sequence):
                 prev_source = source
                 #print(len(sources), self.seq_overlap)
                 if j == len(sources) - 1:
-                    #print('last item', i, j)
-                    #self.__fix_incomplete_sequence(seq, source_seq, seqs, 
-                    #                               source_seqs, source)
                     if self.min_seq_length <= len(seq):
                         self.__add_incomplete_sequence(seq, source_seq, 
                                                        seqs, source_seqs)

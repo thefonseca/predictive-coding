@@ -52,6 +52,8 @@ vgg_base_config = {
     #'workers': 4,
     #'use_multiprocessing': True,
     'task': '2c_easy',
+    'model_type': 'lstm',
+    'hidden_dims': [64],
     'training_index_start': VGG_FEATURES_PER_VIDEO * 300,
     'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
     'test_index_start': VGG_FEATURES_PER_VIDEO * 100,
@@ -63,32 +65,31 @@ vgg_base_config = {
 }
 
 VGG_SAMPLE_STEP = 2
+FRAME_SAMPLE_STEP = 6
 
 add_config(configs, 'moments__vgg_imagenet', 
            { 'description': 'A ConvLSTM classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'min_seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
-             'sample_step': VGG_SAMPLE_STEP,
-             'model_type': 'lstm' }, vgg_base_config)
+             'sample_step': VGG_SAMPLE_STEP }, vgg_base_config)
 
 add_config(configs, 'moments__images', 
            { 'description': 'A ConvLSTM classifier using raw images',
-             'seq_length': 10,
-             'sample_step': 3,
-             'batch_size': 5,
+             'seq_length': FRAMES_PER_VIDEO/FRAME_SAMPLE_STEP,
+             'sample_step': FRAME_SAMPLE_STEP,
              'input_channels': 3, 
              'input_height': 128, 
              'input_width': 160,
              'rescale': 1./255,
-             'training_max_per_class': VGG_FEATURES_PER_VIDEO * 100,
+             'training_index_start': FRAMES_PER_VIDEO * 300,
+             'training_max_per_class': FRAMES_PER_VIDEO * 100,
              #'test_max_per_class': VGG_FEATURES_PER_VIDEO * 5,
              #'validation_max_per_class': VGG_FEATURES_PER_VIDEO * 10,
              'pad_sequences': True,
              'average_predictions': True,
              'training_data_dir': '../../datasets/moments_video_frames/training',
              'validation_data_dir': '../../datasets/moments_video_frames/validation',
-             'test_data_dir': '../../datasets/moments_video_frames/training',
-             'model_type': 'convlstm' }, vgg_base_config)
+             'test_data_dir': '../../datasets/moments_video_frames/training' }, vgg_base_config)
 
 PREDNET_FEATURES_PER_VIDEO = 5
 
@@ -101,7 +102,8 @@ prednet_base_config.update({
     'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class,
     'test_index_start': PREDNET_FEATURES_PER_VIDEO * 100,
     'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
-    'model_type': 'convlstm'
+    'hidden_dims': [64],
+    'model_type': 'lstm'
 })
 
 add_config(configs, 'prednet_kitti_moments', 
@@ -168,9 +170,10 @@ add_config(configs, 'prednet_kitti_finetuned_moments_10c__ucf',
            { 'description': 'A convnet classifier trained on PredNet \
 (pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
              'task': 'full',
-             'model_type': 'convnet',
              'seq_length': None,
              'batch_size': 50,
+             'min_seq_length': 1,
+             'pad_sequences': True,
              'average_predictions': True,
              'training_max_per_class': .9,
              'training_index_start': 0,

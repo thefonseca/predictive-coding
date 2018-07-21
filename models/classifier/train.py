@@ -46,10 +46,10 @@ def resize_fn(input_height, input_width):
     return resize
     
 def train(config_name, training_data_dir, validation_data_dir, 
-          base_results_dir, test_data_dir=None, epochs=10, 
-          use_multiprocessing=False, workers=1, dropout=0.5, 
-          seq_length=None, sample_step=1, batch_size=10, 
-          stopping_patience=3, classes=None, #input_shape=None, 
+          base_results_dir, hidden_dims, test_data_dir=None, 
+          epochs=10, use_multiprocessing=False, workers=1, 
+          dropout=0.5, seq_length=None, sample_step=1, 
+          batch_size=10, stopping_patience=3, classes=None, 
           max_queue_size=10, model_type='convnet', shuffle=True,
           training_index_start=0, training_max_per_class=None, 
           validation_index_start=0, validation_max_per_class=None, 
@@ -96,8 +96,8 @@ def train(config_name, training_data_dir, validation_data_dir,
     
     model_fn = getattr(models, model_type)
     mask_value = 0. if pad_sequences else None
-    model = model_fn(input_shape, n_classes, drop_rate=dropout, 
-                     mask_value=mask_value)
+    model = model_fn(input_shape, n_classes, hidden_dims,
+                     drop_rate=dropout, mask_value=mask_value)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')
     csv_path = os.path.join(results_dir, model_type + '.log')
 
@@ -168,7 +168,7 @@ def evaluate_average(model, data_iterator, n_batches):
     return metrics
 
 
-def evaluate(config_name, test_data_dir, batch_size, 
+def evaluate(config_name, test_data_dir, #batch_size, 
              base_results_dir, classes=None, sample_step=1,
              workers=1, use_multiprocessing=False,
              seq_length=None, min_seq_length=0, pad_sequences=False,
@@ -180,7 +180,7 @@ def evaluate(config_name, test_data_dir, batch_size,
     # we use the remaining part of training set as test set
     print('Classes: {}'.format(classes))
     generator = DataGenerator(classes=classes,
-                              batch_size=batch_size,
+                              batch_size=1,
                               sample_step=sample_step,
                               seq_length=seq_length,
                               min_seq_length=min_seq_length,
