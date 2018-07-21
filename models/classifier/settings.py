@@ -166,11 +166,11 @@ add_config(configs, 'prednet_random_finetuned_moments_audio_10c',
                           'prednet_kitti_finetuned_moments_10c']
            }, dict())'''
 
-add_config(configs, 'prednet_kitti_finetuned_moments_10c__ucf', 
-           { 'description': 'A convnet classifier trained on PredNet \
+add_config(configs, 'prednet_kitti_finetuned_moments_full__ucf_01', 
+           { 'description': 'A classifier trained on PredNet \
 (pretrained on Moments in Time) features extracted from the Moments in Time dataset.',
              'task': 'full',
-             'seq_length': None,
+             'seq_length': PREDNET_FEATURES_PER_VIDEO,
              'batch_size': 50,
              'min_seq_length': 1,
              'pad_sequences': True,
@@ -180,6 +180,6 @@ add_config(configs, 'prednet_kitti_finetuned_moments_10c__ucf',
              'validation_index_start': .9,
              'test_max_per_class': None,
              'test_index_start': 0,
-             'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf__representation__full/training',
-             'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf__representation__full/training',
-             'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf__representation__full/validation'}, prednet_base_config)
+             'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf_01__representation__full/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf_01__representation__full/training',
+             'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf_01__representation__full/validation'}, prednet_base_config)
