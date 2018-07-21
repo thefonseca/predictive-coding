@@ -16,7 +16,7 @@ This folder contains classification models that are trained on learned represent
 | Features + Classifier           | 2-class easy | 2-class hard | 10-class |
 | -------------                   | :--: | :--: | :--: |
 | VGG ImageNet + SVM              | 85.0 | 66.8 | 36.8 |
-| VGG ImageNet + LSTM             | 87.4 | 45.8 | 42.1 |
+| VGG ImageNet + LSTM             | 87.4 | 58.4 | 43.2 |
 | PredNet random + SVM            | 66.8 | 62.2 | 23.0 |
 | PredNet KITTI + SVM             | 73.3 | 70.3 | 24.6 |
 | PredNet Moments 3.3h + SVM      | 72.8 | 65.6 | 27.3 |
@@ -24,22 +24,12 @@ This folder contains classification models that are trained on learned represent
 | PredNet Moments 66.6h + LSTM    | 82.6 | 55.8 | 37.1 |
 
 
-| Model      | Easy (ConvLSTM) | Hard (ConvLSTM) | Easy (SVM) | Hard (SVM) | 10-class (ConvLSTM) | 10-class (SVM) |
-| -------------                  | :--:  | :--:  | :--:  | :--:  | :--:  | :--:  |
-| VGG ImageNet                   | 88.4 | 46.3 | 85.0 | 66.8 | | 36.8 |
-| VGG ImageNet LSTM              | 87.4 | 45.8 |  |  | | |
-| PredNet random                 | 52.1 | 50.5 | 66.8 | 62.2 | | 23.0 |
-| PredNet KITTI                  | 70.0 | 51.1 | 73.3 | 70.3 | | 24.6 |
-| PredNet KITTI + Moments 1h     | 70.5 | 58.9 | 72.0 | 65.3 | | |
-| PredNet KITTI + Moments 3.3h   | 65.8 | 62.1 | 72.8 | 65.6 | | 27.3 |
-| PredNet KITTI + Moments 66.6h  | 72.6 | 55.8 | 73.7 | 64.4 | 26.9 | 29.8 |
-
 #### Results: Validation set
 
 | Model    | Easy (loss) | Hard (loss) | Easy (acc) | Hard (acc) |    
 | -------------                  | :---: | :---: | :---: | :---: |
 | VGG ImageNet                   | 0.274 | 0.688 | 0.867 | 0.578 |
-| VGG ImageNet LSTM              | 0.191 | 0.733 | 0.956 | 0.578 |
+| VGG ImageNet LSTM              | 0.224 | 0.634 | 0.933 | 0.689 |
 | PredNet random                 | 0.690 | 0.694 | 0.544 | 0.556 |
 | PredNet KITTI                  | 0.582 | 0.685 | 0.722 | 0.622 |
 | PredNet KITTI + Moments 1h     | 0.470 | 0.649 | 0.778 | 0.611 |
