@@ -1,7 +1,7 @@
 from keras.models import Sequential, Model
 from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D, LSTM, TimeDistributed
 from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
-from keras.layers import Input, Average, Masking, Reshape
+from keras.layers import Input, Average, Masking, Reshape, Lambda
 from keras import backend as K
 
 import sys
@@ -64,7 +64,25 @@ def lstm(input_shape, n_classes, hidden_dims, drop_rate=0.5, mask_value=None):
     predictions = Dense(n_classes, activation='softmax')(x)
     return Model(inputs=inputs, outputs=predictions)
 
-def prednet(input_shape, n_classes, hidden_dims, 
+def crop(dimension, start, end=None):
+    # Crops (or slices) a Tensor on a given dimension from start to end
+    # example : to crop tensor x[:, :, 5:10]
+    # call slice(2, 5, 10) as you want to crop on the second dimension
+    # See https://github.com/keras-team/keras/issues/890
+    def func(x):
+        if dimension == 0:
+            return x[start: end]
+        if dimension == 1:
+            return x[:, start: end]
+        if dimension == 2:
+            return x[:, :, start: end]
+        if dimension == 3:
+            return x[:, :, :, start: end]
+        if dimension == 4:
+            return x[:, :, :, :, start: end]
+    return Lambda(func)
+
+def pred_lstm(input_shape, n_classes, hidden_dims, 
             drop_rate=0.5, mask_value=None, **config):
     if config is None:
         config = {}
@@ -79,6 +97,26 @@ def prednet(input_shape, n_classes, hidden_dims,
         x = Masking(mask_value=mask_value)(x)
     for dim in hidden_dims:
         x = LSTM(dim, return_sequences=False, dropout=drop_rate)(x)
+    predictions = Dense(n_classes, activation='softmax')(x)
+    model = Model(inputs=model.inputs, outputs=predictions)
+    return model
+
+def prednet(input_shape, n_classes, hidden_dims, 
+            drop_rate=0.5, mask_value=None, **config):
+    if config is None:
+        config = {}
+    
+    config['input_height'] = input_shape[1]
+    config['input_width'] = input_shape[2]
+    config['input_channels'] = input_shape[3]
+        
+    model = prednet_model.create_model(train=False, output_mode='representation', **config)
+    x = crop(1, -1)(model.outputs[0])   
+    x = Flatten()(x)
+    
+    for dim in hidden_dims:
+        x = Dense(dim, activation='relu')(x)
+        x = Dropout(drop_rate)(x)
     predictions = Dense(n_classes, activation='softmax')(x)
     model = Model(inputs=model.inputs, outputs=predictions)
     return model
