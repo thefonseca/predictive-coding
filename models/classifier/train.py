@@ -54,7 +54,8 @@ def train(config_name, training_data_dir, validation_data_dir,
           training_index_start=0, training_max_per_class=None, 
           validation_index_start=0, validation_max_per_class=None, 
           input_width=None, input_height=None, rescale=None,
-          min_seq_length=0, pad_sequences=False, **config):
+          min_seq_length=0, pad_sequences=False, 
+          data_format=K.image_data_format(), **config):
     
     train_generator = DataGenerator(batch_size=batch_size,
                                     shuffle=shuffle,
@@ -65,6 +66,7 @@ def train(config_name, training_data_dir, validation_data_dir,
                                     #target_size=input_shape,
                                     sample_step=sample_step,
                                     rescale=rescale,
+                                    data_format=data_format,
                                     fn_preprocess=resize_fn(input_height, 
                                                             input_width),
                                     index_start=training_index_start,
@@ -97,7 +99,7 @@ def train(config_name, training_data_dir, validation_data_dir,
     model_fn = getattr(models, model_type)
     mask_value = 0. if pad_sequences else None
     model = model_fn(input_shape, n_classes, hidden_dims,
-                     drop_rate=dropout, mask_value=mask_value)
+                     drop_rate=dropout, mask_value=mask_value, **config)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')
     csv_path = os.path.join(results_dir, model_type + '.log')
 
@@ -174,7 +176,8 @@ def evaluate(config_name, test_data_dir,
              seq_length=None, min_seq_length=0, pad_sequences=False,
              test_max_per_class=None, test_index_start=0,
              model_type='convnet', average_predictions=False, 
-             input_height=None, input_width=None, **config):
+             input_height=None, input_width=None, 
+             data_format=K.image_data_format(), **config):
     
     print('\nEvaluating model on test set...')
     # we use the remaining part of training set as test set
@@ -186,6 +189,7 @@ def evaluate(config_name, test_data_dir,
                               min_seq_length=min_seq_length,
                               pad_sequences=pad_sequences,
                               return_sources=average_predictions,
+                              data_format=data_format,
                               fn_preprocess=resize_fn(input_height, 
                                                       input_width),
                               index_start=test_index_start,
