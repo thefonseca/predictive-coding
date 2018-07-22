@@ -1,3 +1,4 @@
+import os
 
 def add_config(configs, name, config, base_config=None):
     new_config = dict()
@@ -196,10 +197,10 @@ add_config(configs, 'prednet_end2end_finetuned_moments_full__ucf_01',
              'input_height': 128, 
              'input_width': 160,
              'rescale': 1./255,
-             'batch_size': 20,
+             'batch_size': 10,
              'pad_sequences': True,
              'model_type': 'prednet',
-             'hidden_dims': [32],
+             'hidden_dims': [64],
              'average_predictions': True,
              'training_max_per_class': .9,
              'training_index_start': 0,
@@ -208,4 +209,6 @@ add_config(configs, 'prednet_end2end_finetuned_moments_full__ucf_01',
              'test_index_start': 0,
              'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
              'validation_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
-             'test_data_dir': os.path.join(UCF_DATA_DIR, 'test_01') }, prednet_base_config)
+             'test_data_dir': os.path.join(UCF_DATA_DIR, 'test_01'),
+             'model_weights_file': '../prednet/results/prednet_kitti__moments__model__full/weights.hdf5',
+             'model_json_file': '../prednet/results/prednet_kitti__moments__model__full/model.json' }, prednet_base_config)
