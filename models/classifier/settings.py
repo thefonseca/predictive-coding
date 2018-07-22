@@ -100,9 +100,9 @@ prednet_base_config.update({
     'seq_length': PREDNET_FEATURES_PER_VIDEO,
     'min_seq_length': PREDNET_FEATURES_PER_VIDEO,
     'training_index_start': 0, #PREDNET_FEATURES_PER_VIDEO * 300,
-    'training_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class,
-    'test_index_start': PREDNET_FEATURES_PER_VIDEO * 100,
-    'test_max_per_class': PREDNET_FEATURES_PER_VIDEO * 100, # features_per_video * max_videos_per_class
+    'training_max_per_class': 0.5,
+    'test_index_start': 0.5,
+    'test_max_per_class': None, # features_per_video * max_videos_per_class
     'hidden_dims': [64],
     'model_type': 'lstm'
 })
@@ -200,7 +200,7 @@ add_config(configs, 'prednet_end2end_finetuned_moments_full__ucf_01',
              'rescale': 1./255,
              'batch_size': 10,
              'pad_sequences': True,
-             'model_type': 'prednet',
+             'model_type': 'pred_lstm',
              'hidden_dims': [32],
              'average_predictions': True,
              'training_max_per_class': .9,

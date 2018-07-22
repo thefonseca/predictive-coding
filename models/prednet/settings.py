@@ -69,16 +69,14 @@ eval_base_config = {
     'rescale': 1./255,
     'shuffle': False,
     'workers': 4,
-    #'gpus': 2,
-    #'use_multiprocessing': True,
     # DATA
     'training_data_dir': os.path.join(DATA_DIR, 'training'),
     'validation_data_dir': os.path.join(DATA_DIR, 'validation'),
     'task': '10c',
     'pretrained': '10c',
-    # extract features only for the last 200 videos
-    'training_index_start': FRAMES_PER_VIDEO * 300,
-    'training_max_per_class': FRAMES_PER_VIDEO * 200,
+    # extract features only for the last 40% videos
+    'training_index_start': 0.6,
+    'training_max_per_class': 0.4,
     # RESULTS
     'base_results_dir': './results/',
     'n_plot': 20
@@ -99,8 +97,6 @@ add_config(configs, 'prednet_random__moments_audio__prediction',
              'frame_step': 1,
              'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
              'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
-             #'training_max_per_class': FRAMES_PER_VIDEO * 10,
-             #'validation_max_per_class': FRAMES_PER_VIDEO * 10,
              'model_name': 'prednet_random' }, eval_base_config)
 
 add_config(configs, 'prednet_random__moments__representation', 
@@ -135,8 +131,8 @@ add_config(configs, 'prednet_random_finetuned_moments_audio__representation',
              'frame_step': 1,
              'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
              'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
-             'training_index_start': AUDIO_FRAMES_PER_VIDEO * 300,
-             'training_max_per_class': AUDIO_FRAMES_PER_VIDEO * 200,
+             'training_index_start': 0.6, #AUDIO_FRAMES_PER_VIDEO * 300,
+             'training_max_per_class': 0.4, #AUDIO_FRAMES_PER_VIDEO * 200,
              'output_mode': 'representation' }, eval_base_config)
 
 add_config(configs, 'prednet_kitti_finetuned_moments__ucf_01__representation', 
@@ -183,13 +179,14 @@ train_base_config.update(eval_base_config)
 train_base_config.update({
     'output_mode': 'error',
     'epochs': 30,
-    'batch_size': SEQUENCES_PER_VIDEO,
+    'batch_size': 4 * SEQUENCES_PER_VIDEO,
     'shuffle': True,
     'task': '10c',
+    'gpus': 2,
     #'stopping_patience': 100,
     'training_index_start': 0,
-    # train on first 400 videos
-    'training_max_per_class': AUDIO_FRAMES_PER_VIDEO * 400,
+    # train on first 80% videos
+    'training_max_per_class': 0.8, #AUDIO_FRAMES_PER_VIDEO * 400,
     #'stack_sizes': (32, 64, 128, 256)
 })
 
@@ -206,6 +203,4 @@ add_config(configs, 'prednet_random__moments_audio__model',
              'frame_step': 1,
              'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
              'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
-             #'training_max_per_class': FRAMES_PER_VIDEO * 10,
-             #'validation_max_per_class': FRAMES_PER_VIDEO * 10,
              'model_name': 'prednet_random' }, train_base_config)

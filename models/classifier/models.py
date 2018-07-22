@@ -51,7 +51,8 @@ def convlstm(input_shape, n_classes, hidden_dims, drop_rate=0.5, mask_value=None
     predictions = Dense(n_classes, activation='softmax')(x)
     return Model(inputs=inputs, outputs=[predictions])
 
-def lstm(input_shape, n_classes, hidden_dims, drop_rate=0.5, mask_value=None):
+def lstm(input_shape, n_classes, hidden_dims, 
+         drop_rate=0.5, mask_value=None, **config):
     if K.image_data_format() == 'channels_first':
         input_shape = (input_shape[0], input_shape[3], input_shape[1], input_shape[2])
     
