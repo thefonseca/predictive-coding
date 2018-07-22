@@ -4,6 +4,9 @@ from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras.layers import Input, Average, Masking, Reshape
 from keras import backend as K
 
+import sys
+sys.path.append("../prednet")
+import prednet_model
 
 
 def convnet(input_shape, n_classes, hidden_dims, drop_rate=0.5):
@@ -60,6 +63,25 @@ def lstm(input_shape, n_classes, hidden_dims, drop_rate=0.5, mask_value=None):
         x = LSTM(dim, return_sequences=False, dropout=drop_rate)(x)
     predictions = Dense(n_classes, activation='softmax')(x)
     return Model(inputs=inputs, outputs=predictions)
+
+def prednet(input_shape, n_classes, hidden_dims, 
+            drop_rate=0.5, mask_value=None, **config):
+    if config is None:
+        config = {}
+    
+    config['input_height'] = input_shape[1]
+    config['input_width'] = input_shape[2]
+    config['input_channels'] = input_shape[3]
+        
+    model = prednet_model.create_model(train=False, output_mode='R3', **config)
+    x = TimeDistributed(Flatten())(model.outputs[0])
+    if mask_value is not None:
+        x = Masking(mask_value=mask_value)(x)
+    for dim in hidden_dims:
+        x = LSTM(dim, return_sequences=False, dropout=drop_rate)(x)
+    predictions = Dense(n_classes, activation='softmax')(x)
+    model = Model(inputs=model.inputs, outputs=predictions)
+    return model
     
 def ensemble(models, input_shape):
     if models and len(models) < 2:

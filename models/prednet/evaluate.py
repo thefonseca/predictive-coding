@@ -14,8 +14,8 @@ import math
 from keras import backend as K
 
 from prednet import PredNet
-#from settings import configs, tasks
 import utils
+import prednet_model
 import sys
 sys.path.append("../classifier")
 from data import DataGenerator
@@ -204,12 +204,12 @@ def evaluate(config_name, dataset, data_dir, output_mode,
              index_start=0, stateful=False, rescale=None, 
              min_seq_length=0, pad_sequences=False, **config):
     
-    model = utils.create_model(train=False, 
-                               stateful=stateful, 
-                               batch_size=batch_size, 
-                               input_width=input_width, 
-                               input_height=input_height,
-                               output_mode=output_mode, **config)
+    model = prednet_model.create_model(train=False, 
+                                       stateful=stateful, 
+                                       batch_size=batch_size, 
+                                       input_width=input_width, 
+                                       input_height=input_height,
+                                       output_mode=output_mode, **config)
     model.summary()
     
     layer_config = model.layers[1].get_config()

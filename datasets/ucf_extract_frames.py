@@ -82,10 +82,10 @@ def get_video_parts(video_path):
     return train_or_test, classname, filename_no_ext, filename
 
 def check_already_extracted(video_parts):
-    """Check to see if we created the -0001 frame of this file."""
+    """Check to see if we created the _0001 frame of this file."""
     train_or_test, classname, filename_no_ext, _ = video_parts
     return bool(os.path.exists(train_or_test + '/' + classname +
-                               '/' + filename_no_ext + '-0001.jpg'))
+                               '/' + filename_no_ext + '_0001.jpg'))
 
 def main():
     """

@@ -28,8 +28,8 @@ tf.set_random_seed(1234)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
 K.set_session(sess)
 
-#from settings import configs, tasks
 import utils
+import prednet_model
 import argparse
 import sys
 sys.path.append("../classifier")
@@ -88,11 +88,11 @@ def train(config_name, training_data_dir, validation_data_dir,
           validation_max_per_class=None, data_format=K.image_data_format(), 
           seq_overlap=0, **config):
     
-    model = utils.create_model(train=True, stateful=stateful,
-                               input_channels=input_channels, 
-                               input_width=input_width, 
-                               batch_size=batch_size,
-                               input_height=input_height, **config)
+    model = prednet_model.create_model(train=True, stateful=stateful,
+                                       input_channels=input_channels, 
+                                       input_width=input_width, 
+                                       batch_size=batch_size,
+                                       input_height=input_height, **config)
     
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     callbacks = get_callbacks(model, results_dir, stopping_patience, stateful)

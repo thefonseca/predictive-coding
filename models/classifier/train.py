@@ -168,7 +168,7 @@ def evaluate_average(model, data_iterator, n_batches):
     return metrics
 
 
-def evaluate(config_name, test_data_dir, #batch_size, 
+def evaluate(config_name, test_data_dir,
              base_results_dir, classes=None, sample_step=1,
              workers=1, use_multiprocessing=False,
              seq_length=None, min_seq_length=0, pad_sequences=False,
@@ -215,15 +215,11 @@ def evaluate(config_name, test_data_dir, #batch_size,
         metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
         metric_str = ' - '.join(metric_str)
     
-
-    metric_str = ['{}: {}'.format(m, v) for m, v in zip(model.metrics_names, metrics)]
-    metric_str = ' - '.join(metric_str)
     print('Test {}'.format(metric_str))
     f = open(os.path.join(results_dir, 'test.txt'), 'w')
     f.write('Test results:\n')
     f.write(metric_str)
     f.close()
-
 
 
 if __name__ == '__main__':
