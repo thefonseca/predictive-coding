@@ -62,10 +62,10 @@ class DataGenerator(Sequence):
         for i, c in enumerate(self.classes):
             class_samples = sorted(glob.glob(os.path.join(data_dir, data_pattern.format(c))))
             total_samples += self.__process_class_samples(i, class_samples, class_samples)
-            
+        
         msg = 'Found {} samples belonging to {} classes in {}'
         print(msg.format(total_samples, len(self.classes), self.data_dir))
-            
+
         self.__postprocess()
         return self
         
@@ -85,7 +85,7 @@ class DataGenerator(Sequence):
             
         msg = 'Found {} samples belonging to {} classes'
         print(msg.format(total_samples, len(self.classes)))
-            
+        
         self.__postprocess()
         return self
     
@@ -120,6 +120,7 @@ class DataGenerator(Sequence):
         if len(self.X) == 0:
             print('No data found in {}!'.format(self.data_dir))
         else:
+            self.sources = []
             
             if self.seq_length:
                 # Check sequence counts consistency
@@ -132,6 +133,12 @@ class DataGenerator(Sequence):
                 for seq in self.X:
                     count_per_length = seq_length_dist.get(len(seq), 0)
                     seq_length_dist[len(seq)] = count_per_length + 1
+                    
+                    # get sources (e.g. videos)
+                    for sample in seq:
+                        source = '__'.join(sample.split('__')[:-1])
+                        if len(source) > 0 and source != 'padding':
+                            self.sources.append(source)
                 
                 msg = 'Found {} sequences belonging to {} classes'
                 print(msg.format(len(self.X), self.n_classes))
@@ -143,7 +150,16 @@ class DataGenerator(Sequence):
                     total += count * length
                 all_samples = [s for seq in self.X for s in seq if s != 'padding']
                 unique_samples = len(set(all_samples))
-                print('Total samples used: {}'.format(unique_samples)) 
+                print('Total samples used: {}'.format(unique_samples))
+                
+            else:
+                for x in self.X:
+                    source = '__'.join(x.split('__')[:-1])
+                    if len(source) > 0 and source != 'padding':
+                        self.sources.append(source)
+                
+            self.sources = sorted(list(set(self.sources)))
+            print('Total sources used: {}'.format(len(self.sources)))
             
             self.data_shape = self.__load_data(0).shape
             print('Data shape: {}'.format(self.data_shape))
