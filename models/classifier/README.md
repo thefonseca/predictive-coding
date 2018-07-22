@@ -49,7 +49,7 @@ This folder contains classification models that are trained on learned represent
 | CNN tuple verification [1]  | 50.2 | UCF-101         | 2.7M  |
 | Random LSTM [2]             | 74.5 | -       | 0     |
 | Composite LSTM [2]          | 75.8 | Sports-1M       | 32.4M |
-| PredNet                     | _coming soon_ | Moments in Time | 2.4M  |
+| PredNet                     | 51.9 | Moments in Time | 2.4M  |
 | PredNet finetuned           | _coming soon_ | Moments in Time | 2.4M  |
 
 [1] Misra, I., Zitnick, C. L., & Hebert, M. (2016, October). [Shuffle and learn: unsupervised learning using temporal order verification](https://link.springer.com/chapter/10.1007/978-3-319-46448-0_32). In European Conference on Computer Vision (pp. 527-544). Springer, Cham.
