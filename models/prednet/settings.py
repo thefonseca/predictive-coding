@@ -178,8 +178,8 @@ train_base_config = dict()
 train_base_config.update(eval_base_config)
 train_base_config.update({
     'output_mode': 'error',
-    'epochs': 30,
-    'batch_size': 4 * SEQUENCES_PER_VIDEO,
+    'epochs': 50,
+    'batch_size': 2 * SEQUENCES_PER_VIDEO,
     'shuffle': True,
     'task': '10c',
     'gpus': 2,
@@ -197,6 +197,15 @@ add_config(configs, 'prednet_kitti__moments__model',
 add_config(configs, 'prednet_random__moments__model', 
            { 'description': 'Training PredNet from scratch on Moments in Time dataset.',
              'model_name': 'prednet_random' }, train_base_config)
+
+add_config(configs, 'prednet__ucf_01__model', 
+           { 'description': 'Training PredNet on UCF-101 (split 1) dataset.',
+             'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
+             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test_01'),
+             'task': 'full',
+             'pretrained': 'full',
+             'training_max_per_class': 0.9,
+             'model_name': 'prednet_kitti_finetuned_moments' }, train_base_config)
 
 add_config(configs, 'prednet_random__moments_audio__model', 
            { 'description': 'Training PredNet from scratch on Moments in Time dataset audio spectrograms.',
