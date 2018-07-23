@@ -77,12 +77,14 @@ def evaluate_average(model, data_iterator, n_batches):
         for j in range(len(sources)):
             s_count = source_counts.get(sources[j], 0)
             source_counts[sources[j]] = s_count + 1
-            acc_pred = predictions.get(sources[j], np.zeros_like(preds[j]))
-            predictions[sources[j]] = acc_pred + preds[j]
+            acc_pred = predictions.get(sources[j], np.zeros_like(y[j]))
+            acc_pred[int(preds[j])] += 1
+            predictions[sources[j]] = acc_pred
             labels[sources[j]] = np.argmax(y[j])
 
     y_avg_true = [y for source, y in sorted(labels.items())]
-    y_avg_pred = [int(round((1. * predictions[s]) / source_counts[s])) for s in sorted(predictions.keys())]
+    #y_avg_pred = [int(round((1. * predictions[s]) / source_counts[s])) for s in sorted(predictions.keys())]
+    y_avg_pred = [np.argmax(predictions[s]) for s in sorted(predictions.keys())]
     
     metrics = {}
     #print(y_true, y_pred)

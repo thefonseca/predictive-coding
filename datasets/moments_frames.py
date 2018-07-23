@@ -1,7 +1,6 @@
 import os
 import glob
 from tqdm import tqdm
-import pickle as pkl
 import argparse
 import subprocess
 
