@@ -150,6 +150,13 @@ add_config(configs, 'prednet_random_finetuned_moments_audio_10c',
              'validation_data_dir': '../prednet/results/prednet_random_finetuned_moments_audio__representation__10c/validation',
              'test_data_dir': '../prednet/results/prednet_random_finetuned_moments_audio__representation__10c/training'}, prednet_base_config)
 
+add_config(configs, 'prednet_random_moments_audio',
+           { 'description': 'A classifier trained on PredNet \
+(pretrained on Moments in Time audio) features extracted from the Moments in Time dataset.',
+             'training_data_dir': '../prednet/results/prednet_random__moments_audio__representation__10c/training',
+             'validation_data_dir': '../prednet/results/prednet_random__moments_audio__representation__10c/validation',
+             'test_data_dir': '../prednet/results/prednet_random__moments_audio__representation__10c/training'}, prednet_base_config)
+
 '''add_config(configs, 'vgg_prednet_ensemble', 
            { 'description': 'An ensemble classifier trained on features extracted from the Moments in Time dataset.',
              'task': '2c_easy',
