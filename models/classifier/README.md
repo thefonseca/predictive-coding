@@ -15,12 +15,12 @@ This folder contains classification models that are trained on learned represent
 
 | Features + Classifier           | 2-class easy | 2-class hard | 10-class |
 | -------------                   | :--: | :--: | :--: |
-| VGG ImageNet + SVM              | 85.0 | 66.8 | 36.8 |
+| VGG ImageNet + SVM              | 85.5 | 67.0 | 52.8 |
 | VGG ImageNet + LSTM             | 87.4 | 58.4 | 43.2 |
-| PredNet random + SVM            | 66.8 | 62.2 | 23.0 |
-| PredNet KITTI + SVM             | 73.3 | 70.3 | 24.6 |
-| PredNet Moments 3.3h + SVM      | 72.8 | 65.6 | 27.3 |
-| PredNet Moments 66.6h + SVM     | 73.7 | 64.4 | 29.8 |
+| PredNet random + SVM            | 67.6 | 62.6 | 30.1 |
+| PredNet KITTI + SVM             | 73.2 | 70.7 | 39.8 |
+| PredNet Moments 3.3h + SVM      | 73.2 | 66.1 | 39.5 |
+| PredNet Moments 66.6h + SVM     | 74.2 | 65.1 | 41.4 |
 | PredNet Moments 66.6h + LSTM    | 82.6 | 55.8 | 37.1 |
 
 
@@ -66,11 +66,12 @@ This folder contains classification models that are trained on learned represent
 
 | Features + Classifier        | 2-class easy | 2-class hard | 10-class |
 | -------------                | :--: | :--: | :--: |
-| PredNet Video random + SVM   | 66.8 | 62.2 | 23.0 |
-| PredNet Video 66.6h + SVM    | 73.7 | 64.4 | 29.8 |
-| PredNet Audio 3.3h + SVM     | 52.2 | 50.5 |  |
-| PredNet Audio 3.3h + LSTM    | 52.2 | 50.5 |  |
-| PredNet Audio/Video + SVM    | 51.7 |  |  |
+| PredNet Video random + SVM   | 67.6 | 62.6 | 30.1 |
+| PredNet Video 66.6h + SVM    | 74.2 | 65.1 | 41.4 |
+| PredNet Audio random + SVM   |  |  |  |
+| PredNet Audio 3.3h + SVM     | 66.9 | 56.8 | 29.1 |
+| PredNet Audio 3.3h + LSTM    |  |  |  |
+| PredNet A/V Ensemble         |  |  |  |
 
 ## Models
 
