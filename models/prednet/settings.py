@@ -131,9 +131,16 @@ add_config(configs, 'prednet_random_finetuned_moments_audio__representation',
              'frame_step': 1,
              'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
              'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
-             'training_index_start': 0.6, #AUDIO_FRAMES_PER_VIDEO * 300,
-             'training_max_per_class': 0.4, #AUDIO_FRAMES_PER_VIDEO * 200,
              'output_mode': 'representation' }, eval_base_config)
+
+add_config(configs, 'prednet_random__moments_audio__representation', 
+           { 'description': 'Using PredNet with random weights to extract features.',
+             'model_name': 'prednet_random',
+             'frame_step': 1,
+             'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
+             'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
+             'output_mode': 'representation'
+           }, eval_base_config)
 
 add_config(configs, 'prednet_kitti_finetuned_moments__ucf_01__representation', 
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
