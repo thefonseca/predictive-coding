@@ -47,10 +47,10 @@ This folder contains classification models that are trained on learned represent
 | Model                       | UCF-101 RGB (%) | Pre-training dataset | Pre-training size (frames) |
 | -------------               | :--: | :---:           | :---: |
 | CNN tuple verification [1]  | 50.2 | UCF-101         | 2.7M  |
-| Random LSTM [2]             | 74.5 | -       | 0     |
+| Random LSTM [2]             | 74.5 | -               | 0     |
 | Composite LSTM [2]          | 75.8 | Sports-1M       | 32.4M |
 | PredNet                     | 51.9 | Moments in Time | 2.4M  |
-| PredNet finetuned           | _coming soon_ | Moments in Time | 2.4M  |
+| PredNet finetuned           |      | Moments in Time | 2.4M  |
 
 [1] Misra, I., Zitnick, C. L., & Hebert, M. (2016, October). [Shuffle and learn: unsupervised learning using temporal order verification](https://link.springer.com/chapter/10.1007/978-3-319-46448-0_32). In European Conference on Computer Vision (pp. 527-544). Springer, Cham.
 
@@ -68,9 +68,9 @@ This folder contains classification models that are trained on learned represent
 | -------------                | :--: | :--: | :--: |
 | PredNet Video random + SVM   | 67.6 | 62.6 | 30.1 |
 | PredNet Video 66.6h + SVM    | 74.2 | 65.1 | 41.4 |
-| PredNet Audio random + SVM   |  |  |  |
-| PredNet Audio 3.3h + SVM     | 66.9 | 56.8 | 29.1 |
-| PredNet Audio 3.3h + LSTM    |  |  |  |
+| PredNet Audio random + SVM   | 63.6 | 56.8 | 30.3 |
+| PredNet Audio 2h + SVM       | 66.9 | 56.8 | 29.1 |
+| PredNet Audio 37h + LSTM     |  |  |  |
 | PredNet A/V Ensemble         |  |  |  |
 
 ## Models
