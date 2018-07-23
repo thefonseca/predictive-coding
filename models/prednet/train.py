@@ -83,9 +83,11 @@ def train(config_name, training_data_dir, validation_data_dir,
           use_multiprocessing=False, workers=1, shuffle=True,
           n_timesteps=10, batch_size=4, stopping_patience=None, 
           input_channels=3, input_width=160, input_height=128, 
-          max_queue_size=10, classes=None, training_max_per_class=None, 
+          max_queue_size=10, classes=None, 
+          training_index_start=0, training_max_per_class=None, 
           frame_step=1, stateful=False, rescale=None, gpus=None,
-          validation_max_per_class=None, data_format=K.image_data_format(), 
+          validation_index_start=0, validation_max_per_class=None, 
+          data_format=K.image_data_format(), 
           seq_overlap=0, **config):
     
     model = prednet_model.create_model(train=True, stateful=stateful,
@@ -126,6 +128,7 @@ def train(config_name, training_data_dir, validation_data_dir,
                                     shuffle=shuffle,
                                     data_format=data_format,
                                     output_mode='error',
+                                    index_start=training_index_start,
                                     max_per_class=training_max_per_class)
     
     val_generator = DataGenerator(classes=classes,
@@ -139,6 +142,7 @@ def train(config_name, training_data_dir, validation_data_dir,
                                   batch_size=batch_size,
                                   data_format=data_format,
                                   output_mode='error', 
+                                  index_start=validation_index_start,
                                   max_per_class=validation_max_per_class)
     
     train_generator = train_generator.flow_from_directory(training_data_dir)

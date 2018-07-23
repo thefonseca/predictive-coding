@@ -182,7 +182,7 @@ train_base_config.update({
     'batch_size': 2 * SEQUENCES_PER_VIDEO,
     'shuffle': True,
     'task': '10c',
-    'gpus': 2,
+    #'gpus': 2,
     #'stopping_patience': 100,
     'training_index_start': 0,
     # train on first 80% videos
@@ -201,10 +201,11 @@ add_config(configs, 'prednet_random__moments__model',
 add_config(configs, 'prednet__ucf_01__model', 
            { 'description': 'Training PredNet on UCF-101 (split 1) dataset.',
              'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
-             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test_01'),
+             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
              'task': 'full',
              'pretrained': 'full',
              'training_max_per_class': 0.9,
+             'validation_index_start': 0.9,
              'model_name': 'prednet_kitti_finetuned_moments' }, train_base_config)
 
 add_config(configs, 'prednet_random__moments_audio__model', 
