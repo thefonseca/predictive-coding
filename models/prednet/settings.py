@@ -52,6 +52,10 @@ models = {
     'prednet_random_finetuned_moments_audio': {
         'model_weights_file': './results/prednet_random__moments_audio__model{}/weights.hdf5',
         'model_json_file': './results/prednet_random__moments_audio__model{}/model.json',
+    },
+    'prednet_finetuned_ucf': {
+        'model_weights_file': './results/prednet__ucf_01__model{}/weights.hdf5',
+        'model_json_file': './results/prednet__ucf_01__model{}/model.json',
     }
 }
 
@@ -145,6 +149,19 @@ add_config(configs, 'prednet_random__moments_audio__representation',
 add_config(configs, 'prednet_kitti_finetuned_moments__ucf_01__representation', 
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
              'model_name': 'prednet_kitti_finetuned_moments',
+             'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
+             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test_01'),
+             'task': 'full',
+             'min_seq_length': 5,
+             'pad_sequences': True,
+             'pretrained': 'full',
+             'training_index_start': 0,
+             'training_max_per_class': None,
+             'output_mode': 'representation' }, eval_base_config)
+
+add_config(configs, 'prednet_finetuned_ucf__ucf_01__representation', 
+           { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
+             'model_name': 'prednet_finetuned_ucf',
              'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
              'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test_01'),
              'task': 'full',
