@@ -84,17 +84,26 @@ def crop(dimension, start, end=None):
             return x[:, :, :, :, start: end]
     return Lambda(func)
 
-def lstm_layer(tensor, mask_value, hidden_dims, dropout):
-    x = TimeDistributed(Flatten())(tensor)
+def lstm_layer(tensor, mask_value, hidden_dims, 
+               filters, dropout, name):
+    x = tensor
+    for i, f in enumerate(filters):
+        name_ = name + '_' + str(i)
+        x = TimeDistributed(Conv2D(f, (3, 3), padding='same', activation='relu'), 
+                            name='conv_' + name_)(x)
+        #x = TimeDistributed(BatchNormalization())(x)
+        x = TimeDistributed(MaxPooling2D(pool_size=(4, 4), padding='same'), 
+                            name='maxpool_' + name_)(x)
+        x = TimeDistributed(Dropout(dropout), name='dropout_' + name_)(x)
+    x = TimeDistributed(Flatten(), name='flatten_' + name_)(x)
     if mask_value is not None:
         x = Masking(mask_value=mask_value)(x)
     for dim in hidden_dims:
-        x = Bidirectional(LSTM(dim, return_sequences=False, dropout=dropout), 
-                          merge_mode='concat')(x)
+        x = Bidirectional(LSTM(dim, return_sequences=False, dropout=dropout), merge_mode='concat')(x)
     return x
 
-def prednet_lstm(input_shape, n_classes, hidden_dims, 
-                 drop_rate=0.5, mask_value=None, **config):
+def multistream(input_shape, n_classes, hidden_dims, 
+                drop_rate=0.5, mask_value=None, **config):
     if config is None:
         config = {}
     config['input_width'] = input_shape[0]
@@ -105,28 +114,48 @@ def prednet_lstm(input_shape, n_classes, hidden_dims,
                                        output_mode='representation', 
                                        **config)
     prednet_layer = model.layers[1]
-    for l in model.layers:
-        l.trainable = False
+    prednet_layer.trainable = False
     
     image_input = model.inputs[0]
-    image = lstm_layer(image_input, mask_value, hidden_dims, drop_rate)
+    conv_filters = [100, 100]
+    image = lstm_layer(image_input, mask_value, hidden_dims, 
+                       conv_filters, drop_rate, 'image')
+    
+    layer_config = prednet_layer.get_config()
+    data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
     
     index = 0
     reps = []
     flat_shapes = [61440, 245760, 122880, 61440]
+    filters = [3, 48, 96, 192]
+    
     for l in range(prednet_layer.nb_layers):
         if l not in [1, 2]:
-            reps.append(crop(2, index, index + flat_shapes[l])(model.outputs[0]))
+            r = crop(2, index, index + flat_shapes[l])(model.outputs[0])
+            # Unflatten representation
+            width = input_shape[0] / (2 ** l)
+            height = input_shape[1] / (2 ** l)
+            
+            r_shape = (-1,) #tuple(r.shape[:2].as_list())
+            if data_format == 'channels_first':
+                shape = r_shape + (filters[l], height, width)
+            else:
+                shape = r_shape + (height, width, filters[l])
+                
+            r = Reshape(shape)(r)
+            reps.append(r)
         index += flat_shapes[l]
         
     lstms = []
-    for r in reps:
-        lstms.append(lstm_layer(r, mask_value, hidden_dims, drop_rate))
+    conv_filters = [[100, 100], [100]]
+    for i, r in enumerate(reps):
+        lstms.append(lstm_layer(r, mask_value, hidden_dims, 
+                                conv_filters[i], drop_rate, 
+                                'r' + str(i)))
     
     x = Concatenate(axis=1)([image] + [l for l in lstms])
     predictions = Dense(n_classes, activation='softmax')(x)
     model = Model(inputs=model.inputs, outputs=predictions)
-    return model
 
 def prednet(input_shape, n_classes, hidden_dims, 
             drop_rate=0.5, mask_value=None, **config):

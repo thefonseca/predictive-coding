@@ -12,13 +12,13 @@ configs = {}
 
 FRAMES_PER_VIDEO = 90
 
-configs['imagenet__moments__features'] = {
+configs['moments__features'] = {
     'description': 'Extract features from Moments in Time dataset',
     'input_shape': (160, 160, 3),
     'batch_size': 10,
     'sample_step': 3,
     'task': '10c',
-    'model_type': 'vgg',
+    'model_type': 'vgg_imagenet',
     'base_results_dir': './results',
     'training_data_dir': '../../datasets/moments_video_frames/training',
     'validation_data_dir': '../../datasets/moments_video_frames/validation'
@@ -68,6 +68,15 @@ FRAME_SAMPLE_STEP = 6
 
 add_config(configs, 'moments__vgg_imagenet', 
            { 'description': 'A ConvLSTM classifier using VGG features',
+             'seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
+             'min_seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
+             'sample_step': VGG_SAMPLE_STEP }, vgg_base_config)
+
+add_config(configs, 'moments__vgg_random',
+           { 'description': 'A ConvLSTM classifier using VGG features',
+             'training_data_dir': './results/vgg_random__moments__features__10c/training',
+             'validation_data_dir': './results/vgg_random__moments__features__10c/validation',
+             'test_data_dir': './results/vgg_random__moments__features__10c/training',
              'seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'min_seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'sample_step': VGG_SAMPLE_STEP }, vgg_base_config)
@@ -219,7 +228,7 @@ add_config(configs, 'prednet_end2end_finetuned_moments_full__ucf_01',
              'rescale': 1./255,
              'batch_size': 10,
              'pad_sequences': True,
-             'model_type': 'prednet_lstm',
+             'model_type': 'multistream',
              'hidden_dims': [32],
              'dropout': 0.5,
              'average_predictions': True,
