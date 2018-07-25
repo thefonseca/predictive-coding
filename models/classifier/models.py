@@ -1,7 +1,8 @@
 from keras.models import Sequential, Model
 from keras.layers import Conv2D, MaxPooling2D, ConvLSTM2D, Conv3D, LSTM, TimeDistributed
 from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
-from keras.layers import Input, Average, Masking, Reshape, Lambda, Bidirectional
+from keras.layers import Input, Average, Masking, Reshape, Lambda
+from keras.layers import Bidirectional, Concatenate
 from keras import backend as K
 
 import sys
