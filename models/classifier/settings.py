@@ -215,7 +215,7 @@ features extracted from the UCF-101 dataset.',
 
 UCF_DATA_DIR = '../../datasets/ucf_data/'
 
-add_config(configs, 'prednet_end2end_finetuned_moments_full__ucf_01', 
+add_config(configs, 'prednet_multistream_finetuned_moments_full__ucf_01', 
            { 'description': 'An end2end Prednet classifier trained on the UCF-101 dataset.',
              'task': 'full',
              'seq_length': 10,
@@ -240,5 +240,5 @@ add_config(configs, 'prednet_end2end_finetuned_moments_full__ucf_01',
              'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
              'validation_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
              'test_data_dir': os.path.join(UCF_DATA_DIR, 'test_01'),
-             'model_weights_file': '../prednet/results/prednet__ucf_01__model__full/weights.hdf5',
-             'model_json_file': '../prednet/results/prednet__ucf_01__model__full/model.json' }, prednet_base_config)
+             'model_weights_file': '../prednet/results/prednet_kitti__moments__model__full/weights.hdf5',
+             'model_json_file': '../prednet/results/prednet_kitti__moments__model__full/model.json' }, prednet_base_config)

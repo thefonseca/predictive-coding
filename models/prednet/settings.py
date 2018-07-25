@@ -46,8 +46,8 @@ models = {
         'model_json_file': './results/prednet_kitti__moments__model{}/model.json',
     },
     'prednet_random_finetuned_moments': {
-        'model_weights_file': './results/prednet_kitti__moments__model{}/weights.hdf5',
-        'model_json_file': './results/prednet_kitti__moments__model{}/model.json',
+        'model_weights_file': './results/prednet_random__moments__model{}/weights.hdf5',
+        'model_json_file': './results/prednet_random__moments__model{}/model.json',
     },
     'prednet_random_finetuned_moments_audio': {
         'model_weights_file': './results/prednet_random__moments_audio__model{}/weights.hdf5',
