@@ -15,6 +15,7 @@ This folder contains classification models that are trained on learned represent
 
 | Features + Classifier           | 2-class easy | 2-class hard | 10-class |
 | -------------                   | :--: | :--: | :--: |
+| VGG random + SVM                | 67.0 | 56.0 | 18.7 |
 | VGG ImageNet + SVM              | 85.5 | 67.0 | 52.8 |
 | VGG ImageNet + LSTM             | 87.4 | 58.4 | 43.2 |
 | PredNet random + SVM            | 67.6 | 62.6 | 30.1 |
