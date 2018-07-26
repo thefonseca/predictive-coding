@@ -23,9 +23,8 @@ def create_model(model_json_file=None, model_weights_file=None,
         model = random_prednet(train=train, **config)
     return model
 
-def pretrained_prednet(pretrained_model, output_mode='error', train=False, 
-                       n_timesteps=10, stateful=False, batch_size=None, 
-                       **config):
+def pretrained_prednet(pretrained_model, n_timesteps, output_mode='error', 
+                       train=False, stateful=False, batch_size=None, **config):
     layer_config = pretrained_model.layers[1].get_config()
     layer_config['output_mode'] = output_mode
     layer_config['stateful'] = stateful
@@ -38,7 +37,7 @@ def pretrained_prednet(pretrained_model, output_mode='error', train=False,
     return model
 
 def random_prednet(input_channels, input_height, input_width, 
-                   stack_sizes=(48, 96, 192), n_timesteps=10, 
+                   n_timesteps, stack_sizes=(48, 96, 192), 
                    train=False, output_mode='error', stateful=False, 
                    batch_size=None, **config):
     # Model parameters

@@ -102,6 +102,45 @@ def lstm_layer(tensor, mask_value, hidden_dims,
         x = Bidirectional(LSTM(dim, return_sequences=False, dropout=dropout), merge_mode='concat')(x)
     return x
 
+def crop(dimension, start=None, end=None, stride=1, name=None):
+    # Crops (or slices) a Tensor on a given dimension from start to end
+    # example : to crop tensor x[:, :, 5:10]
+    # call slice(2, 5, 10) as you want to crop on the second dimension
+    # See https://github.com/keras-team/keras/issues/890
+    def func(x):
+        if dimension == 0:
+            return x[start:end:stride]
+        if dimension == 1:
+            return x[:, start:end:stride]
+        if dimension == 2:
+            return x[:, :, start:end:stride]
+        if dimension == 3:
+            return x[:, :, :, start:end:stride]
+        if dimension == 4:
+            return x[:, :, :, :, start:end:stride]
+    return Lambda(func, name=name)
+
+def conv_layer(tensor, filters, dropout, name):
+    x = tensor
+    for i, f in enumerate(filters):
+        name_ = name + '_' + str(i)
+        x = TimeDistributed(Conv2D(f, (3, 3), padding='same', activation='relu'), 
+                            name='conv_' + name_)(x)
+        #x = TimeDistributed(BatchNormalization())(x)
+        x = TimeDistributed(MaxPooling2D(pool_size=(2, 2), padding='same'), 
+                            name='maxpool_' + name_)(x)
+        x = TimeDistributed(Dropout(dropout), name='dropout_' + name_)(x)
+    return x
+
+def lstm_layer(tensor, mask_value, hidden_dims, dropout, name):
+    x = TimeDistributed(Flatten(), name='flatten_' + name)(tensor)
+    if mask_value is not None:
+        x = Masking(mask_value=mask_value)(x)
+    for dim in hidden_dims:
+        x = Bidirectional(LSTM(dim, return_sequences=False, dropout=dropout), 
+                          merge_mode='concat', name='BiLSTM_' + name)(x)
+    return x
+
 def multistream(input_shape, n_classes, hidden_dims, 
                 drop_rate=0.5, mask_value=None, **config):
     if config is None:
@@ -117,9 +156,9 @@ def multistream(input_shape, n_classes, hidden_dims,
     prednet_layer.trainable = False
     
     image_input = model.inputs[0]
-    conv_filters = [100, 100]
-    image = lstm_layer(image_input, mask_value, hidden_dims, 
-                       conv_filters, drop_rate, 'image')
+    conv_filters = [50, 50, 10]
+    image = conv_layer(image_input, conv_filters, drop_rate, 'image')
+    image = lstm_layer(image, mask_value, hidden_dims, drop_rate, 'image')
     
     layer_config = prednet_layer.get_config()
     data_format = layer_config['data_format'] if 'data_format' in layer_config else layer_config['dim_ordering']
@@ -128,32 +167,36 @@ def multistream(input_shape, n_classes, hidden_dims,
     reps = []
     flat_shapes = [61440, 245760, 122880, 61440]
     filters = [3, 48, 96, 192]
+    prednet_out = crop(1, stride=10, name='timestep_crop')(model.outputs[0])
+    prednet_out = crop(1, stride=-1, name='invert')(prednet_out)
     
     for l in range(prednet_layer.nb_layers):
         if l not in [1, 2]:
-            r = crop(2, index, index + flat_shapes[l])(model.outputs[0])
+            r = crop(2, index, index + flat_shapes[l], 
+                     name='r_crop_' + str(l))(prednet_out)
             # Unflatten representation
             width = input_shape[0] / (2 ** l)
             height = input_shape[1] / (2 ** l)
             
-            r_shape = (-1,) #tuple(r.shape[:2].as_list())
             if data_format == 'channels_first':
-                shape = r_shape + (filters[l], height, width)
+                shape = (-1, filters[l], height, width)
             else:
-                shape = r_shape + (height, width, filters[l])
+                shape = (-1, height, width, filters[l])
                 
             r = Reshape(shape)(r)
             reps.append(r)
         index += flat_shapes[l]
         
-    lstms = []
-    conv_filters = [[100, 100], [100]]
+    rep_layers = []
+    conv_filters = [[50, 50, 10], [50]]
     for i, r in enumerate(reps):
-        lstms.append(lstm_layer(r, mask_value, hidden_dims, 
-                                conv_filters[i], drop_rate, 
-                                'r' + str(i)))
-    
-    x = Concatenate(axis=1)([image] + [l for l in lstms])
+        rep_l = conv_layer(r, conv_filters[i], 
+                           drop_rate, 'r' + str(i))
+        rep_l = lstm_layer(rep_l, mask_value, hidden_dims, 
+                           drop_rate, 'r' + str(i))
+        rep_layers.append(rep_l)
+        
+    x = Concatenate(axis=1)([image] + [l for l in rep_layers])
     predictions = Dense(n_classes, activation='softmax')(x)
     model = Model(inputs=model.inputs, outputs=predictions)
     return model
