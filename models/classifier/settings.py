@@ -215,7 +215,7 @@ features extracted from the UCF-101 dataset.',
 
 UCF_DATA_DIR = '../../datasets/ucf_data/'
 
-add_config(configs, 'prednet_multistream_finetuned_moments_full__ucf_01', 
+add_config(configs, 'prednet_finetuned_moments_full__ucf_01', 
            { 'description': 'An end2end Prednet classifier trained on the UCF-101 dataset.',
              'task': 'full',
              'seq_length': 10,
