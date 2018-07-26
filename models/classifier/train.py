@@ -167,7 +167,6 @@ def evaluate_average(model, data_iterator, n_batches):
     if y_true.shape[-1] > 10:
         top_k_acc = top_k_categorical_accuracy(y_true, y_pred, k=5)
         metrics['top_k_acc'] = K.eval(top_k_acc)
-        
     return metrics
 
 
@@ -177,7 +176,7 @@ def evaluate(config_name, test_data_dir,
              seq_length=None, min_seq_length=0, pad_sequences=False,
              test_max_per_class=None, test_index_start=0,
              model_type='convnet', average_predictions=False, 
-             input_height=None, input_width=None, 
+             input_height=None, input_width=None, rescale=None,
              data_format=K.image_data_format(), **config):
     
     print('\nEvaluating model on test set...')
@@ -191,6 +190,7 @@ def evaluate(config_name, test_data_dir,
                               pad_sequences=pad_sequences,
                               return_sources=average_predictions,
                               data_format=data_format,
+                              rescale=rescale,
                               fn_preprocess=resize_fn(input_height, 
                                                       input_width),
                               index_start=test_index_start,

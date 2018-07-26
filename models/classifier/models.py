@@ -156,6 +156,7 @@ def multistream(input_shape, n_classes, hidden_dims,
     x = Concatenate(axis=1)([image] + [l for l in lstms])
     predictions = Dense(n_classes, activation='softmax')(x)
     model = Model(inputs=model.inputs, outputs=predictions)
+    return model
 
 def prednet(input_shape, n_classes, hidden_dims, 
             drop_rate=0.5, mask_value=None, **config):
