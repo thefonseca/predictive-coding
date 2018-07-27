@@ -39,30 +39,37 @@ def train(config_name, training_data_dir, base_results_dir, batch_size,
           input_width=None, input_height=None, rescale=None,
           model_type='linear', **config):
     
-    train_generator = DataGenerator(batch_size=batch_size, classes=classes,
-                                    rescale=rescale,
-                                    fn_preprocess=resize_fn(input_height, 
-                                                            input_width),
-                                    max_per_class=training_max_per_class)
-    train_generator = train_generator.flow_from_directory(training_data_dir)
-    train_iterator = iter(train_generator)
+    generator = DataGenerator(batch_size=batch_size, classes=classes,
+                              rescale=rescale,
+                              fn_preprocess=resize_fn(input_height, 
+                                                      input_width),
+                              max_per_class=training_max_per_class)
+    generator = generator.flow_from_directory(training_data_dir)
+    
+    train_iterator = iter(generator)
 
-    if len(train_generator) == 0:
+    if len(generator) == 0:
         return
     
     print('Training linear model...')
     clf = SGDClassifier(loss='log', max_iter=100, tol=1e-3, n_jobs=4)
     scaler = StandardScaler()
     
-    for i in tqdm(range(len(train_generator)), desc='Processing'):
-        X, y = next(train_iterator)
-        scaler.partial_fit([X_.flatten() for X_ in X])
+    train_X = []
+    train_y = []
     
-    classes_ = [i for i in range(train_generator.n_classes)]
-    for i in tqdm(range(len(train_generator)), desc='Training'):
+    for i in tqdm(range(len(generator)), desc='Processing'):
         X, y = next(train_iterator)
-        X = scaler.transform([X_.flatten() for X_ in X])
-        clf.partial_fit(X, [np.argmax(y_) for y_ in y], classes=classes_)
+        X_ = [X_.flatten() for X_ in X]
+        train_X.append(X_)
+        train_y.append([np.argmax(y_) for y_ in y])
+        scaler.partial_fit(X_)
+    
+    classes_ = [i for i in range(generator.n_classes)]
+    for X, y in tqdm(zip(train_X, train_y), desc='Training'):
+        #X, y = next(train_iterator)
+        X_ = scaler.transform([X_.flatten() for X_ in X])
+        clf.partial_fit(X_, y, classes=classes_)
     
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     model_path = os.path.join(results_dir, model_type + '.pkl')
