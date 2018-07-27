@@ -204,6 +204,7 @@ def evaluate(config_name, dataset, data_dir, output_mode,
              index_start=0, stateful=False, rescale=None, 
              min_seq_length=0, pad_sequences=False, **config):
     
+    config['n_timesteps'] = n_timesteps
     model = prednet_model.create_model(train=False, 
                                        stateful=stateful, 
                                        batch_size=batch_size, 
