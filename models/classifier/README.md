@@ -20,9 +20,9 @@ This folder contains classification models that are trained on learned represent
 | VGG ImageNet + LSTM             | 87.4 | 58.4 | 43.2 |
 | PredNet random + SVM            | 67.6 | 62.6 | 30.1 |
 | PredNet KITTI + SVM             | 73.2 | 70.7 | 39.8 |
-| PredNet Moments 3.3h + SVM      | 73.2 | 66.1 | 39.5 |
-| PredNet Moments 66.6h + SVM     | 74.2 | 65.1 | 41.4 |
-| PredNet Moments 66.6h + LSTM    | 82.6 | 55.8 | 37.1 |
+| PredNet Moments 3h + SVM        | 73.2 | 66.1 | 39.5 |
+| PredNet Moments 67h + SVM       | 74.2 | 65.1 | 41.4 |
+| PredNet Moments 67h + LSTM      | 82.6 | 55.8 | 37.1 |
 
 #### Insights
 * VGG features pre-trained on Imagenet work very well when the spatial information is determinant for the action classification. However, it falls short to capture fine-grained temporal patterns needed to distinguish between running and walking actions.
@@ -41,8 +41,8 @@ This folder contains classification models that are trained on learned represent
 | PredNet KITTI                  | 0.582 | 0.685 | 0.722 | 0.622 |
 | PredNet KITTI + Moments 1h     | 0.470 | 0.649 | 0.778 | 0.611 |
 | PredNet KITTI + Moments 1.25h* | 0.513 | 0.668 | 0.768 | 0.595 |
-| PredNet KITTI + Moments 3.3h   | 0.583 | 0.676 | 0.778 | 0.500 |
-| PredNet KITTI + Moments 66.6h  | 0.592 | 0.666 | 0.744 | 0.533 |
+| PredNet KITTI + Moments 3h     | 0.583 | 0.676 | 0.778 | 0.500 |
+| PredNet KITTI + Moments 67h    | 0.592 | 0.666 | 0.744 | 0.533 |
 
 \* _In this run we let the model "see" the held-out labelled data_
 
@@ -54,10 +54,9 @@ This folder contains classification models that are trained on learned represent
 | Model                       | UCF-101 RGB (%) | Pre-training dataset | Pre-training size (frames) |
 | -------------               | :--: | :---:           | :---: |
 | CNN tuple verification [1]  | 50.2 | UCF-101         | 2.7M  |
-| Random LSTM [2]             | 74.5 | -               | 0     |
-| Composite LSTM [2]          | 75.8 | Sports-1M       | 32.4M |
-| PredNet                     | 51.9 | Moments in Time | 2.4M  |
-| PredNet finetuned           |      | Moments in Time | 2.4M  |
+| ConvNet + LSTM []           | xx.x | -               | 0     |
+| PredNet Video 67h           | 51.9 | Moments in Time | 2.4M  |
+| PredNet Audio 37h           |      | Moments in Time | 2.4M  |
 
 [1] Misra, I., Zitnick, C. L., & Hebert, M. (2016, October). [Shuffle and learn: unsupervised learning using temporal order verification](https://link.springer.com/chapter/10.1007/978-3-319-46448-0_32). In European Conference on Computer Vision (pp. 527-544). Springer, Cham.
 
@@ -77,7 +76,7 @@ This folder contains classification models that are trained on learned represent
 | PredNet Video 66.6h + SVM    | 74.2 | 65.1 | 41.4 |
 | PredNet Audio random + SVM   | 63.6 | 56.8 | 30.3 |
 | PredNet Audio 2h + SVM       | 66.9 | 56.8 | 29.1 |
-| PredNet Audio 37h + LSTM     |  |  |  |
+| PredNet Audio 37h + SVM      | 67.8 | 58.3 |  |
 
 ## Models
 
