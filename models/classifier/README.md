@@ -24,6 +24,12 @@ This folder contains classification models that are trained on learned represent
 | PredNet Moments 66.6h + SVM     | 74.2 | 65.1 | 41.4 |
 | PredNet Moments 66.6h + LSTM    | 82.6 | 55.8 | 37.1 |
 
+#### Insights
+* VGG features pre-trained on Imagenet work very well when the spatial information is determinant for the action classification. However, it falls short to capture fine-grained temporal patterns needed to distinguish between running and walking actions.
+* PredNet random features perform better than VGG random features, especially in the 2-class temporal task. This indicates that PredNet has better inductive biases to capture temporal patterns.
+* As we add more data, PredNet features improve the performance of action classification task. However, as more out-of-domain data is added (unrelated classes), the performance drops in the 2-class temporal task. Still, the results are competitive with Imagenet-derived features.
+* Using an LSTM instead of an SVM improves the results in the 2-class spatial task and worsen the results in the 2-class temporal task. No clear why.
+
 
 #### Results: Validation set
 
@@ -72,7 +78,6 @@ This folder contains classification models that are trained on learned represent
 | PredNet Audio random + SVM   | 63.6 | 56.8 | 30.3 |
 | PredNet Audio 2h + SVM       | 66.9 | 56.8 | 29.1 |
 | PredNet Audio 37h + LSTM     |  |  |  |
-| PredNet A/V Ensemble         |  |  |  |
 
 ## Models
 
