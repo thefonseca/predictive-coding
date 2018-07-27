@@ -9,6 +9,7 @@ import numpy as np
 import random as rn
 from sklearn.externals import joblib
 from sklearn.linear_model import SGDClassifier
+from sklearn.preprocessing import StandardScaler
 from keras import backend as K
 from keras.metrics import categorical_accuracy, top_k_categorical_accuracy
 from keras.losses import categorical_crossentropy
@@ -50,14 +51,18 @@ def train(config_name, training_data_dir, base_results_dir, batch_size,
         return
     
     print('Training linear model...')
-    clf = SGDClassifier(loss='log', max_iter=100, tol=1e-3)
+    clf = SGDClassifier(loss='log', max_iter=100, tol=1e-3, n_jobs=4)
+    scaler = StandardScaler()
+    
+    for i in tqdm(range(len(train_generator)), desc='Processing'):
+        X, y = next(train_iterator)
+        scaler.partial_fit([X_.flatten() for X_ in X])
     
     classes_ = [i for i in range(train_generator.n_classes)]
     for i in tqdm(range(len(train_generator)), desc='Training'):
         X, y = next(train_iterator)
-        clf.partial_fit([X_.flatten() for X_ in X], 
-                        [np.argmax(y_) for y_ in y], 
-                        classes=classes_)
+        X = scaler.transform([X_.flatten() for X_ in X])
+        clf.partial_fit(X, [np.argmax(y_) for y_ in y], classes=classes_)
     
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     model_path = os.path.join(results_dir, model_type + '.pkl')
