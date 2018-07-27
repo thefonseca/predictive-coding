@@ -11,6 +11,9 @@ from data import DataGenerator
 from settings import configs, tasks
 import models
 import utils
+import sys
+sys.path.append("../prednet")
+from prednet_model import PredNet
 
 from tqdm import tqdm
 import numpy as np
@@ -203,7 +206,7 @@ def evaluate(config_name, test_data_dir,
     # load best model
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')       
-    model = load_model(checkpoint_path)
+    model = load_model(checkpoint_path, custom_objects={'PredNet': PredNet})
     model.summary()
     
     if average_predictions:
