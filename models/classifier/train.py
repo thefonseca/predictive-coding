@@ -10,7 +10,6 @@ from keras.losses import categorical_crossentropy
 from data import DataGenerator
 from settings import configs, tasks
 import models
-from models import load_pretrained
 import utils
 
 from tqdm import tqdm

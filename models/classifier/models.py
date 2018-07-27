@@ -136,8 +136,10 @@ def multistream(input_shape, n_classes, hidden_dims,
     reps = []
     flat_shapes = [61440, 245760, 122880, 61440]
     filters = [3, 48, 96, 192]
-    prednet_out = crop(1, stride=10, name='timestep_crop')(model.outputs[0])
-    prednet_out = crop(1, stride=-1, name='invert')(prednet_out)
+    
+    #prednet_out = crop(1, stride=10, name='timestep_crop')(model.outputs[0])
+    #prednet_out = crop(1, stride=-1, name='invert')(prednet_out)
+    prednet_out = model.outputs[0]
     
     for l in range(prednet_layer.nb_layers):
         if l not in [1, 2]:
@@ -184,7 +186,7 @@ def prednet_lstm(input_shape, n_classes, hidden_dims,
         l.trainable = False
     
     image_input = model.inputs[0]
-    image = lstm_layer(image_input, mask_value, hidden_dims, drop_rate)
+    image = lstm_layer(image_input, mask_value, hidden_dims, drop_rate, 'image')
     
     index = 0
     reps = []
@@ -195,8 +197,8 @@ def prednet_lstm(input_shape, n_classes, hidden_dims,
         index += flat_shapes[l]
         
     lstms = []
-    for r in reps:
-        lstms.append(lstm_layer(r, mask_value, hidden_dims, drop_rate))
+    for i, r in enumerate(reps):
+        lstms.append(lstm_layer(r, mask_value, hidden_dims, drop_rate, 'r' + str(i)))
     
     x = Concatenate(axis=1)([image] + [l for l in lstms])
     predictions = Dense(n_classes, activation='softmax')(x)
