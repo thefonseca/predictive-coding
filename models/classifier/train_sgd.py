@@ -37,7 +37,7 @@ def resize_fn(input_height, input_width):
 def train(config_name, training_data_dir, base_results_dir, batch_size, 
           classes=None, training_index_start=0, training_max_per_class=None, 
           input_width=None, input_height=None, rescale=None,
-          model_type='linear', **config):
+          model_type='linear', shuffle=True, **config):
     
     generator = DataGenerator(batch_size=batch_size, classes=classes,
                               rescale=rescale,
@@ -52,7 +52,8 @@ def train(config_name, training_data_dir, base_results_dir, batch_size,
         return
     
     print('Training linear model...')
-    clf = SGDClassifier(loss='log', max_iter=100, tol=1e-3, n_jobs=4)
+    clf = SGDClassifier(loss='log', max_iter=100, tol=1e-3, 
+                        n_jobs=4, shuffle=shuffle)
     scaler = StandardScaler()
     
     train_X = []

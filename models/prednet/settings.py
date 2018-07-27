@@ -159,6 +159,20 @@ add_config(configs, 'prednet_kitti_finetuned_moments__ucf_01__representation',
              'training_max_per_class': None,
              'output_mode': 'representation' }, eval_base_config)
 
+add_config(configs, 'prednet_kitti_finetuned_moments_audio__ucf_01__representation', 
+           { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
+             'model_name': 'prednet_kitti_finetuned_moments_audio',
+             'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
+             'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
+             'task': 'full',
+             'frame_step': 1,
+             'min_seq_length': 5,
+             'pad_sequences': True,
+             'pretrained': 'full',
+             'training_index_start': 0,
+             'training_max_per_class': None,
+             'output_mode': 'representation' }, eval_base_config)
+
 add_config(configs, 'prednet_finetuned_ucf__ucf_01__representation', 
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
              'model_name': 'prednet_finetuned_ucf',

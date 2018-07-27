@@ -202,6 +202,24 @@ features extracted from the UCF-101 dataset.',
              'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf_01__representation__full/training',
              'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__ucf_01__representation__full/validation'}, prednet_base_config)
 
+add_config(configs, 'prednet_kitti_finetuned_moments_audio_full__ucf_01', 
+           { 'description': 'A classifier trained on PredNet \
+features extracted from the UCF-101 dataset.',
+             'task': 'full',
+             'seq_length': PREDNET_FEATURES_PER_VIDEO,
+             'batch_size': 20,
+             'min_seq_length': 1,
+             'pad_sequences': True,
+             'average_predictions': True,
+             'training_max_per_class': .9,
+             'training_index_start': 0,
+             'validation_index_start': .9,
+             'test_max_per_class': None,
+             'test_index_start': 0,
+             'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments_audio__ucf_01__representation__full/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments_audio__ucf_01__representation__full/training',
+             'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments_audio__ucf_01__representation__full/validation'}, prednet_base_config)
+
 add_config(configs, 'prednet_finetuned_ucf__ucf_01', 
            { 'description': 'A classifier trained on PredNet \
 features extracted from the UCF-101 dataset.',
