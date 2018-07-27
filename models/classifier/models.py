@@ -4,6 +4,7 @@ from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras.layers import Input, Average, Masking, Reshape, Lambda
 from keras.layers import Bidirectional, Concatenate
 from keras import backend as K
+from keras.models import load_model
 
 import sys
 sys.path.append("../prednet")
@@ -163,6 +164,41 @@ def multistream(input_shape, n_classes, hidden_dims,
         rep_layers.append(rep_l)
         
     x = Concatenate(axis=1)([image] + [l for l in rep_layers])
+    predictions = Dense(n_classes, activation='softmax')(x)
+    model = Model(inputs=model.inputs, outputs=predictions)
+    return model
+
+def prednet_lstm(input_shape, n_classes, hidden_dims, 
+                 drop_rate=0.5, mask_value=None, **config):
+    if config is None:
+        config = {}
+    config['input_width'] = input_shape[1]
+    config['input_height'] = input_shape[2]
+    config['input_channels'] = input_shape[3]
+        
+    model = prednet_model.create_model(train=False, 
+                                       output_mode='representation', 
+                                       **config)
+    prednet_layer = model.layers[1]
+    for l in model.layers:
+        l.trainable = False
+    
+    image_input = model.inputs[0]
+    image = lstm_layer(image_input, mask_value, hidden_dims, drop_rate)
+    
+    index = 0
+    reps = []
+    flat_shapes = [61440, 245760, 122880, 61440]
+    for l in range(prednet_layer.nb_layers):
+        if l not in [1, 2]:
+            reps.append(crop(2, index, index + flat_shapes[l])(model.outputs[0]))
+        index += flat_shapes[l]
+        
+    lstms = []
+    for r in reps:
+        lstms.append(lstm_layer(r, mask_value, hidden_dims, drop_rate))
+    
+    x = Concatenate(axis=1)([image] + [l for l in lstms])
     predictions = Dense(n_classes, activation='softmax')(x)
     model = Model(inputs=model.inputs, outputs=predictions)
     return model

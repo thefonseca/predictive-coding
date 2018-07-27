@@ -3,17 +3,15 @@ import argparse
 
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint, CSVLogger, EarlyStopping
-from keras.models import load_model
+#from keras.models import load_model
 from keras.metrics import categorical_accuracy, top_k_categorical_accuracy
 from keras.losses import categorical_crossentropy
 
 from data import DataGenerator
 from settings import configs, tasks
 import models
+from models import load_pretrained
 import utils
-import sys
-sys.path.append("../prednet")
-from prednet_model import PredNet
 
 from tqdm import tqdm
 import numpy as np
@@ -110,6 +108,12 @@ def train(config_name, training_data_dir, validation_data_dir,
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam', metrics=['accuracy'])
     model.summary()
+    
+    json_file = os.path.join(results_dir, model_type + '.json')
+    json_string = model.to_json()
+    with open(json_file, "w") as f:
+        f.write(json_string)
+    
     checkpointer = ModelCheckpoint(filepath=checkpoint_path, 
                                    verbose=1, save_best_only=True)
     
@@ -173,7 +177,7 @@ def evaluate_average(model, data_iterator, n_batches):
     return metrics
 
 
-def evaluate(config_name, test_data_dir,
+def evaluate(config_name, test_data_dir, hidden_dims,
              base_results_dir, classes=None, sample_step=1,
              workers=1, use_multiprocessing=False,
              seq_length=None, min_seq_length=0, pad_sequences=False,
@@ -203,10 +207,21 @@ def evaluate(config_name, test_data_dir,
     if len(generator) == 0:
         return
     
+    input_shape = generator.data_shape
+    n_classes = 101 #generator.n_classes
+    config['batch_size'] = generator.batch_size
+    
     # load best model
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')       
-    model = load_model(checkpoint_path, custom_objects={'PredNet': PredNet})
+    #model = load_pretrained(checkpoint_path)
+    model_fn = getattr(models, model_type)
+    mask_value = 0. if pad_sequences else None
+    model = model_fn(input_shape, n_classes, hidden_dims,
+                     drop_rate=0, mask_value=mask_value, **config)
+    checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')
+    model.load_weights(checkpoint_path)
+    
     model.summary()
     
     if average_predictions:
@@ -233,8 +248,7 @@ def evaluate(config_name, test_data_dir,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train a classifier.')
     parser.add_argument('config', help='experiment config name defined in settings.py')
-    parser.add_argument('-m', '--model_type', type=str, choices=['convlstm', 'lstm'],
-                    help='model architecture of classifier')
+    parser.add_argument('-m', '--model_type', type=str, help='model architecture of classifier')
     parser.add_argument('-t', '--task', type=str, choices=['2c_easy', '2c_hard', '10c'],
                     help='classification task')
     parser.add_argument('--eval', help='perform only evaluation using pretrained model',
