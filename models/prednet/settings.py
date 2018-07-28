@@ -3,6 +3,7 @@ import os
 DATA_DIR = '../../datasets/moments_video_frames/'
 AUDIO_DIR = '../../datasets/moments_audio_frames/'
 UCF_DATA_DIR = '../../datasets/ucf_data/'
+UCF_AUDIO_DIR = '../../datasets/ucf_audio/'
 FRAMES_PER_VIDEO = 90
 AUDIO_FRAMES_PER_VIDEO = 30
 SEQUENCES_PER_VIDEO = 5
@@ -159,11 +160,11 @@ add_config(configs, 'prednet_kitti_finetuned_moments__ucf_01__representation',
              'training_max_per_class': None,
              'output_mode': 'representation' }, eval_base_config)
 
-add_config(configs, 'prednet_kitti_finetuned_moments_audio__ucf_01__representation', 
+add_config(configs, 'prednet_random_finetuned_moments_audio__ucf_01__representation', 
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
-             'model_name': 'prednet_kitti_finetuned_moments_audio',
-             'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
-             'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
+             'model_name': 'prednet_random_finetuned_moments_audio',
+             'training_data_dir': os.path.join(UCF_AUDIO_DIR, 'training'),
+             'validation_data_dir': os.path.join(UCF_AUDIO_DIR, 'validation'),
              'task': 'full',
              'frame_step': 1,
              'min_seq_length': 5,
