@@ -11,6 +11,7 @@ def add_config(configs, name, config, base_config=None):
 configs = {}
 
 FRAMES_PER_VIDEO = 90
+UCF_DATA_DIR = '../../datasets/ucf_data/'
 
 configs['moments__features'] = {
     'description': 'Extract features from Moments in Time dataset',
@@ -67,13 +68,13 @@ VGG_SAMPLE_STEP = 2
 FRAME_SAMPLE_STEP = 6
 
 add_config(configs, 'moments__vgg_imagenet', 
-           { 'description': 'A ConvLSTM classifier using VGG features',
+           { 'description': 'A classifier using VGG features',
              'seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'min_seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'sample_step': VGG_SAMPLE_STEP }, vgg_base_config)
 
 add_config(configs, 'moments__vgg_random',
-           { 'description': 'A ConvLSTM classifier using VGG features',
+           { 'description': 'A classifier using VGG features',
              'training_data_dir': './results/vgg_random__moments__features__10c/training',
              'validation_data_dir': './results/vgg_random__moments__features__10c/validation',
              'test_data_dir': './results/vgg_random__moments__features__10c/training',
@@ -82,7 +83,7 @@ add_config(configs, 'moments__vgg_random',
              'sample_step': VGG_SAMPLE_STEP }, vgg_base_config)
 
 add_config(configs, 'moments__images', 
-           { 'description': 'A ConvLSTM classifier using raw images',
+           { 'description': 'A classifier using raw images',
              'seq_length': FRAMES_PER_VIDEO/FRAME_SAMPLE_STEP,
              'sample_step': FRAME_SAMPLE_STEP,
              'input_channels': 3, 
@@ -94,6 +95,25 @@ add_config(configs, 'moments__images',
              'training_data_dir': '../../datasets/moments_video_frames/training',
              'validation_data_dir': '../../datasets/moments_video_frames/validation',
              'test_data_dir': '../../datasets/moments_video_frames/training' }, vgg_base_config)
+
+add_config(configs, 'ucf__images', 
+           { 'description': 'A classifier using raw images',
+             'seq_length': FRAMES_PER_VIDEO/FRAME_SAMPLE_STEP,
+             'sample_step': FRAME_SAMPLE_STEP,
+             'input_channels': 3, 
+             'input_height': 128, 
+             'input_width': 160,
+             'rescale': 1./255,
+             'pad_sequences': True,
+             'average_predictions': True,
+             'training_max_per_class': .95,
+             'training_index_start': 0,
+             'validation_index_start': .95,
+             'test_max_per_class': None,
+             'test_index_start': 0,
+             'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
+             'validation_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
+             'test_data_dir': os.path.join(UCF_DATA_DIR, 'test_01') }, vgg_base_config)
 
 PREDNET_FEATURES_PER_VIDEO = 5
 
@@ -238,7 +258,6 @@ features extracted from the UCF-101 dataset.',
              'validation_data_dir': '../prednet/results/prednet_finetuned_ucf__ucf_01__representation__full/training',
              'test_data_dir': '../prednet/results/prednet_finetuned_ucf__ucf_01__representation__full/validation'}, prednet_base_config)
 
-UCF_DATA_DIR = '../../datasets/ucf_data/'
 
 add_config(configs, 'prednet_finetuned_moments_full__ucf_01', 
            { 'description': 'An end2end Prednet classifier trained on the UCF-101 dataset.',
