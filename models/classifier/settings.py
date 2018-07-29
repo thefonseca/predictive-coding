@@ -126,7 +126,7 @@ prednet_base_config.update({
     'training_max_per_class': 0.5,
     'test_index_start': 0.5,
     'test_max_per_class': None, # features_per_video * max_videos_per_class
-    'hidden_dims': [64],
+    'hidden_dims': [32, 32],
     'model_type': 'lstm'
 })
 
@@ -203,6 +203,24 @@ add_config(configs, 'prednet_random_moments_audio',
              'ensemble': ['moments__vgg_imagenet', # 'moments__vgg_imagenet'] 
                           'prednet_kitti_finetuned_moments_10c']
            }, dict())'''
+
+add_config(configs, 'prednet_random__ucf_01', 
+           { 'description': 'A classifier trained on PredNet \
+features extracted from the UCF-101 dataset.',
+             'task': 'full',
+             'seq_length': PREDNET_FEATURES_PER_VIDEO,
+             'batch_size': 20,
+             'min_seq_length': 1,
+             'pad_sequences': True,
+             'average_predictions': True,
+             'training_max_per_class': .95,
+             'training_index_start': 0,
+             'validation_index_start': .95,
+             'test_max_per_class': None,
+             'test_index_start': 0,
+             'training_data_dir': '../prednet/results/prednet_random__ucf_01__representation__full/training',
+             'validation_data_dir': '../prednet/results/prednet_random__ucf_01__representation__full/training',
+             'test_data_dir': '../prednet/results/prednet_random__ucf_01__representation__full/validation'}, prednet_base_config)
 
 add_config(configs, 'prednet_kitti_finetuned_moments_full__ucf_01', 
            { 'description': 'A classifier trained on PredNet \

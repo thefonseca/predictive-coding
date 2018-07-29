@@ -207,7 +207,7 @@ def evaluate(config_name, test_data_dir, hidden_dims,
         return
     
     input_shape = generator.data_shape
-    n_classes = 101 #generator.n_classes
+    n_classes = generator.n_classes
     config['batch_size'] = generator.batch_size
     
     # load best model
