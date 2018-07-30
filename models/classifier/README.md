@@ -55,6 +55,7 @@ This folder contains classification models that are trained on learned represent
 | -------------               | :--: | :---:           | :---: |
 | CNN tuple verification [1]  | 50.2 | UCF-101         | 2.7M  |
 | ConvNet + LSTM []           | xx.x | -               | 0     |
+| PredNet Video random        | 0.97 | -               | 0     |
 | PredNet Video 67h           | 51.9 | Moments in Time | 2.4M  |
 | PredNet Audio 37h           | 24.8 | Moments in Time | 2.4M  |
 
