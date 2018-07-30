@@ -82,6 +82,8 @@ eval_base_config = {
     # extract features only for the last 40% videos
     'training_index_start': 0.6,
     'training_max_per_class': 0.4,
+    'test_index_start': 0.8,
+    'test_max_per_class': 0.2,
     # RESULTS
     'base_results_dir': './results/',
     'n_plot': 20
@@ -191,8 +193,8 @@ add_config(configs, 'prednet_random__ucf_01_audio__representation',
 add_config(configs, 'prednet_random_finetuned_moments_audio__ucf_01__representation', 
            { 'description': 'Using PredNet pre-trained on Moments in Time dataset to extract features.',
              'model_name': 'prednet_random_finetuned_moments_audio',
-             'training_data_dir': os.path.join(UCF_AUDIO_DIR, 'training'),
-             'validation_data_dir': os.path.join(UCF_AUDIO_DIR, 'validation'),
+             'training_data_dir': os.path.join(UCF_AUDIO_DIR, 'train'),
+             'validation_data_dir': os.path.join(UCF_AUDIO_DIR, 'test'),
              'task': 'full',
              'frame_step': 1,
              'min_seq_length': 5,
