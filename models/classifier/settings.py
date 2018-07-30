@@ -126,7 +126,7 @@ prednet_base_config.update({
     'training_max_per_class': 0.5,
     'test_index_start': 0.5,
     'test_max_per_class': None, # features_per_video * max_videos_per_class
-    'hidden_dims': [32, 32],
+    'hidden_dims': [64],
     'model_type': 'lstm'
 })
 
