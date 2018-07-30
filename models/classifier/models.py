@@ -63,7 +63,10 @@ def lstm(input_shape, n_classes, hidden_dims,
     if mask_value is not None:
         x = Masking(mask_value=mask_value)(x)
     for i, dim in enumerate(hidden_dims):
-        x = Bidirectional(LSTM(dim, return_sequences=(i<len(hidden_dims) - 1), dropout=drop_rate), merge_mode='concat')(x)
+        if bidirectional:
+            x = Bidirectional(LSTM(dim, return_sequences=(i<len(hidden_dims) - 1), dropout=drop_rate), merge_mode='concat')(x)
+        else:
+            x = LSTM(dim, return_sequences=(i<len(hidden_dims) - 1), dropout=drop_rate)(x)
     predictions = Dense(n_classes, activation='softmax')(x)
     return Model(inputs=inputs, outputs=predictions)
 
