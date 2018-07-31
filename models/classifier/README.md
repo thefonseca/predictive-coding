@@ -16,12 +16,12 @@ This folder contains classification models that are trained on learned represent
 | Features + Classifier           | 2-class easy | 2-class hard | 5-class | 10-class |
 | -------------                   | :--: | :--: | :--: | :--: |
 | VGG random + SVM                | 67.0 | 56.0 | | 18.7 |
-| VGG ImageNet + SVM              | 85.5 | 67.0 | | 52.8 |
+| VGG ImageNet + SVM              | 85.5 | 67.0 | 44.6 | 52.8 |
 | VGG ImageNet + LSTM             | 87.4 | 58.4 | | 43.2 |
 | PredNet random + SVM            | 67.6 | 62.6 | 37.2 | 30.1 |
 | PredNet KITTI + SVM             | 73.2 | 70.7 | 50.7 | 39.8 |
 | PredNet Moments 3h + SVM        | 73.2 | 66.1 | | 39.5 |
-| PredNet Moments 67h + SVM       | 74.2 | 65.1 | | 41.4 |
+| PredNet Moments 67h + SVM       | 74.2 | 65.1 | 50.9 | 41.4 |
 | PredNet Moments 67h + LSTM      | 82.6 | 55.8 | | 37.1 |
 
 #### Insights
