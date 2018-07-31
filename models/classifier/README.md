@@ -57,7 +57,9 @@ This folder contains classification models that are trained on learned represent
 | ConvNet + LSTM []           | xx.x | -               | 0     |
 | PredNet Video random        | 0.97 | -               | 0     |
 | PredNet Video 67h           | 51.9 | Moments in Time | 2.4M  |
+| PredNet Video random        | 22.7 | -               | 0     |
 | PredNet Audio 37h           | 24.8 | Moments in Time | 2.4M  |
+
 
 [1] Misra, I., Zitnick, C. L., & Hebert, M. (2016, October). [Shuffle and learn: unsupervised learning using temporal order verification](https://link.springer.com/chapter/10.1007/978-3-319-46448-0_32). In European Conference on Computer Vision (pp. 527-544). Springer, Cham.
 
