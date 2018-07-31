@@ -138,7 +138,7 @@ def evaluate(config_name, test_data_dir, base_results_dir,
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train a classifier.')
     parser.add_argument('config', help='experiment config name defined in settings.py')
-    parser.add_argument('-t', '--task', type=str, choices=['2c_easy', '2c_hard', '10c'],
+    parser.add_argument('-t', '--task', type=str, choices=['2c_easy', '2c_hard', '5c_hard', '10c'],
                     help='classification task')
     parser.add_argument('--eval', help='perform only evaluation using pretrained model',
                         action='store_true')
