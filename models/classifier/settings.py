@@ -32,6 +32,9 @@ tasks = {
     '2c_hard': {
         'classes': ['running', 'walking']
     },
+    '5c_hard': {
+        'classes': ['biting', 'climbing', 'running', 'sleeping', 'walking']
+    },
     '10c': {
         'classes': ['barking', 'cooking', 'driving', 'juggling', 'photographing', 
                     'biting', 'climbing', 'running', 'sleeping', 'walking']
