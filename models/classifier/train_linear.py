@@ -9,6 +9,7 @@ import numpy as np
 import random as rn
 from sklearn.metrics import accuracy_score
 from sklearn.svm import LinearSVC
+from sklearn.preprocessing import StandardScaler
 #from sklearn.linear_model import LogisticRegression
 from sklearn.externals import joblib
 
@@ -46,14 +47,18 @@ def train(config_name, training_data_dir, base_results_dir, classes=None,
     
     print('Training linear model...')
     clf = LinearSVC()
+    scaler = StandardScaler()
+    train_X = scaler.fit_transform(train_X)
     #clf = LogisticRegression()
     clf.fit(train_X, train_y)
     
     results_dir = utils.get_create_results_dir(config_name, base_results_dir)
     model_path = os.path.join(results_dir, model_type + '.pkl')
+    scaler_path = os.path.join(results_dir, model_type + '_scaler.pkl')
     joblib.dump(clf, model_path)
+    joblib.dump(scaler, scaler_path)
     
-def evaluate_average(model, data_iterator, n_batches):
+def evaluate_average(model, data_iterator, n_batches, scaler=None):
     predictions = {}
     source_counts = {}
     labels = {}
@@ -69,8 +74,12 @@ def evaluate_average(model, data_iterator, n_batches):
             source = source.split('__')
             source = '__'.join(source[:-1])
             sources.append(os.path.join(category, source))
+        
+        eval_X = [X_.flatten() for X_ in X]
+        if scaler:
+            eval_X = scaler.transform(eval_X)
             
-        preds = model.predict([X_.flatten() for X_ in X])
+        preds = model.predict(eval_X)
         y_pred.extend([int(p) for p in preds])
         y_true.extend([np.argmax(y_) for y_ in y])
         
@@ -116,11 +125,16 @@ def evaluate(config_name, test_data_dir, base_results_dir,
     model_path = os.path.join(results_dir, model_type + '.pkl')
     model = joblib.load(model_path)
     
+    scaler_path = os.path.join(results_dir, model_type + '_scaler.pkl')
+    scaler = None
+    if os.path.exists(scaler_path):
+        scaler = joblib.load(scaler_path)
+    
     if average_predictions:
         # Average predictions for sequences coming from the 
         # same source video
         n_batches = len(test_generator)
-        metrics = evaluate_average(model, iter(test_generator), n_batches)
+        metrics = evaluate_average(model, iter(test_generator), n_batches, scaler=scaler)
         metric_str = ['{}: {}'.format(m, v) for m, v in metrics.items()]
         metric_str = ' - '.join(metric_str)
     else:
