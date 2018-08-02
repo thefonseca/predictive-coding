@@ -3,7 +3,7 @@ import os
 DATA_DIR = '../../datasets/moments_video_frames/'
 AUDIO_DIR = '../../datasets/moments_audio_frames/'
 UCF_DATA_DIR = '../../datasets/ucf_data/'
-UCF_AUDIO_DIR = '../../datasets/ucf_audio/'
+UCF_AUDIO_DIR = '../../datasets/ucf_data/audio'
 FRAMES_PER_VIDEO = 90
 AUDIO_FRAMES_PER_VIDEO = 30
 SEQUENCES_PER_VIDEO = 5
