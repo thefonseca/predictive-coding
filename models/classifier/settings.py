@@ -189,6 +189,13 @@ add_config(configs, 'prednet_random_finetuned_moments_audio_full',
              'validation_data_dir': '../prednet/results/prednet_random_finetuned_moments_audio__representation__full/validation',
              'test_data_dir': '../prednet/results/prednet_random_finetuned_moments_audio__representation__full/training'}, prednet_base_config)
 
+add_config(configs, 'prednet_kitti_finetuned_moments_audio_full',
+           { 'description': 'A classifier trained on PredNet \
+(pretrained on Moments in Time audio) features extracted from the Moments in Time dataset.',
+             'training_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__audio__representation__full/training',
+             'validation_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__audio__representation__full/validation',
+             'test_data_dir': '../prednet/results/prednet_kitti_finetuned_moments__audio__representation__full/training'}, prednet_base_config)
+
 add_config(configs, 'prednet_random_moments_audio',
            { 'description': 'A classifier trained on PredNet \
 (pretrained on Moments in Time audio) features extracted from the Moments in Time dataset.',
