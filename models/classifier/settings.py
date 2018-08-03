@@ -25,6 +25,18 @@ configs['moments__features'] = {
     'validation_data_dir': '../../datasets/moments_video_frames/validation'
 }
 
+configs['moments_audio__features'] = {
+    'description': 'Extract features from Moments in Time dataset',
+    'input_shape': (160, 160, 3),
+    'batch_size': 10,
+    'sample_step': 1,
+    'task': '10c',
+    'model_type': 'vgg_imagenet',
+    'base_results_dir': './results',
+    'training_data_dir': '../../datasets/moments_audio_frames/training',
+    'validation_data_dir': '../../datasets/moments_audio_frames/validation'
+}
+
 tasks = {
     '2c_easy': {
         'classes': ['cooking', 'walking']
