@@ -22,7 +22,7 @@ This folder contains classification models that are trained on learned represent
 | PredNet KITTI + SVM             | 73.2 | 70.7 | 50.7 | 39.8 |
 | PredNet Moments 3h + SVM        | 73.2 | 66.1 | 49.5 | 39.5 |
 | PredNet Moments 67h + SVM       | 74.2 | 65.1 | 50.9 | 41.4 |
-| PredNet Moments 67h + LSTM      | 82.6 | 55.8 | 50.1 | 37.1 |
+| PredNet Moments 67h + LSTM      | 78.6 | 55.8 | 50.1 | 42.9 |
 
 
 #### Insights
