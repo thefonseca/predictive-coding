@@ -142,7 +142,9 @@ prednet_base_config.update({
     'test_index_start': 0.5,
     'test_max_per_class': None, # features_per_video * max_videos_per_class
     'hidden_dims': [64],
-    'model_type': 'lstm'
+    'model_type': 'lstm',
+    'max_seq_per_source': 1
+    
 })
 
 add_config(configs, 'prednet_kitti_moments', 
