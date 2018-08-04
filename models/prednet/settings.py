@@ -99,12 +99,36 @@ add_config(configs, 'prednet_kitti__moments__prediction',
              'model_name': 'prednet_kitti',
              'output_mode': 'prediction' }, eval_base_config)
 
-add_config(configs, 'prednet_random__moments_audio__prediction', 
-           { 'description': 'Training PredNet from scratch on Moments in Time dataset audio spectrograms.',
+add_config(configs, 'prednet_random__moments_audio__prediction',
+           { 'description': 'Evaluating PredNet from scratch on Moments in Time dataset audio spectrograms.',
              'frame_step': 1,
-             'training_data_dir': os.path.join(AUDIO_DIR, 'training'),
-             'validation_data_dir': os.path.join(AUDIO_DIR, 'validation'),
-             'model_name': 'prednet_random' }, eval_base_config)
+             'training_data_dir': None,
+             'validation_data_dir': None,
+             'test_data_dir': os.path.join(AUDIO_DIR, 'training'),
+             'model_name': 'prednet_random',
+             'output_mode': 'prediction'
+            }, eval_base_config)
+
+add_config(configs, 'prednet_kitti__moments_audio__prediction',
+           { 'description': 'Evaluating PredNet KITTI on Moments in Time dataset audio spectrograms.',
+             'frame_step': 1,
+             'training_data_dir': None,
+             'validation_data_dir': None,
+             'test_data_dir': os.path.join(AUDIO_DIR, 'training'),
+             'model_name': 'prednet_kitti',
+             'output_mode': 'prediction'
+            }, eval_base_config)
+
+add_config(configs, 'prednet_kitti_finetuned_moments_audio__prediction',
+           { 'description': 'Evaluating PredNet finetuned Moments on Moments in Time dataset audio spectrograms.',
+             'frame_step': 1,
+             'training_data_dir': None,
+             'validation_data_dir': None,
+             'test_data_dir': os.path.join(AUDIO_DIR, 'training'),
+             'model_name': 'prednet_random_finetuned_moments_audio',
+             'output_mode': 'prediction'
+            }, eval_base_config)
+
 
 add_config(configs, 'prednet_random__moments__representation', 
            { 'description': 'Using PredNet with random weights to extract features.',
