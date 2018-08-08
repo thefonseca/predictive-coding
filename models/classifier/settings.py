@@ -88,6 +88,16 @@ add_config(configs, 'moments__vgg_imagenet',
              'min_seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
              'sample_step': VGG_SAMPLE_STEP }, vgg_base_config)
 
+add_config(configs, 'moments_audio__vgg_imagenet',
+           { 'description': 'A classifier using VGG audio features',
+             'seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
+             'min_seq_length': VGG_FEATURES_PER_VIDEO/VGG_SAMPLE_STEP,
+             'sample_step': VGG_SAMPLE_STEP,
+             'training_data_dir': './results/vgg_imagenet__moments_audio__features__10c/training',
+             'validation_data_dir': './results/vgg_imagenet__moments_audio__features__10c/validation',
+             'test_data_dir': './results/vgg_imagenet__moments_audio__features__10c/training'
+           }, vgg_base_config)
+
 add_config(configs, 'moments__vgg_random',
            { 'description': 'A classifier using VGG features',
              'training_data_dir': './results/vgg_random__moments__features__10c/training',
