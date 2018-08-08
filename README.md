@@ -7,7 +7,7 @@ This project focuses on the use o Deep Predictive Coding models as a more princi
 ## Relevant documents
 * [Project proposal](./informatics-project-proposal.pdf)
 * [Project progress report](./project-progress-report.pdf)
-* [Latest dissertation draft](./dissertation.pdf)
+* [Latest dissertation draft](https://github.com/thefonseca/msc-project/raw/master/dissertation.pdf)
 
 ## Project folders
 * [datasets](./datasets): includes scripts for downloading and preprocessing of the datasets used in the experiments, including the Moments in Time and UCF-101 datasets.
