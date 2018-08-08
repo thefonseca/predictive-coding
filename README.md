@@ -11,8 +11,8 @@ This project focuses on the use o Deep Predictive Coding models as a more princi
 
 ## Project folders
 * [datasets](./datasets): includes scripts for downloading and preprocessing of the datasets used in the experiments, including the Moments in Time and UCF-101 datasets.
-* [models/prednet](./datasets/prednet): the primary model implementation for our study. The model code is adapted from the implementation provided by [Lotter, 2016](#lotter). All the pipeline was reimplemented to fit our experimental needs.
-* [models/classifier](./datasets/classifier): implementation of simple SVM and LSTM classifiers used on top of predictive coding representations.
+* [models/prednet](./models/prednet): the primary model implementation for our study. The model code is adapted from the implementation provided by [Lotter, 2016](#lotter). All the pipeline was reimplemented to fit our experimental needs.
+* [models/classifier](./models/classifier): implementation of simple SVM and LSTM classifiers used on top of predictive coding representations.
 
 __Note for the marker__: all the pre-trained models and generated representations are available in the local disk of [tambo.inf.ed.ac.uk](tambo.inf.ed.ac.uk) in the following folder:
 ```
