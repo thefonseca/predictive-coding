@@ -62,7 +62,7 @@ This folder contains classification models that are trained on learned represent
 | Model                       | UCF-101 RGB (%) | Pre-training dataset | Pre-training size (frames) |
 | -------------               | :--: | :---:           | :---: |
 | CNN tuple verification [1]  | 50.2 | UCF-101         | 2.7M  |
-| ConvNet + LSTM []           | xx.x | -               | 0     |
+| ConvNet + LSTM              | xx.x | -               | 0     |
 | PredNet Video random        | 1.64 | -               | 0     |
 | PredNet Video 67h           | 51.9 | Moments in Time | 2.4M  |
 | PredNet Video random        | 22.7 | -               | 0     |
@@ -70,9 +70,6 @@ This folder contains classification models that are trained on learned represent
 
 
 [1] Misra, I., Zitnick, C. L., & Hebert, M. (2016, October). [Shuffle and learn: unsupervised learning using temporal order verification](https://link.springer.com/chapter/10.1007/978-3-319-46448-0_32). In European Conference on Computer Vision (pp. 527-544). Springer, Cham.
-
-[2] Srivastava, N., Mansimov, E., & Salakhudinov, R. (2015, June). [Unsupervised learning of video representations using lstms](https://arxiv.org/abs/1502.04681). In International conference on machine learning (pp. 843-852).
-
 
 ## Exploring the audio modality
 #### Objectives:
