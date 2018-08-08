@@ -7,7 +7,7 @@ This project focuses on the use o Deep Predictive Coding models as a more princi
 ## Relevant documents
 * [Project proposal](./informatics-project-proposal.pdf)
 * [Project progress report](./project-progress-report.pdf)
-* [Latest dissertation draft](https://v2.overleaf.com/project/5b43d9a5f6f30f51aba60bd1/output/output.pdf?compileGroup=priority&clsiserverid=clsi2-26)
+* [Latest dissertation draft](./dissertation.pdf)
 
 ## Project folders
 * [datasets](./datasets): includes scripts for downloading and preprocessing of the datasets used in the experiments, including the Moments in Time and UCF-101 datasets.
