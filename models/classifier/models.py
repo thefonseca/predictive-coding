@@ -104,13 +104,18 @@ def conv_layer(tensor, filters, dropout, data_format, name):
         x = TimeDistributed(Dropout(dropout), name='dropout_' + name_)(x)
     return x
 
-def lstm_layer(tensor, mask_value, hidden_dims, dropout, name):
+def lstm_layer(tensor, mask_value, hidden_dims, 
+               dropout, name, bidirectional=False, 
+               return_sequences=False):
     x = TimeDistributed(Flatten(), name='flatten_' + name)(tensor)
     if mask_value is not None:
         x = Masking(mask_value=mask_value)(x)
     for dim in hidden_dims:
-        x = Bidirectional(LSTM(dim, return_sequences=False, dropout=dropout), 
-                          merge_mode='concat', name='BiLSTM_' + name)(x)
+        if bidirectional:
+            x = Bidirectional(LSTM(dim, return_sequences=return_sequences, dropout=dropout), 
+                              merge_mode='concat', name='BiLSTM_' + name)(x)
+        else:
+            x = LSTM(dim, return_sequences=return_sequences, dropout=dropout)(x)
     return x
 
 def multistream(input_shape, n_classes, hidden_dims, 
@@ -140,8 +145,6 @@ def multistream(input_shape, n_classes, hidden_dims,
     flat_shapes = [61440, 245760, 122880, 61440]
     filters = [3, 48, 96, 192]
     
-    #prednet_out = crop(1, stride=10, name='timestep_crop')(model.outputs[0])
-    #prednet_out = crop(1, stride=-1, name='invert')(prednet_out)
     prednet_out = model.outputs[0]
     
     for l in range(prednet_layer.nb_layers):
@@ -188,8 +191,8 @@ def prednet_lstm(input_shape, n_classes, hidden_dims,
     for l in model.layers:
         l.trainable = False
     
-    image_input = model.inputs[0]
-    image = lstm_layer(image_input, mask_value, hidden_dims, drop_rate, 'image')
+    #image_input = model.inputs[0]
+    #image = lstm_layer(image_input, mask_value, hidden_dims, drop_rate, 'image')
     
     index = 0
     reps = []
@@ -201,9 +204,12 @@ def prednet_lstm(input_shape, n_classes, hidden_dims,
         
     lstms = []
     for i, r in enumerate(reps):
-        lstms.append(lstm_layer(r, mask_value, hidden_dims, drop_rate, 'r' + str(i)))
+        lstms.append(lstm_layer(r, mask_value, hidden_dims, drop_rate, 
+                                'r' + str(i), return_sequences=True))
     
-    x = Concatenate(axis=1)([image] + [l for l in lstms])
+    #x = Concatenate(axis=1)([image] + [l for l in lstms])
+    x = Concatenate(axis=1)([l for l in lstms])
+    x = lstm_layer(x, mask_value, hidden_dims, drop_rate, 'r' + str(i))
     predictions = Dense(n_classes, activation='softmax')(x)
     model = Model(inputs=model.inputs, outputs=predictions)
     return model

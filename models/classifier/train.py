@@ -162,8 +162,17 @@ def evaluate_average(model, data_iterator, n_batches):
             labels[sources[j]] = y[j]
 
     metrics = {}
-    y_true = K.variable(np.array([y for source, y in sorted(labels.items())]))
-    y_pred = K.variable(np.array([(1. * predictions[s]) / source_counts[s] for s in sorted(predictions.keys())]))
+    y_true = np.array([y for source, y in sorted(labels.items())])
+    y_pred = np.array([(1. * predictions[s]) / source_counts[s] for s in sorted(predictions.keys())])
+
+    predictions = { 'y_true': y_true, 'y_pred': y_pred, 
+                    'sources': sorted(labels.keys()) }
+
+    with open(os.path.join(results_dir, 'predictions.pkl'), 'w') as f:
+        pkl.dump(predictions, f)
+
+    y_true = K.variable(y_true)
+    y_pred = K.variable(y_pred)
 
     loss = categorical_crossentropy(y_true, y_pred)
     metrics['loss'] = K.eval(K.mean(loss))
@@ -221,7 +230,8 @@ def evaluate(config_name, test_data_dir, hidden_dims,
                      drop_rate=0, mask_value=mask_value, **config)
     checkpoint_path = os.path.join(results_dir, model_type + '.hdf5')
     model.load_weights(checkpoint_path)
-    
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam', metrics=['categorical_accuracy']) 
     model.summary()
     
     if average_predictions:
