@@ -118,7 +118,7 @@ def lstm_layer(tensor, mask_value, hidden_dims,
             x = LSTM(dim, return_sequences=return_sequences, dropout=dropout)(x)
     return x
 
-def multistream(input_shape, n_classes, hidden_dims, 
+def multistream2(input_shape, n_classes, hidden_dims, 
                 drop_rate=0.5, mask_value=None, **config):
     if config is None:
         config = {}
@@ -176,7 +176,7 @@ def multistream(input_shape, n_classes, hidden_dims,
     model = Model(inputs=model.inputs, outputs=predictions)
     return model
 
-def prednet_lstm(input_shape, n_classes, hidden_dims, 
+def multistream(input_shape, n_classes, hidden_dims, 
                  drop_rate=0.5, mask_value=None, **config):
     if config is None:
         config = {}
