@@ -14,10 +14,19 @@ This project focuses on the use o Deep Predictive Coding models as a more princi
 * [models/prednet](./models/prednet): the primary model implementation for our study. The model code is adapted from the implementation provided by [Lotter, 2016](#lotter). All the pipeline was reimplemented to fit our experimental needs.
 * [models/classifier](./models/classifier): implementation of simple SVM and LSTM classifiers used on top of predictive coding representations.
 
-__Note to the marker__: all the pre-trained models and generated representations are available in the local disk of [tambo.inf.ed.ac.uk](tambo.inf.ed.ac.uk) in the following folder:
+__Note to the marker__: the datasets, features and pre-trained models are too large to be included in the archive directory. Thus, the files are made available as follows:
+
+* Source code, pre-trained models and generated representations (~1.5TB) are available in the local disk of [tambo.inf.ed.ac.uk](tambo.inf.ed.ac.uk) in the following folder:
 ```
 /disk/scratch/mfonseca/prednet
 ```
+
+* Source code and pre-trained models (~7.5GB) are available in the NAS folder:
+```
+/disk/ocean/mfonseca/prednet
+```
+
+* Source code and LINEAR pre-trained models are available in the submitted archive.
 
 ## Introduction
 
@@ -34,8 +43,6 @@ In the above case, the image features are merely the last layer of an Inception-
 For details refer to [Lotter, 2016](#lotter), Section 2. A reference implementation is provided [here](https://github.com/coxlab/prednet).
 
 ![prednet](./images/prednet.png)
-
-![prednet](./images/prednet-equations.png)
 
 ## References
 
