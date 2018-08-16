@@ -198,7 +198,7 @@ def multistream(input_shape, n_classes, hidden_dims,
     reps = []
     flat_shapes = [61440, 245760, 122880, 61440]
     for l in range(prednet_layer.nb_layers):
-        if l not in [1, 2]:
+        if l not in [1]:
             reps.append(crop(2, index, index + flat_shapes[l])(model.outputs[0]))
         index += flat_shapes[l]
         
@@ -208,8 +208,9 @@ def multistream(input_shape, n_classes, hidden_dims,
                                 'r' + str(i), return_sequences=True))
     
     #x = Concatenate(axis=1)([image] + [l for l in lstms])
-    x = Concatenate(axis=1)([l for l in lstms])
-    x = lstm_layer(x, mask_value, hidden_dims, drop_rate, 'r' + str(i))
+    x = Concatenate(axis=2)([l for l in lstms])
+    x = lstm_layer(x, mask_value, hidden_dims, drop_rate, 
+                   'joint', bidirectional=True)
     predictions = Dense(n_classes, activation='softmax')(x)
     model = Model(inputs=model.inputs, outputs=predictions)
     return model

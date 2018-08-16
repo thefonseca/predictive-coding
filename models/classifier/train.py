@@ -16,6 +16,7 @@ from tqdm import tqdm
 import numpy as np
 import tensorflow as tf
 import random as rn
+import pickle as pkl
 
 # Getting reproducible results:
 # https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
@@ -137,7 +138,7 @@ def gen_multiple(generators):
         y = generators[0].next()[1]
         yield X_list, y
         
-def evaluate_average(model, data_iterator, n_batches):
+def evaluate_average(model, data_iterator, n_batches, results_dir):
     predictions = {}
     source_counts = {}
     labels = {}
@@ -238,7 +239,7 @@ def evaluate(config_name, test_data_dir, hidden_dims,
         # Average predictions for sequences coming from the 
         # same source video
         n_batches = len(generator)
-        metrics = evaluate_average(model, iter(generator), n_batches)
+        metrics = evaluate_average(model, iter(generator), n_batches, results_dir)
         metric_str = ['{}: {}'.format(m, v) for m, v in metrics.items()]
         metric_str = ' - '.join(metric_str)
     else:

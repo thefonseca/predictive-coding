@@ -25,6 +25,18 @@ configs['moments__features'] = {
     'validation_data_dir': '../../datasets/moments_video_frames/validation'
 }
 
+configs['ucf__features'] = {
+    'description': 'Extract features from UCF-101 dataset',
+    'input_shape': (160, 160, 3),
+    'batch_size': 10,
+    'sample_step': 3,
+    'task': 'full',
+    'model_type': 'vgg_imagenet',
+    'base_results_dir': './results',
+    'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
+    'validation_data_dir': os.path.join(UCF_DATA_DIR, 'test_01'),
+}
+
 configs['moments_audio__features'] = {
     'description': 'Extract features from Moments in Time dataset',
     'input_shape': (160, 160, 3),
@@ -329,6 +341,25 @@ features extracted from the UCF-101 dataset.',
              'test_data_dir': '../prednet/results/prednet_finetuned_ucf__ucf_01__representation__full/validation'}, prednet_base_config)
 
 
+add_config(configs, 'vgg_imagenet__ucf_01', 
+           { 'description': 'A classifier trained on VGG Imagenet \
+features extracted from the UCF-101 dataset.',
+             'task': 'full',
+             'seq_length': VGG_FEATURES_PER_VIDEO,
+             'batch_size': 20,
+             'min_seq_length': 4,
+             'pad_sequences': True,
+             'average_predictions': True,
+             'training_max_per_class': .9,
+             'training_index_start': 0,
+             'validation_index_start': .9,
+             'test_max_per_class': None,
+             'test_index_start': 0,
+             'training_data_dir': './results/vgg_imagenet__ucf__features__full/train_01',
+             'validation_data_dir': './results/vgg_imagenet__ucf__features__full/train_01',
+             'test_data_dir': './results/vgg_imagenet__ucf__features__full/test_01'}, prednet_base_config)
+
+
 add_config(configs, 'prednet_finetuned_moments_full__ucf_01', 
            { 'description': 'An end2end Prednet classifier trained on the UCF-101 dataset.',
              'task': 'full',
@@ -344,12 +375,12 @@ add_config(configs, 'prednet_finetuned_moments_full__ucf_01',
              'batch_size': 10,
              'pad_sequences': True,
              'model_type': 'multistream',
-             'hidden_dims': [128],
+             'hidden_dims': [64],
              'dropout': 0.5,
              'average_predictions': True,
-             'training_max_per_class': .95,
+             'training_max_per_class': .9,
              'training_index_start': 0,
-             'validation_index_start': .95,
+             'validation_index_start': .9,
              'test_max_per_class': None,
              'test_index_start': 0,
              #'training_data_dir': '../../datasets/moments_video_frames/training',
