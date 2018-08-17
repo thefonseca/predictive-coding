@@ -26,7 +26,7 @@ __Note to the marker__: the datasets, features and pre-trained models are too la
 /disk/ocean/mfonseca/prednet
 ```
 
-* Source code and pre-trained LINEAR classifiers models (~1GB) are available in the submitted archive.
+* Source code and pre-trained LINEAR classifiers models (~300GB) are available in the submitted archive.
 
 ## Introduction
 
