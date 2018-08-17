@@ -13,7 +13,7 @@ Example: extract features using a PredNet with random weights for data from 3 cl
 * [train.py](./train.py): script to train the predictive coding neural network.
 Example: train PredNet from scratch using data from 10 classes of the Moments in Time dataset (defined in settings.py)
 ```
-> python evaluate.py prednet_random_finetuned_moments__representation --task 10c
+> python train.py prednet_random_finetuned_moments__representation --task 10c
 ```
 
 * [settings.py](./settings.py): parameters for each experiment.
