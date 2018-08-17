@@ -16,17 +16,17 @@ This project focuses on the use o Deep Predictive Coding models as a more princi
 
 __Note to the marker__: the datasets, features and pre-trained models are too large to be included in the archive directory. Thus, the files are made available as follows:
 
-* Source code, pre-trained models and generated representations (~1.5TB) are available in the local disk of [tambo.inf.ed.ac.uk](tambo.inf.ed.ac.uk) in the following folder:
+* Source code, all pre-trained models and generated representations (~1.5TB) are available in the local disk of [tambo.inf.ed.ac.uk](tambo.inf.ed.ac.uk) in the following folder:
 ```
 /disk/scratch/mfonseca/prednet
 ```
 
-* Source code and pre-trained models (~10GB) are available in the NAS folder:
+* Source code and pre-trained classifiers (~10GB) are available in the NAS folder:
 ```
 /disk/ocean/mfonseca/prednet
 ```
 
-* Source code and LINEAR pre-trained models (~1GB) are available in the submitted archive.
+* Source code and pre-trained LINEAR classifiers models (~1GB) are available in the submitted archive.
 
 ## Introduction
 
