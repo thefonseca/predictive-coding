@@ -21,12 +21,12 @@ __Note to the marker__: the datasets, features and pre-trained models are too la
 /disk/scratch/mfonseca/prednet
 ```
 
-* Source code and pre-trained models (~7.5GB) are available in the NAS folder:
+* Source code and pre-trained models (~10GB) are available in the NAS folder:
 ```
 /disk/ocean/mfonseca/prednet
 ```
 
-* Source code and LINEAR pre-trained models are available in the submitted archive.
+* Source code and LINEAR pre-trained models (~1GB) are available in the submitted archive.
 
 ## Introduction
 
