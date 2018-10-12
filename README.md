@@ -18,7 +18,10 @@ Our main contributions are summarised as follows:
 * Based on a theoretical review of the free-energy principle [(Friston, 2010)](#friston_), we analyse some of the architectural limitations of [Lotter et al. (2016)](#lotter) deep learning implementation, in particular, regarding the inference of hidden causes via free energy minimisation.
 * We extend the work of [Lotter et al. (2016)](#lotter) by using predictive coding representations to decode higher-level concepts that require the understanding of world dynamics. The learned representations are evaluated on small-scale tasks and on UCF-101 [(Soomro et al., 2012)](#soomro), a popular action recognition benchmark.
 * We train the predictive coding model on a dataset about 60 times larger than the one used in previous work ([Lotter et al., 2016](#lotter)) and show that model continues to improve future frame predictions, even when the training dataset includes a large number of unrelated classes.
-* Inspired by sensory substitution literature from neuroscience [(Stiles and Shi- mojo, 2015)](#stiles), a novel application of the predictive coding model is proposed for unsupervised representation learning from audio data. Our results suggest that the different modalities provide complementary information that is useful for the action classification task.
+
+![next-frame](./images/next-frame.png)
+
+* Inspired by sensory substitution literature from neuroscience [(Stiles and Shimojo, 2015)](#stiles), a novel application of the predictive coding model is proposed for unsupervised representation learning from audio data. Our results suggest that the different modalities provide complementary information that is useful for the action classification task.
 
 
 ## Relevant documents
