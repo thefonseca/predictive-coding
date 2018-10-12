@@ -2,47 +2,17 @@
 
 ## Abstract
 
-This project focuses on the use o Deep Predictive Coding models as a more principled approach for representation learning on videos. We evaluate the quality of learned representations on supervised problems, including action recognition and language understanding using multimodal aligned information of video, audio, and text.
+In machine learning parlance, common sense reasoning relates to the capacity of _learning representations_ that disentangle hidden factors behind spatiotemporal sensory data. In this work, we hypothesise that the predictive coding theory of perception and learning from neuroscience literature may be a good candidate for implementing such common sense inductive biases. We build upon a previous deep learning implementation of predictive coding by [Lotter et al., 2016](#lotter) and extend its application to the challenging task of inferring abstract, everyday human actions such as _cooking_ and _diving_. Furthermore, we propose a novel application of the same architecture to process auditory data, and find that with a simple sensory substitution trick, the predictive coding model can learning useful representations. Our transfer learning experiments also demonstrate good generalisation of learned representations on the UCF-101 action classification dataset.
 
 ## Relevant documents
 * [Project proposal](./informatics-project-proposal.pdf)
 * [Project progress report](./project-progress-report.pdf)
-* [Latest dissertation draft](https://github.com/thefonseca/msc-project/raw/master/dissertation.pdf)
+* [Latest dissertation version](https://github.com/thefonseca/msc-project/raw/master/dissertation.pdf)
 
 ## Project folders
 * [datasets](./datasets): includes scripts for downloading and preprocessing of the datasets used in the experiments, including the Moments in Time and UCF-101 datasets.
 * [models/prednet](./models/prednet): the primary model implementation for our study. The model code is adapted from the implementation provided by [Lotter, 2016](#lotter). All the pipeline was reimplemented to fit our experimental needs.
 * [models/classifier](./models/classifier): implementation of simple SVM and LSTM classifiers used on top of predictive coding representations.
-
-__Note to the marker__: the datasets, features and pre-trained models are too large to be included in the archive directory. Thus, the files are made available as follows:
-
-* Source code, all pre-trained models and generated representations (~1.5TB) are available in the local disk of [tambo.inf.ed.ac.uk](tambo.inf.ed.ac.uk) in the following folder:
-```
-/disk/scratch/mfonseca/prednet
-```
-
-* Source code and pre-trained classifiers (~45GB) are available in the NAS folder:
-```
-/disk/ocean/mfonseca/prednet
-```
-
-* Source code and pre-trained LINEAR classifiers models (~300GB) are available in the submitted archive.
-
-## Introduction
-
-Deep Predictive Coding networks (PredNets), inspired by the "predictive coding" literature from neuroscience ([Friston, 2009](#friston)), frame the unsupervised learning problem as the capacity of predicting future sensory data in a sequence. These networks can predict complex object movements in synthetic and natural videos, resulting in learned representations that are useful for estimating latent variables like steering angle in an autonomous vehicle setting ([Lotter, 2016](#lotter)).
-
-Given this successful application on videos, we hypothesise that **representations learned using the predictive coding approach could lead to better performance in multimodal tasks involving videos**, such as cross-modal retrieval ([Aytar, 2017](#aytar)), grounded language learning ([Hermann, 2017](#hermann)), and action/event recognition in videos ([Monfort, 2017](#monfort)). Many of the models used in these tasks use a naive approach to extract features from videos, using the last layer of pre-trained image classifiers. To illustrate this point, we show the architecture of the Whodunnit model ([Frermann, 2017](#frermann)):
-
-![whodunnit](./images/whodunnit.png)
-
-In the above case, the image features are merely the last layer of an Inception-v4 convolutional network pre-trained on an object classification task. We believe that PredNets could perform better in this task because they are specifically designed to handle temporal data and, most importantly, they can be trained in an unsupervised way on cheaply available unlabeled video datasets.
-
-## Deep Predictive Coding model
-
-For details refer to [Lotter, 2016](#lotter), Section 2. A reference implementation is provided [here](https://github.com/coxlab/prednet).
-
-![prednet](./images/prednet.png)
 
 ## References
 
