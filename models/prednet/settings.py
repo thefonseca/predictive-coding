@@ -292,6 +292,10 @@ add_config(configs, 'prednet_random__moments__model',
            { 'description': 'Training PredNet from scratch on Moments in Time dataset.',
              'model_name': 'prednet_random' }, train_base_config)
 
+add_config(configs, 'prednet_moments__model',
+           { 'description': 'Training PredNet pre-trained on Moments in Time dataset.',
+             'model_name': 'prednet_kitti_finetuned_moments' }, train_base_config)
+
 add_config(configs, 'prednet__ucf_01__model', 
            { 'description': 'Training PredNet on UCF-101 (split 1) dataset.',
              'training_data_dir': os.path.join(UCF_DATA_DIR, 'train_01'),
