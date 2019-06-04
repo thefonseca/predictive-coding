@@ -24,7 +24,7 @@ def extract_frames(source_dir, dest_dir, splits, categories=None,
         if len(videos) == 0:
             
             if categories is None:
-                all_categories = os.walk(os.path.join(source_dir, split)).next()[1]
+                all_categories = next(os.walk(os.path.join(source_dir, split)))[1]
                 categories = all_categories
                     
             for c in sorted(categories):

@@ -8,6 +8,7 @@ FRAMES_PER_VIDEO = 90
 AUDIO_FRAMES_PER_VIDEO = 30
 SEQUENCES_PER_VIDEO = 5
 
+
 def add_config(configs, name, config, base_config=None):
     new_config = dict()
     if base_config:

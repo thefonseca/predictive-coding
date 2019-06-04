@@ -13,6 +13,7 @@ def get_create_results_dir(experiment_name, base_results_dir, dataset=None):
     if not os.path.exists(results_dir): os.makedirs(results_dir)
     return results_dir
 
+
 def save_experiment_config(experiment_name, base_results_dir, config, dataset=None):   
     results_dir = get_create_results_dir(experiment_name, 
                                          base_results_dir, 
@@ -21,7 +22,8 @@ def save_experiment_config(experiment_name, base_results_dir, config, dataset=No
     for key in sorted(config):
         f.write('{}: {}\n'.format(key, config[key]))
     f.close()
-    
+
+
 def get_config_str(config):
     config_str = ''
     for k, v in sorted(config.items()):
@@ -29,11 +31,13 @@ def get_config_str(config):
             config_str += '    {}: {}\n'.format(k, v)
     return config_str
 
+
 def crop_center(img, cropx, cropy):
     x,y,c = img.shape
     startx = x//2-(cropx//2)
     starty = y//2-(cropy//2)   
     return img[startx:startx+cropx,starty:starty+cropy]
+
 
 def resize_img(img, target_size):
     ratios = [float(target_size[i]) / img.shape[i] for i in range(len(target_size))]
@@ -47,6 +51,7 @@ def resize_img(img, target_size):
     # crop
     img = crop_center(img, target_size[0], target_size[1])
     return img
+
 
 def get_config(FLAGS):
     config = dict()
@@ -82,8 +87,17 @@ def get_config(FLAGS):
         
     if stateful:
         name += '__' + 'stateful'
+
+    if FLAGS.get('train_dir'):
+        config['training_data_dir'] = FLAGS.get('train_dir')
+
+    if FLAGS.get('val_dir'):
+        config['validation_data_dir'] = FLAGS.get('val_dir')
     
     config['_config_name'] = name
     config['_config_name_original'] = FLAGS['config']
-    config.update(tasks[config['task']])
+    if config['task'] in tasks:
+        config.update(tasks[config['task']])
+    else:
+        config['classes'] = None
     return name, config

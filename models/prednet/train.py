@@ -8,21 +8,22 @@ import tensorflow as tf
 import random as rn
 
 from keras import backend as K
-from keras.models import Model
 from keras.callbacks import Callback, LearningRateScheduler, ModelCheckpoint
 from keras.callbacks import CSVLogger, EarlyStopping, LambdaCallback
-from keras.utils.training_utils import multi_gpu_model
-from keras.optimizers import Adam
+# from keras.utils.training_utils import multi_gpu_model
+
 
 # Getting reproducible results:
 # https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
 os.environ['PYTHONHASHSEED'] = '0'
 np.random.seed(42)
 rn.seed(12345)
+
 # Force TensorFlow to use single thread.
 # Multiple threads are a potential source of
 # non-reproducible results.
-# For further details, see: https://stackoverflow.com/questions/42022950/which-seeds-have-to-be-set-where-to-realize-100-reproducibility-of-training-res
+# For further details, see:
+# https://stackoverflow.com/questions/42022950/which-seeds-have-to-be-set-where-to-realize-100-reproducibility-of-training-res
 session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
 tf.set_random_seed(1234)
 sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
@@ -39,7 +40,8 @@ from data import DataGenerator
 class StateResetter(Callback):
     def on_batch_end(self, batch, logs={}):
         self.model.reset_states()
-        
+
+
 class CustomModelCheckpoint(ModelCheckpoint):
     '''
     Trick to use multi_gpu_model. We save the original model instead.
@@ -52,6 +54,7 @@ class CustomModelCheckpoint(ModelCheckpoint):
     def on_epoch_end(self, epoch, logs=None):
         self.model = self.model_to_save
         super(CustomModelCheckpoint, self).on_epoch_end(epoch, logs)
+
 
 def get_callbacks(model, results_dir, stopping_patience=None, stateful=False):
     # start with lr of 0.001 and then drop to 0.0001 after 75 epochs
@@ -77,9 +80,10 @@ def get_callbacks(model, results_dir, stopping_patience=None, stateful=False):
     if stateful:
         callbacks.append(StateResetter())
     return callbacks
-    
+
+
 def train(config_name, training_data_dir, validation_data_dir, 
-          base_results_dir, test_data_dir=None, epochs=150, 
+          base_results_dir, epochs=150,
           use_multiprocessing=False, workers=1, shuffle=True,
           n_timesteps=10, batch_size=4, stopping_patience=None, 
           input_channels=3, input_width=160, input_height=128, 
@@ -89,7 +93,8 @@ def train(config_name, training_data_dir, validation_data_dir,
           validation_index_start=0, validation_max_per_class=None, 
           data_format=K.image_data_format(), 
           seq_overlap=0, **config):
-    
+
+    config['n_timesteps'] = n_timesteps
     model = prednet_model.create_model(train=True, stateful=stateful,
                                        input_channels=input_channels, 
                                        input_width=input_width, 
@@ -104,8 +109,8 @@ def train(config_name, training_data_dir, validation_data_dir,
     with open(json_file, "w") as f:
         f.write(json_string)
     
-    if gpus:
-        model = multi_gpu_model(model, gpus=gpus)
+    # if gpus:
+    #    model = multi_gpu_model(model, gpus=gpus)
     
     model.summary()
     model.compile(loss='mean_absolute_error', optimizer='adam')
@@ -165,8 +170,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train PredNet model.')
     parser.add_argument('config', help='experiment config name defined in moments_settings.py')
     parser.add_argument('--stateful', help='use stateful PredNet model', action='store_true')
-    parser.add_argument('--task', help='use stateful PredNet model', choices=['3c', '10c', 'full'])
+    parser.add_argument('--task', help='use stateful PredNet model', type=str) # choices=['3c', '10c', 'full'])
+    parser.add_argument('--pretrained', type=str, help='choose pre-trained model dataset')
     parser.add_argument('--gpus', type=int, help='number of gpus')
+    parser.add_argument('--train-dir', help='Training dataset directory', type=str)
+    parser.add_argument('--val-dir', help='Training dataset directory', type=str)
     FLAGS, unparsed = parser.parse_known_args()
     
     config_name, config = utils.get_config(vars(FLAGS))

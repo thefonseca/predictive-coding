@@ -8,8 +8,6 @@ import numpy as np
 import pickle as pkl
 import random as rn
 
-import utils
-
 # Getting reproducible results:
 # https://keras.io/getting-started/faq/#how-can-i-obtain-reproducible-results-using-keras-during-development
 os.environ['PYTHONHASHSEED'] = '0'
@@ -55,7 +53,7 @@ class DataGenerator(Sequence):
         self.data_dir = data_dir
         
         if self.classes is None:
-            self.classes = sorted(os.walk(data_dir).next()[1])
+            self.classes = sorted(next(os.walk(data_dir))[1])
         data_pattern = '{}/*'
         
         total_samples = 0
@@ -90,17 +88,16 @@ class DataGenerator(Sequence):
         return self
     
     def __process_class_samples(self, class_index, class_samples, class_sources=None):
-        if self.index_start > 0 and self.index_start < 1:
+        if 0 < self.index_start < 1:
             index_start = int(self.index_start * len(class_samples))
         else:
             index_start = self.index_start
         
-        if self.max_per_class is None or \
-        (index_start < 0 and index_start + self.max_per_class >= 0):
+        if self.max_per_class is None or (index_start < 0 <= index_start + self.max_per_class):
             class_samples = class_samples[index_start::self.sample_step]
             class_sources = class_sources[index_start::self.sample_step]
         else:
-            if self.max_per_class > 0 and self.max_per_class < 1:
+            if 0 < self.max_per_class < 1:
                 index_end = index_start + int(self.max_per_class * len(class_samples))
             else:
                 index_end = index_start + self.max_per_class
@@ -164,8 +161,7 @@ class DataGenerator(Sequence):
             self.data_shape = self.__load_data(0).shape
             print('Data shape: {}'.format(self.data_shape))
         self.on_epoch_end()
-    
-        
+
     def __len__(self):
         'Denotes the number of batches per epoch'
         return int(np.floor(len(self.X) / self.batch_size))
@@ -224,7 +220,7 @@ class DataGenerator(Sequence):
     def __load_image(self, filename):
         img = image.load_img(filename, target_size=self.target_size)
         img = image.img_to_array(img)
-        #img = imread(filename)
+        # img = imread(filename)
         return self.__preprocess(img)
     
     def __load_pickle(self, filename):
@@ -266,7 +262,7 @@ class DataGenerator(Sequence):
     
     def __add_incomplete_sequence(self, seq, source_seq, seqs, source_seqs):
         if self.pad_sequences:
-            padding_item = 'padding' #np.zeros_like(seq[-1])
+            padding_item = 'padding' # np.zeros_like(seq[-1])
             seq.extend([padding_item] * (self.seq_length - len(seq)))
             source_seq.extend([padding_item] * (self.seq_length - len(seq)))
         seqs.append(seq)
@@ -286,12 +282,12 @@ class DataGenerator(Sequence):
             for j in range(i, i + self.seq_length):
                 # NAME_OF__SOURCE__frame_001.pkl => NAME_OF__SOURCE
                 source = '__'.join(sources[j].split('__')[:-1]) 
-                #print(i, j, source)
+                # print(i, j, source)
                 
                 count = self.source_count.get(source, 0)
                 
                 if self.max_seq_per_source and count >= self.max_seq_per_source:
-                    #print('count:', count, samples[j])
+                    # print('count:', count, samples[j])
                     i = j + 1
                     break
                 
@@ -299,9 +295,9 @@ class DataGenerator(Sequence):
                     seq.append(samples[j])
                     source_seq.append(source)
                     
-                    #print('prev_source == source:', i, j)
+                    # print('prev_source == source:', i, j)
                     if len(seq) == self.seq_length:
-                        #print('added:', i, j, source)
+                        # print('added:', i, j, source)
                         seqs.append(seq)
                         source_seqs.append(source_seq)
                         i = j - self.seq_overlap + 1
@@ -315,7 +311,7 @@ class DataGenerator(Sequence):
                     break
                     
                 prev_source = source
-                #print(len(sources), self.seq_overlap)
+                # print(len(sources), self.seq_overlap)
                 if j == len(sources) - 1:
                     if self.min_seq_length <= len(seq):
                         self.__add_incomplete_sequence(seq, source_seq, 
