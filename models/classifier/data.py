@@ -200,6 +200,11 @@ class DataGenerator(Sequence):
          
         if self.output_mode is not None and self.output_mode == 'error':  
             data = (X, np.zeros(self.batch_size, np.float32))
+        elif self.output_mode is not None and self.output_mode == 'category_and_error':
+            data = (X, {
+              'category_prediction': to_categorical(y, num_classes=self.n_classes), 
+              'prednet_error': np.zeros(self.batch_size, np.float32)
+              })
         else:
             data = (X, to_categorical(y, num_classes=self.n_classes))
         
